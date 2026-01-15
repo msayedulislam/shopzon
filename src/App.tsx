@@ -52,6 +52,8 @@ const App = () => (
             <Route path="/cart" element={<CartPage />} />
             <Route path="/flash-sale" element={<ProductsPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/register" element={<AuthPage />} />
+            <Route path="/login" element={<AuthPage />} />
 
             {/* Protected Routes */}
             <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
