@@ -1,0 +1,206 @@
+import { useState, useEffect } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingBag,
+  DollarSign,
+  Settings,
+  LogOut,
+  Menu,
+  Store,
+  AlertCircle,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+
+const menuItems = [
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/seller/dashboard' },
+  { icon: Package, label: 'Products', path: '/seller/dashboard/products' },
+  { icon: ShoppingBag, label: 'Orders', path: '/seller/dashboard/orders' },
+  { icon: DollarSign, label: 'Earnings', path: '/seller/dashboard/earnings' },
+  { icon: Settings, label: 'Settings', path: '/seller/dashboard/settings' },
+];
+
+export default function SellerDashboard() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const [seller, setSeller] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchSeller();
+    }
+  }, [user]);
+
+  const fetchSeller = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('sellers')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        navigate('/seller/register');
+        return;
+      }
+
+      setSeller(data);
+    } catch (error) {
+      console.error('Error fetching seller:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  const Sidebar = () => (
+    <div className="h-full flex flex-col">
+      {/* Logo */}
+      <div className="p-4 border-b">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-xl">B</span>
+          </div>
+          <div>
+            <span className="font-display font-bold">BDMart</span>
+            <p className="text-xs text-muted-foreground">Seller Center</p>
+          </div>
+        </Link>
+      </div>
+
+      {/* Seller Info */}
+      <div className="p-4 border-b">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <Store className="h-5 w-5 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold truncate">{seller?.shop_name}</p>
+            <Badge
+              className={
+                seller?.status === 'active'
+                  ? 'bg-green-100 text-green-800'
+                  : seller?.status === 'pending'
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : 'bg-red-100 text-red-800'
+              }
+            >
+              {seller?.status}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* Pending Approval Notice */}
+      {seller?.status === 'pending' && (
+        <div className="p-4 m-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <div className="flex gap-2">
+            <AlertCircle className="h-5 w-5 text-yellow-600 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-yellow-800">Pending Approval</p>
+              <p className="text-xs text-yellow-700">
+                Your shop is under review. You can add products but they won't be visible until approved.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <div className="space-y-1">
+          {menuItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                location.pathname === item.path
+                  ? 'bg-primary text-primary-foreground'
+                  : 'hover:bg-secondary'
+              }`}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      {/* Sign Out */}
+      <div className="p-4 border-t">
+        <button
+          onClick={handleSignOut}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-destructive hover:bg-destructive/10 transition-colors"
+        >
+          <LogOut className="h-5 w-5" />
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:block w-64 bg-card border-r shrink-0">
+        <Sidebar />
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
+        <header className="h-16 border-b bg-card flex items-center justify-between px-4 lg:px-6">
+          {/* Mobile Menu */}
+          <Sheet>
+            <SheetTrigger asChild className="lg:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-64">
+              <Sidebar />
+            </SheetContent>
+          </Sheet>
+
+          <div className="hidden lg:block">
+            <h1 className="font-semibold">Seller Dashboard</h1>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+              ← Back to Store
+            </Link>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 p-4 lg:p-6 bg-secondary/30 overflow-auto">
+          <Outlet context={{ seller, fetchSeller }} />
+        </main>
+      </div>
+    </div>
+  );
+}
