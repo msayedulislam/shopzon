@@ -29,6 +29,7 @@ import SellerProducts from "./pages/seller/SellerProducts";
 
 // Admin
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminSellers from "./pages/admin/AdminSellers";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -75,6 +76,7 @@ const App = () => (
             </Route>
 
             {/* Admin Routes */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>}>
               <Route index element={<AdminOverview />} />
               <Route path="sellers" element={<AdminSellers />} />
