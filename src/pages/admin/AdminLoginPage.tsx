@@ -17,18 +17,20 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [checkingRole, setCheckingRole] = useState(false);
   
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
-  const { signIn, user, isAdmin, loading: authLoading } = useAuth();
+  const { signIn, user, isAdmin, roles, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authLoading && user) {
+    // Only check roles after user is logged in and roles have been fetched
+    if (!authLoading && user && roles.length > 0) {
       if (isAdmin) {
         navigate('/admin');
       } else {
@@ -40,7 +42,12 @@ export default function AdminLoginPage() {
         navigate('/');
       }
     }
-  }, [user, isAdmin, authLoading, navigate, toast]);
+    
+    // Handle case where user just logged in but roles haven't loaded yet
+    if (!authLoading && user && roles.length === 0 && !checkingRole) {
+      setCheckingRole(true);
+    }
+  }, [user, isAdmin, roles, authLoading, navigate, toast, checkingRole]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -200,9 +207,9 @@ export default function AdminLoginPage() {
             <Button 
               type="submit" 
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-12 text-base font-semibold" 
-              disabled={loading}
+              disabled={loading || checkingRole}
             >
-              {loading ? (
+              {loading || checkingRole ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <>
