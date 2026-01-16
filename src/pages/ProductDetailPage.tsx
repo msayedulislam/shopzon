@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Minus, Plus, Check, Share2, ChevronRight, Award, Package } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
@@ -11,10 +11,14 @@ import { useCart } from '@/hooks/useCart';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const { addItem } = useCart();
+  const { user } = useAuth();
   const product = products.find((p) => p.slug === slug) || products[0];
   
   const [selectedImage, setSelectedImage] = useState(0);
@@ -26,6 +30,7 @@ export default function ProductDetailPage() {
     product.variations?.find((v) => v.type === 'size')?.value || ''
   );
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const colorVariations = product.variations?.filter((v) => v.type === 'color') || [];
   const sizeVariations = product.variations?.filter((v) => v.type === 'size') || [];
@@ -33,6 +38,51 @@ export default function ProductDetailPage() {
   const relatedProducts = products.filter(
     (p) => p.category.id === product.category.id && p.id !== product.id
   ).slice(0, 4);
+
+  // Check if product is in wishlist
+  useEffect(() => {
+    const checkWishlist = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('wishlists')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('product_id', product.id)
+        .maybeSingle();
+      setIsWishlisted(!!data);
+    };
+    checkWishlist();
+  }, [user, product.id]);
+
+  const handleWishlistToggle = async () => {
+    if (!user) {
+      toast.error('Please login to add items to wishlist');
+      return;
+    }
+
+    setWishlistLoading(true);
+    try {
+      if (isWishlisted) {
+        await supabase
+          .from('wishlists')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('product_id', product.id);
+        setIsWishlisted(false);
+        toast.success('Removed from wishlist');
+      } else {
+        await supabase
+          .from('wishlists')
+          .insert({ user_id: user.id, product_id: product.id });
+        setIsWishlisted(true);
+        toast.success('Added to wishlist');
+      }
+    } catch (error) {
+      toast.error('Failed to update wishlist');
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   const handleAddToCart = () => {
     addItem(product, quantity);
@@ -94,8 +144,9 @@ export default function ProductDetailPage() {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
-                    className="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:shadow-xl transition-all"
-                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    className="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                    onClick={handleWishlistToggle}
+                    disabled={wishlistLoading}
                   >
                     <Heart className={`h-5 w-5 transition-all ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600 dark:text-gray-300'}`} />
                   </motion.button>
