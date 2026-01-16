@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
 
+import { MessageSquare, BookOpen } from 'lucide-react';
+
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
   { icon: Users, label: 'Users', path: '/admin/users' },
@@ -29,6 +31,8 @@ const menuItems = [
   { icon: Tag, label: 'Brands', path: '/admin/brands' },
   { icon: Ticket, label: 'Coupons', path: '/admin/coupons' },
   { icon: FileText, label: 'Pages', path: '/admin/pages' },
+  { icon: BookOpen, label: 'Blog', path: '/admin/blog' },
+  { icon: MessageSquare, label: 'Inquiries', path: '/admin/inquiries' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/logs' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
