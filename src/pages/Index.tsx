@@ -4,7 +4,10 @@ import { HeroSection } from '@/components/home/HeroSection';
 import { CategoriesSection } from '@/components/home/CategoriesSection';
 import { FlashSaleSection } from '@/components/home/FlashSaleSection';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
-import { FeaturesSection } from '@/components/home/FeaturesSection';
+import { NewArrivalSection } from '@/components/home/NewArrivalSection';
+import { NewCollectionSection } from '@/components/home/NewCollectionSection';
+import { FreeDeliverySection } from '@/components/home/FreeDeliverySection';
+import { DiscountProductSection } from '@/components/home/DiscountProductSection';
 import { PromoBanners } from '@/components/home/PromoBanners';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 
@@ -14,11 +17,14 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <HeroSection />
-        <FeaturesSection />
         <CategoriesSection />
         <FlashSaleSection />
         <PromoBanners />
         <FeaturedProducts />
+        <NewArrivalSection />
+        <NewCollectionSection />
+        <FreeDeliverySection />
+        <DiscountProductSection />
         <TestimonialsSection />
       </main>
       <Footer />
