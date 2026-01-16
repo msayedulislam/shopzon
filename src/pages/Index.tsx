@@ -4,7 +4,6 @@ import { HeroSection } from '@/components/home/HeroSection';
 import { CategoriesSection } from '@/components/home/CategoriesSection';
 import { FlashSaleSection } from '@/components/home/FlashSaleSection';
 import { NewArrivalSection } from '@/components/home/NewArrivalSection';
-import { NewCollectionSection } from '@/components/home/NewCollectionSection';
 import { FreeDeliverySection } from '@/components/home/FreeDeliverySection';
 import { DiscountProductSection } from '@/components/home/DiscountProductSection';
 import { MarketingFeatures } from '@/components/home/MarketingFeatures';
@@ -12,6 +11,7 @@ import { AllProductsSection } from '@/components/home/AllProductsSection';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { BestSellingSection } from '@/components/home/BestSellingSection';
 import { TopSellersSection } from '@/components/home/TopSellersSection';
+import { TrendingDealsSection } from '@/components/home/TrendingDealsSection';
 
 const Index = () => {
   return (
@@ -24,7 +24,7 @@ const Index = () => {
         <FlashSaleSection />
         <BestSellingSection />
         <NewArrivalSection />
-        <NewCollectionSection />
+        <TrendingDealsSection />
         <FreeDeliverySection />
         <DiscountProductSection />
         <AllProductsSection />
