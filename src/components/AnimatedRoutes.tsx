@@ -33,6 +33,10 @@ import AdminOverview from '@/pages/admin/AdminOverview';
 import AdminSellers from '@/pages/admin/AdminSellers';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminOrders from '@/pages/admin/AdminOrders';
+import AdminPages from '@/pages/admin/AdminPages';
+
+// Static Pages
+import StaticPage from '@/pages/StaticPage';
 
 export function AnimatedRoutes() {
   const location = useLocation();
@@ -77,7 +81,24 @@ export function AnimatedRoutes() {
           <Route path="sellers" element={<AdminSellers />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="pages" element={<AdminPages />} />
         </Route>
+
+        {/* Static Pages */}
+        <Route path="/about-us" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/contact-us" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/careers" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/blog" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/faqs" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/privacy-policy" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/terms-conditions" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/track-order" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/returns-exchanges" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/refund-policy" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/shipping-info" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/seller-policy" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/payment-methods" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/help-center" element={<PageTransition><StaticPage /></PageTransition>} />
 
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
