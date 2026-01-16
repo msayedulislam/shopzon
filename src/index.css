@@ -222,12 +222,12 @@
     border: 1px solid rgba(239, 68, 68, 0.2);
   }
 
-  /* Premium Hero Button Styles */
+  /* Premium Hero Button Styles - Solid Dark Red */
   .btn-hero {
     @apply inline-flex items-center justify-center gap-3 px-10 py-5 text-lg font-semibold rounded-2xl transition-all duration-500 relative overflow-hidden;
-    background: var(--gradient-premium);
+    background: hsl(0 72% 45%);
     color: hsl(var(--primary-foreground));
-    box-shadow: var(--shadow-accent), 0 0 40px hsl(0 84% 60% / 0.3);
+    box-shadow: 0 8px 24px hsl(0 72% 45% / 0.4), 0 0 40px hsl(0 72% 45% / 0.2);
   }
 
   .btn-hero::before {
@@ -237,7 +237,7 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
     transition: left 0.6s ease;
   }
 
@@ -246,21 +246,21 @@
   }
 
   .btn-hero:hover {
+    background: hsl(0 72% 40%);
     transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 40px hsl(0 84% 60% / 0.5), 0 0 60px hsl(0 84% 60% / 0.3);
+    box-shadow: 0 12px 40px hsl(0 72% 45% / 0.5), 0 0 60px hsl(0 72% 45% / 0.3);
   }
 
   .btn-hero-outline {
     @apply inline-flex items-center justify-center gap-3 px-10 py-5 text-lg font-semibold rounded-2xl transition-all duration-500;
-    @apply border-2 border-white/20 text-white;
-    background: rgba(255, 255, 255, 0.05);
+    @apply border-2 border-primary/40 text-foreground;
+    background: transparent;
     backdrop-filter: blur(10px);
   }
 
   .btn-hero-outline:hover {
-    @apply border-primary/60;
-    background: rgba(239, 68, 68, 0.15);
-    box-shadow: 0 0 30px hsl(0 84% 60% / 0.3);
+    @apply border-primary bg-primary/10;
+    box-shadow: 0 0 30px hsl(0 72% 45% / 0.3);
     transform: translateY(-2px);
   }
 
