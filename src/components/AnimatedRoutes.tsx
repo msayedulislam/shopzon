@@ -34,9 +34,15 @@ import AdminSellers from '@/pages/admin/AdminSellers';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminOrders from '@/pages/admin/AdminOrders';
 import AdminPages from '@/pages/admin/AdminPages';
+import AdminBlog from '@/pages/admin/AdminBlog';
+import AdminInquiries from '@/pages/admin/AdminInquiries';
 
 // Static Pages
 import StaticPage from '@/pages/StaticPage';
+
+// Blog
+import BlogPage from '@/pages/BlogPage';
+import BlogPostPage from '@/pages/BlogPostPage';
 
 export function AnimatedRoutes() {
   const location = useLocation();
@@ -82,13 +88,16 @@ export function AnimatedRoutes() {
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="pages" element={<AdminPages />} />
+          <Route path="blog" element={<AdminBlog />} />
+          <Route path="inquiries" element={<AdminInquiries />} />
         </Route>
 
         {/* Static Pages */}
         <Route path="/about-us" element={<PageTransition><StaticPage /></PageTransition>} />
         <Route path="/contact-us" element={<PageTransition><StaticPage /></PageTransition>} />
         <Route path="/careers" element={<PageTransition><StaticPage /></PageTransition>} />
-        <Route path="/blog" element={<PageTransition><StaticPage /></PageTransition>} />
+        <Route path="/blog" element={<PageTransition><BlogPage /></PageTransition>} />
+        <Route path="/blog/:slug" element={<PageTransition><BlogPostPage /></PageTransition>} />
         <Route path="/faqs" element={<PageTransition><StaticPage /></PageTransition>} />
         <Route path="/privacy-policy" element={<PageTransition><StaticPage /></PageTransition>} />
         <Route path="/terms-conditions" element={<PageTransition><StaticPage /></PageTransition>} />

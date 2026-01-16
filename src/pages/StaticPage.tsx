@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Home, FileText, Phone, Mail, MapPin, Clock, Users, Package, Truck, CreditCard, HelpCircle, Shield, BookOpen, Briefcase, MessageSquare, Search, ChevronRight, Send, CheckCircle, Loader2 } from 'lucide-react';
+import { TrackOrderForm } from '@/components/TrackOrderForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -431,32 +432,8 @@ export default function StaticPage() {
           >
             {/* Track Order Form */}
             {slug === 'track-order' && (
-              <div className="glass-card rounded-2xl p-6 md:p-8 mb-8 shadow-lg border border-border">
-                <h2 className="text-xl font-bold text-foreground mb-6">Track Your Order</h2>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Order Number</label>
-                    <Input 
-                      placeholder="e.g., BDM-20240115-12345"
-                      value={orderNumber}
-                      onChange={(e) => setOrderNumber(e.target.value)}
-                      className="h-12"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Phone Number</label>
-                    <Input 
-                      placeholder="e.g., 01712345678"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="h-12"
-                    />
-                  </div>
-                </div>
-                <Button className="w-full md:w-auto mt-6 h-12 px-8" size="lg">
-                  <Search className="h-4 w-4 mr-2" />
-                  Track Order
-                </Button>
+              <div className="mb-8">
+                <TrackOrderForm />
               </div>
             )}
 
