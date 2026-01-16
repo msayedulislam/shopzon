@@ -1,20 +1,23 @@
 import { Link } from 'react-router-dom';
-import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, Tag } from 'lucide-react';
+import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, Tag, LogIn } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
 import { formatPrice } from '@/data/mockData';
 import { useState } from 'react';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getSubtotal } = useCart();
+  const { user } = useAuth();
   const [couponCode, setCouponCode] = useState('');
   
   const subtotal = getSubtotal();
   const deliveryCharge = subtotal > 5000 ? 0 : 60;
   const total = subtotal + deliveryCharge;
+  const isLoggedIn = !!user;
 
   if (items.length === 0) {
     return (
@@ -211,12 +214,29 @@ export default function CartPage() {
                 </div>
 
                 {/* Checkout Button */}
-                <Link to="/checkout" className="block mt-6">
-                  <Button className="w-full btn-hero">
-                    Proceed to Checkout
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </Link>
+                {isLoggedIn ? (
+                  <Link to="/checkout" className="block mt-6">
+                    <Button className="w-full btn-hero">
+                      Proceed to Checkout
+                      <ArrowRight className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <div className="mt-6 space-y-3">
+                    <Link to="/auth?mode=login" className="block">
+                      <Button className="w-full btn-hero">
+                        <LogIn className="h-5 w-5" />
+                        Login to Checkout
+                      </Button>
+                    </Link>
+                    <p className="text-xs text-center text-muted-foreground">
+                      Don't have an account?{' '}
+                      <Link to="/auth?mode=register" className="text-primary hover:underline">
+                        Sign up
+                      </Link>
+                    </p>
+                  </div>
+                )}
 
                 {/* Trust Badges */}
                 <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t">
