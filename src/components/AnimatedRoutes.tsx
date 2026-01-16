@@ -15,6 +15,7 @@ import NotFound from '@/pages/NotFound';
 
 // User Dashboard
 import UserDashboard from '@/pages/dashboard/UserDashboard';
+import DashboardOverview from '@/pages/dashboard/DashboardOverview';
 import ProfilePage from '@/pages/dashboard/ProfilePage';
 import OrdersPage from '@/pages/dashboard/OrdersPage';
 import DashboardWishlistPage from '@/pages/dashboard/WishlistPage';
@@ -70,7 +71,8 @@ export function AnimatedRoutes() {
 
         {/* User Dashboard */}
         <Route path="/dashboard" element={<ProtectedRoute><PageTransition><UserDashboard /></PageTransition></ProtectedRoute>}>
-          <Route index element={<ProfilePage />} />
+          <Route index element={<DashboardOverview />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="wishlist" element={<DashboardWishlistPage />} />
           <Route path="addresses" element={<AddressesPage />} />
