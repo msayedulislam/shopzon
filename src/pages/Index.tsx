@@ -13,6 +13,7 @@ import { AllProductsSection } from '@/components/home/AllProductsSection';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { BestSellingSection } from '@/components/home/BestSellingSection';
 import { TopSellersSection } from '@/components/home/TopSellersSection';
+import { BrandLogosSection } from '@/components/home/BrandLogosSection';
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
         <HeroSection />
         <MarketingFeatures />
         <CategoriesSection />
+        <BrandLogosSection />
         <FlashSaleSection />
         <FeaturedProducts />
         <BestSellingSection />
