@@ -303,3 +303,6 @@ export const getFlashSaleProducts = () => products.filter(p => p.isFlashSale);
 export const getFeaturedProducts = () => products.filter(p => p.isFeatured);
 export const getProductsByCategory = (slug: string) => 
   products.filter(p => p.category.slug === slug);
+export const getNewArrivals = () => [...products].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+export const getFreeDeliveryProducts = () => products.filter(p => p.freeDelivery);
+export const getDiscountProducts = () => products.filter(p => p.discount && p.discount > 10).sort((a, b) => (b.discount || 0) - (a.discount || 0));
