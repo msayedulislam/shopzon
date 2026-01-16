@@ -306,3 +306,4 @@ export const getProductsByCategory = (slug: string) =>
 export const getNewArrivals = () => [...products].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 export const getFreeDeliveryProducts = () => products.filter(p => p.freeDelivery);
 export const getDiscountProducts = () => products.filter(p => p.discount && p.discount > 10).sort((a, b) => (b.discount || 0) - (a.discount || 0));
+export const getBestSellingProducts = () => [...products].sort((a, b) => b.sold - a.sold);
