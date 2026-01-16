@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { products, formatPrice } from '@/data/mockData';
 import { useCart } from '@/hooks/useCart';
 import { ProductCard } from '@/components/product/ProductCard';
+import { ProductReviews } from '@/components/product/ProductReviews';
 import { motion } from 'framer-motion';
 
 export default function ProductDetailPage() {
@@ -409,41 +410,11 @@ export default function ProductDetailPage() {
               </motion.div>
             </TabsContent>
             <TabsContent value="reviews" className="mt-0">
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-card rounded-b-2xl rounded-tr-2xl p-8 border border-border/50 shadow-sm"
-              >
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-8 mb-8">
-                  <div className="text-center p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl">
-                    <p className="text-5xl font-bold text-primary mb-2">{product.rating}</p>
-                    <div className="flex items-center gap-0.5 justify-center mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 fill-amber-500 text-amber-500" />
-                      ))}
-                    </div>
-                    <p className="text-sm text-muted-foreground font-medium">{product.reviewCount} reviews</p>
-                  </div>
-                  <div className="flex-1 w-full">
-                    {[5, 4, 3, 2, 1].map((star) => (
-                      <div key={star} className="flex items-center gap-3 mb-2">
-                        <span className="text-sm w-4 font-semibold">{star}</span>
-                        <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-                        <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${star * 18}%` }}
-                            transition={{ duration: 0.5, delay: star * 0.1 }}
-                            className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"
-                          />
-                        </div>
-                        <span className="text-sm text-muted-foreground w-10">{Math.round(star * 18)}%</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <Button className="w-full h-12 font-semibold bg-primary hover:bg-primary/90">Write a Review</Button>
-              </motion.div>
+              <ProductReviews 
+                productId={product.id} 
+                productRating={product.rating} 
+                reviewCount={product.reviewCount} 
+              />
             </TabsContent>
           </Tabs>
         </div>
