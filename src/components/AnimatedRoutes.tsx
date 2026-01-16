@@ -17,7 +17,7 @@ import NotFound from '@/pages/NotFound';
 import UserDashboard from '@/pages/dashboard/UserDashboard';
 import ProfilePage from '@/pages/dashboard/ProfilePage';
 import OrdersPage from '@/pages/dashboard/OrdersPage';
-import WishlistPage from '@/pages/dashboard/WishlistPage';
+import DashboardWishlistPage from '@/pages/dashboard/WishlistPage';
 import AddressesPage from '@/pages/dashboard/AddressesPage';
 
 // Seller
@@ -37,12 +37,14 @@ import AdminPages from '@/pages/admin/AdminPages';
 import AdminBlog from '@/pages/admin/AdminBlog';
 import AdminInquiries from '@/pages/admin/AdminInquiries';
 
-// Static Pages
 import StaticPage from '@/pages/StaticPage';
 
 // Blog
 import BlogPage from '@/pages/BlogPage';
 import BlogPostPage from '@/pages/BlogPostPage';
+
+// Wishlist
+import WishlistPage from '@/pages/WishlistPage';
 
 export function AnimatedRoutes() {
   const location = useLocation();
@@ -60,6 +62,7 @@ export function AnimatedRoutes() {
         <Route path="/auth" element={<PageTransition><AuthPage /></PageTransition>} />
         <Route path="/register" element={<PageTransition><AuthPage /></PageTransition>} />
         <Route path="/login" element={<PageTransition><AuthPage /></PageTransition>} />
+        <Route path="/wishlist" element={<PageTransition><WishlistPage /></PageTransition>} />
 
         {/* Protected Routes */}
         <Route path="/checkout" element={<ProtectedRoute><PageTransition><CheckoutPage /></PageTransition></ProtectedRoute>} />
@@ -69,7 +72,7 @@ export function AnimatedRoutes() {
         <Route path="/dashboard" element={<ProtectedRoute><PageTransition><UserDashboard /></PageTransition></ProtectedRoute>}>
           <Route index element={<ProfilePage />} />
           <Route path="orders" element={<OrdersPage />} />
-          <Route path="wishlist" element={<WishlistPage />} />
+          <Route path="wishlist" element={<DashboardWishlistPage />} />
           <Route path="addresses" element={<AddressesPage />} />
         </Route>
 
