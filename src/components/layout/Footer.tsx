@@ -1,31 +1,35 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin, Heart, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="relative overflow-hidden">
       {/* Newsletter Section */}
-      <div className="bg-primary">
-        <div className="container py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-              <h3 className="text-xl font-display font-bold text-primary-foreground">
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+        
+        <div className="container relative py-12">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="text-center lg:text-left">
+              <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 Subscribe to Our Newsletter
               </h3>
-              <p className="text-primary-foreground/80 text-sm mt-1">
+              <p className="text-primary-foreground/80">
                 Get exclusive offers and updates delivered to your inbox
               </p>
             </div>
-            <div className="flex w-full md:w-auto gap-2">
+            <div className="flex w-full lg:w-auto gap-3">
               <Input
                 type="email"
                 placeholder="Enter your email"
-                className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 w-full md:w-80"
+                className="h-14 rounded-2xl bg-white/10 border-white/20 text-primary-foreground placeholder:text-primary-foreground/60 w-full lg:w-96 focus:border-white/40"
               />
-              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground shrink-0">
+              <Button className="h-14 px-8 rounded-2xl bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
                 Subscribe
+                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
           </div>
@@ -33,170 +37,142 @@ export function Footer() {
       </div>
 
       {/* Main Footer */}
-      <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand & Contact */}
-          <div>
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xl">B</span>
-              </div>
-              <span className="font-display font-bold text-xl">BDMart</span>
-            </Link>
-            <p className="text-background/70 text-sm mb-4">
-              Bangladesh's trusted online marketplace for quality products at the best prices.
-            </p>
-            <div className="space-y-2 text-sm">
-              <a href="tel:+8801234567890" className="flex items-center gap-2 text-background/70 hover:text-background">
-                <Phone className="h-4 w-4" />
-                +880 1234-567890
-              </a>
-              <a href="mailto:support@bdmart.com" className="flex items-center gap-2 text-background/70 hover:text-background">
-                <Mail className="h-4 w-4" />
-                support@bdmart.com
-              </a>
-              <p className="flex items-center gap-2 text-background/70">
-                <MapPin className="h-4 w-4" />
-                Dhaka, Bangladesh
+      <div className="bg-background border-t border-white/5">
+        <div className="container py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            {/* Brand & Contact */}
+            <div>
+              <Link to="/" className="flex items-center gap-3 mb-6 group">
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow group-hover:shadow-accent transition-shadow duration-500">
+                  <span className="text-primary-foreground font-bold text-2xl">B</span>
+                </div>
+                <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <span className="text-gradient">BD</span>Mart
+                </span>
+              </Link>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Bangladesh's premium online marketplace for quality products at unbeatable prices.
               </p>
+              <div className="space-y-3">
+                <a href="tel:+8801234567890" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors duration-300">
+                  <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
+                    <Phone className="h-4 w-4" />
+                  </div>
+                  +880 1234-567890
+                </a>
+                <a href="mailto:support@bdmart.com" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors duration-300">
+                  <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  support@bdmart.com
+                </a>
+                <p className="flex items-center gap-3 text-muted-foreground">
+                  <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                  Dhaka, Bangladesh
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="font-bold text-lg mb-6 text-foreground">Quick Links</h4>
+              <ul className="space-y-3">
+                {['About Us', 'Contact Us', 'Careers', 'Blog', 'FAQs'].map((item) => (
+                  <li key={item}>
+                    <Link 
+                      to={`/${item.toLowerCase().replace(' ', '-')}`} 
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-2 group"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Customer Service */}
+            <div>
+              <h4 className="font-bold text-lg mb-6 text-foreground">Customer Service</h4>
+              <ul className="space-y-3">
+                {['Track Order', 'Returns & Exchanges', 'Shipping Info', 'Payment Methods', 'Help Center'].map((item) => (
+                  <li key={item}>
+                    <Link 
+                      to={`/${item.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} 
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-2 group"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Policies */}
+            <div>
+              <h4 className="font-bold text-lg mb-6 text-foreground">Policies</h4>
+              <ul className="space-y-3">
+                {['Privacy Policy', 'Terms & Conditions', 'Refund Policy', 'Seller Policy'].map((item) => (
+                  <li key={item}>
+                    <Link 
+                      to={`/${item.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} 
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-2 group"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/about" className="text-background/70 hover:text-background transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-background/70 hover:text-background transition-colors">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/careers" className="text-background/70 hover:text-background transition-colors">
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="text-background/70 hover:text-background transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link to="/faq" className="text-background/70 hover:text-background transition-colors">
-                  FAQs
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Customer Service */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Customer Service</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/track-order" className="text-background/70 hover:text-background transition-colors">
-                  Track Order
-                </Link>
-              </li>
-              <li>
-                <Link to="/returns" className="text-background/70 hover:text-background transition-colors">
-                  Returns & Exchanges
-                </Link>
-              </li>
-              <li>
-                <Link to="/shipping" className="text-background/70 hover:text-background transition-colors">
-                  Shipping Info
-                </Link>
-              </li>
-              <li>
-                <Link to="/payment-methods" className="text-background/70 hover:text-background transition-colors">
-                  Payment Methods
-                </Link>
-              </li>
-              <li>
-                <Link to="/support" className="text-background/70 hover:text-background transition-colors">
-                  Help Center
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Policies */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Policies</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/privacy-policy" className="text-background/70 hover:text-background transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/terms" className="text-background/70 hover:text-background transition-colors">
-                  Terms & Conditions
-                </Link>
-              </li>
-              <li>
-                <Link to="/refund-policy" className="text-background/70 hover:text-background transition-colors">
-                  Refund Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/seller-policy" className="text-background/70 hover:text-background transition-colors">
-                  Seller Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Payment Methods & Social */}
-        <div className="mt-12 pt-8 border-t border-background/10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-background/70">Payment Partners:</span>
-              <div className="flex items-center gap-2">
-                <div className="h-8 px-3 bg-background/10 rounded flex items-center justify-center text-xs font-medium">
-                  bKash
+          {/* Payment Methods & Social */}
+          <div className="mt-16 pt-8 border-t border-white/5">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex flex-wrap items-center gap-4">
+                <span className="text-sm text-muted-foreground">Payment Partners:</span>
+                <div className="flex items-center gap-3">
+                  {['bKash', 'Nagad', 'VISA', 'MasterCard'].map((partner) => (
+                    <div key={partner} className="h-10 px-4 glass rounded-xl flex items-center justify-center text-xs font-bold text-foreground">
+                      {partner}
+                    </div>
+                  ))}
                 </div>
-                <div className="h-8 px-3 bg-background/10 rounded flex items-center justify-center text-xs font-medium">
-                  Nagad
-                </div>
-                <div className="h-8 px-3 bg-background/10 rounded flex items-center justify-center text-xs font-medium">
-                  VISA
-                </div>
-                <div className="h-8 px-3 bg-background/10 rounded flex items-center justify-center text-xs font-medium">
-                  MasterCard
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground">Follow Us:</span>
+                <div className="flex items-center gap-3">
+                  {[
+                    { icon: Facebook, href: '#' },
+                    { icon: Instagram, href: '#' },
+                    { icon: Twitter, href: '#' },
+                    { icon: Youtube, href: '#' },
+                  ].map(({ icon: Icon, href }, index) => (
+                    <a 
+                      key={index}
+                      href={href} 
+                      className="h-11 w-11 rounded-xl glass flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all duration-300 group"
+                    >
+                      <Icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-background/70">Follow Us:</span>
-              <div className="flex items-center gap-2">
-                <a href="#" className="h-10 w-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary transition-colors">
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a href="#" className="h-10 w-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a href="#" className="h-10 w-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary transition-colors">
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a href="#" className="h-10 w-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary transition-colors">
-                  <Youtube className="h-5 w-5" />
-                </a>
-              </div>
-            </div>
           </div>
-        </div>
 
-        {/* Copyright */}
-        <div className="mt-8 text-center text-sm text-background/50">
-          <p>© 2024 BDMart. All rights reserved. Made with ❤️ in Bangladesh</p>
+          {/* Copyright */}
+          <div className="mt-10 text-center text-sm text-muted-foreground">
+            <p className="flex items-center justify-center gap-2">
+              © 2024 BDMart. All rights reserved. Made with 
+              <Heart className="h-4 w-4 text-primary fill-primary animate-pulse" /> 
+              in Bangladesh
+            </p>
+          </div>
         </div>
       </div>
     </footer>
