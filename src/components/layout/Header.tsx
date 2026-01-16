@@ -14,6 +14,7 @@ import {
 import { categories } from '@/data/mockData';
 import { useCart } from '@/hooks/useCart';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { StickyCategories } from '@/components/StickyCategories';
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,9 +49,15 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
+  // Show sticky categories when header is hidden
+  const showStickyCategories = !isVisible && !isAtTop;
+
   return (
     <>
-      <header 
+      {/* Sticky Categories Bar */}
+      <StickyCategories isVisible={showStickyCategories} />
+      
+      <header
         className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-out ${
           isVisible ? 'translate-y-0' : '-translate-y-full'
         } ${!isAtTop ? 'shadow-2xl' : ''}`}
