@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Star, Heart, ShoppingCart, Eye } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Eye, Sparkles } from 'lucide-react';
 import { Product } from '@/types';
 import { formatPrice } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
           <img
             src={product.images[0]}
             alt={product.name}
-            className="w-full h-full object-cover rounded-xl"
+            className="w-full h-full object-cover rounded-2xl"
           />
           {product.discount && (
             <span className="badge-sale absolute top-2 left-2">-{product.discount}%</span>
@@ -65,50 +65,56 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
   return (
     <Link to={`/product/${product.slug}`} className="card-product group block">
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-square overflow-hidden rounded-t-3xl">
         <img
           src={product.images[0]}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
         />
         
+        {/* Overlay Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
           {product.discount && (
-            <span className="badge-sale">-{product.discount}%</span>
+            <span className="badge-sale animate-pulse">-{product.discount}%</span>
           )}
           {product.isFlashSale && (
-            <span className="badge-hot">🔥 Flash</span>
+            <span className="badge-hot flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              Flash
+            </span>
           )}
           {product.freeDelivery && (
-            <Badge variant="secondary" className="text-xs">Free Delivery</Badge>
+            <Badge variant="secondary" className="text-xs glass px-3 py-1">
+              Free Delivery
+            </Badge>
           )}
         </div>
 
         {/* Quick Actions */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
           <Button
             size="icon"
-            variant="secondary"
-            className="h-9 w-9 rounded-full shadow-md"
+            className="h-10 w-10 rounded-2xl glass hover:bg-primary/20 transition-all duration-300"
             onClick={handleWishlist}
           >
-            <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-destructive text-destructive' : ''}`} />
+            <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? 'fill-primary text-primary' : 'text-foreground'}`} />
           </Button>
           <Button
             size="icon"
-            variant="secondary"
-            className="h-9 w-9 rounded-full shadow-md"
+            className="h-10 w-10 rounded-2xl glass hover:bg-primary/20 transition-all duration-300"
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-4 w-4 text-foreground" />
           </Button>
         </div>
 
         {/* Add to Cart Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+        <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-all duration-500">
           <Button
             onClick={handleAddToCart}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
+            className="w-full h-12 rounded-2xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground gap-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <ShoppingCart className="h-4 w-4" />
             Add to Cart
@@ -117,29 +123,29 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
       </div>
 
       {/* Product Info */}
-      <div className="p-4">
+      <div className="p-5">
         {/* Brand */}
         {product.brand && (
-          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+          <p className="text-xs text-primary uppercase tracking-wider font-semibold mb-2">
             {product.brand.name}
           </p>
         )}
 
         {/* Name */}
-        <h3 className="font-medium text-foreground line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+        <h3 className="font-semibold text-foreground line-clamp-2 mb-3 group-hover:text-primary transition-colors duration-300">
           {product.name}
         </h3>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex items-center">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-0.5">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={`h-3.5 w-3.5 ${
+                className={`h-4 w-4 ${
                   i < Math.floor(product.rating)
                     ? 'rating-star'
-                    : 'text-muted fill-muted'
+                    : 'text-muted/30'
                 }`}
               />
             ))}
@@ -153,7 +159,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
         </div>
 
         {/* Price */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <span className="price-current">{formatPrice(product.price)}</span>
           {product.originalPrice && (
             <span className="price-original">{formatPrice(product.originalPrice)}</span>
