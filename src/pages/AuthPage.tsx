@@ -9,14 +9,14 @@ import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
 const signUpSchema = z.object({
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().regex(/^01[3-9]\d{8}$/, 'Invalid Bangladesh phone number'),
+  fullName: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name must be less than 100 characters'),
+  phone: z.string().regex(/^01[3-9]\d{8}$/, 'Invalid Bangladesh phone number (01XXXXXXXXX)'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email('Invalid email address').optional().or(z.literal('')),
 });
 
 const signInSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  phone: z.string().regex(/^01[3-9]\d{8}$/, 'Invalid Bangladesh phone number'),
   password: z.string().min(1, 'Password is required'),
 });
 
@@ -73,12 +73,12 @@ export default function AuthPage() {
           return;
         }
 
-        const { error } = await signIn(formData.email, formData.password);
+        const { error } = await signIn(formData.phone, formData.password);
         if (error) {
           if (error.message.includes('Invalid login credentials')) {
             toast({
               title: 'Login Failed',
-              description: 'Invalid email or password. Please try again.',
+              description: 'Invalid phone number or password. Please try again.',
               variant: 'destructive',
             });
           } else {
@@ -108,17 +108,17 @@ export default function AuthPage() {
         }
 
         const { error } = await signUp(
-          formData.email,
+          formData.phone,
           formData.password,
           formData.fullName,
-          formData.phone
+          formData.email || undefined
         );
 
         if (error) {
           if (error.message.includes('already registered')) {
             toast({
               title: 'Account Exists',
-              description: 'This email is already registered. Please login instead.',
+              description: 'This phone number is already registered. Please login instead.',
               variant: 'destructive',
             });
           } else {
@@ -165,14 +165,14 @@ export default function AuthPage() {
           </h1>
           <p className="text-muted-foreground mb-8">
             {isLogin
-              ? 'Enter your credentials to access your account'
+              ? 'Enter your phone number and password to login'
               : 'Join BDMart to start shopping'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">Full Name <span className="text-destructive">*</span></Label>
                 <div className="relative mt-1">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
@@ -192,54 +192,54 @@ export default function AuthPage() {
             )}
 
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
               <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="01XXXXXXXXX"
+                  value={formData.phone}
                   onChange={handleChange}
                   className="pl-10"
                 />
               </div>
-              {errors.email && (
-                <p className="text-destructive text-sm mt-1">{errors.email}</p>
+              {errors.phone && (
+                <p className="text-destructive text-sm mt-1">{errors.phone}</p>
               )}
             </div>
 
             {!isLogin && (
               <div>
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="email">Email <span className="text-muted-foreground text-sm">(Optional)</span></Label>
                 <div className="relative mt-1">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="01XXXXXXXXX"
-                    value={formData.phone}
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="your@email.com (optional)"
+                    value={formData.email}
                     onChange={handleChange}
                     className="pl-10"
                   />
                 </div>
-                {errors.phone && (
-                  <p className="text-destructive text-sm mt-1">{errors.phone}</p>
+                {errors.email && (
+                  <p className="text-destructive text-sm mt-1">{errors.email}</p>
                 )}
               </div>
             )}
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
               <div className="relative mt-1">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
+                  placeholder={isLogin ? 'Enter your password' : 'Create a password (min 6 characters)'}
                   value={formData.password}
                   onChange={handleChange}
                   className="pl-10 pr-10"

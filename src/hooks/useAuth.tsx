@@ -11,8 +11,8 @@ interface AuthContextType {
   roles: AppRole[];
   isAdmin: boolean;
   isSeller: boolean;
-  signUp: (email: string, password: string, fullName: string, phone: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (phone: string, password: string, fullName: string, email?: string) => Promise<{ error: Error | null }>;
+  signIn: (phone: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -70,17 +70,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, phone: string) => {
+  const signUp = async (phone: string, password: string, fullName: string, email?: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
+    // Use provided email or generate one from phone number
+    const authEmail = email && email.trim() ? email.trim() : `${phone}@bdmart.local`;
+    
     const { error } = await supabase.auth.signUp({
-      email,
+      email: authEmail,
       password,
       options: {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
           phone: phone,
+          email: email || null,
         },
       },
     });
@@ -88,9 +92,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error as Error | null };
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (phone: string, password: string) => {
+    // Try to sign in with phone-based email
+    const authEmail = `${phone}@bdmart.local`;
+    
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: authEmail,
       password,
     });
 
