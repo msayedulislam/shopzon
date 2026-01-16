@@ -28,6 +28,7 @@ const menuItems = [
   { icon: Layers, label: 'Categories', path: '/admin/categories' },
   { icon: Tag, label: 'Brands', path: '/admin/brands' },
   { icon: Ticket, label: 'Coupons', path: '/admin/coupons' },
+  { icon: FileText, label: 'Pages', path: '/admin/pages' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/logs' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
