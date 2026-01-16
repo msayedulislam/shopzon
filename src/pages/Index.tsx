@@ -8,10 +8,11 @@ import { NewArrivalSection } from '@/components/home/NewArrivalSection';
 import { NewCollectionSection } from '@/components/home/NewCollectionSection';
 import { FreeDeliverySection } from '@/components/home/FreeDeliverySection';
 import { DiscountProductSection } from '@/components/home/DiscountProductSection';
-import { MarketingBanners } from '@/components/home/MarketingBanners';
 import { MarketingFeatures } from '@/components/home/MarketingFeatures';
 import { AllProductsSection } from '@/components/home/AllProductsSection';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
+import { BestSellingSection } from '@/components/home/BestSellingSection';
+import { TopSellersSection } from '@/components/home/TopSellersSection';
 
 const Index = () => {
   return (
@@ -21,9 +22,10 @@ const Index = () => {
         <HeroSection />
         <MarketingFeatures />
         <CategoriesSection />
-        <MarketingBanners />
         <FlashSaleSection />
         <FeaturedProducts />
+        <BestSellingSection />
+        <TopSellersSection />
         <NewArrivalSection />
         <NewCollectionSection />
         <FreeDeliverySection />
