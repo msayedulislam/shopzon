@@ -11,6 +11,7 @@ import CartPage from '@/pages/CartPage';
 import CheckoutPage from '@/pages/CheckoutPage';
 import OrderSuccessPage from '@/pages/OrderSuccessPage';
 import AuthPage from '@/pages/AuthPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import NotFound from '@/pages/NotFound';
 
 // User Dashboard
@@ -63,6 +64,7 @@ export function AnimatedRoutes() {
         <Route path="/auth" element={<PageTransition><AuthPage /></PageTransition>} />
         <Route path="/register" element={<PageTransition><AuthPage /></PageTransition>} />
         <Route path="/login" element={<PageTransition><AuthPage /></PageTransition>} />
+        <Route path="/forgot-password" element={<PageTransition><ForgotPasswordPage /></PageTransition>} />
         <Route path="/wishlist" element={<PageTransition><WishlistPage /></PageTransition>} />
 
         {/* Protected Routes */}

@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Use provided email or generate one from phone number
     const authEmail = email && email.trim() ? email.trim() : `${phone}@bdmart.local`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: authEmail,
       password,
       options: {
@@ -88,6 +88,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
     });
+
+    // If signup successful, create/update profile with phone number
+    if (!error && data.user) {
+      setTimeout(async () => {
+        try {
+          // Check if profile exists
+          const { data: existingProfile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('user_id', data.user!.id)
+            .single();
+
+          if (existingProfile) {
+            // Update existing profile
+            await supabase
+              .from('profiles')
+              .update({
+                full_name: fullName,
+                phone: phone,
+                email: email || null,
+              })
+              .eq('user_id', data.user!.id);
+          } else {
+            // Create new profile
+            await supabase
+              .from('profiles')
+              .insert({
+                user_id: data.user!.id,
+                full_name: fullName,
+                phone: phone,
+                email: email || null,
+              });
+          }
+        } catch (profileError) {
+          console.error('Error creating/updating profile:', profileError);
+        }
+      }, 0);
+    }
 
     return { error: error as Error | null };
   };

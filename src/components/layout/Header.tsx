@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, Heart, User, Menu, MapPin, Phone, ChevronDown, Sparkles, ChevronUp } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, ShoppingCart, Heart, User, Menu, MapPin, Phone, ChevronDown, Sparkles, ChevronUp, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -9,22 +9,31 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { categories } from '@/data/mockData';
 import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { StickyCategories } from '@/components/StickyCategories';
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const { items } = useCart();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
   
   // Scroll state
   const [isVisible, setIsVisible] = useState(true);
   const [isAtTop, setIsAtTop] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -198,26 +207,46 @@ export function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 glass-card border-white/10 rounded-2xl p-2">
-                    <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
-                      <Link to="/login" className="flex items-center gap-3">
-                        <span>🔐</span> Login
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
-                      <Link to="/register" className="flex items-center gap-3">
-                        <span>✨</span> Register
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
-                      <Link to="/dashboard" className="flex items-center gap-3">
-                        <span>👤</span> My Account
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
-                      <Link to="/dashboard/orders" className="flex items-center gap-3">
-                        <span>📦</span> My Orders
-                      </Link>
-                    </DropdownMenuItem>
+                    {!user ? (
+                      <>
+                        <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
+                          <Link to="/auth?mode=login" className="flex items-center gap-3">
+                            <span>🔐</span> Login
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
+                          <Link to="/auth?mode=register" className="flex items-center gap-3">
+                            <span>✨</span> Register
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    ) : (
+                      <>
+                        <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
+                          <Link to="/dashboard" className="flex items-center gap-3">
+                            <span>👤</span> My Account
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
+                          <Link to="/dashboard/orders" className="flex items-center gap-3">
+                            <span>📦</span> My Orders
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
+                          <Link to="/dashboard/wishlist" className="flex items-center gap-3">
+                            <span>❤️</span> My Wishlist
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-white/10" />
+                        <DropdownMenuItem 
+                          onClick={handleSignOut}
+                          className="rounded-xl hover:bg-destructive/10 cursor-pointer p-3 text-destructive"
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Logout
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
