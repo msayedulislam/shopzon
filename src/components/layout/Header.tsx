@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { categories } from '@/data/mockData';
 import { useCart } from '@/hooks/useCart';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,13 +113,14 @@ export function Header() {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Link to="/wishlist">
-                <Button variant="ghost" size="icon" className="relative h-12 w-12 rounded-2xl hover:bg-white/10 transition-all duration-300">
+                <Button variant="ghost" size="icon" className="relative h-12 w-12 rounded-2xl hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300">
                   <Heart className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/cart">
-                <Button variant="ghost" size="icon" className="relative h-12 w-12 rounded-2xl hover:bg-white/10 transition-all duration-300">
+                <Button variant="ghost" size="icon" className="relative h-12 w-12 rounded-2xl hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
                     <Badge className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center p-0 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xs font-bold shadow-glow">
