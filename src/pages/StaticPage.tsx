@@ -5,9 +5,21 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Home, FileText, Phone, Mail, MapPin, Clock, Users, Package, Truck, CreditCard, HelpCircle, Shield, BookOpen, Briefcase, MessageSquare, Search, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Home, FileText, Phone, Mail, MapPin, Clock, Users, Package, Truck, CreditCard, HelpCircle, Shield, BookOpen, Briefcase, MessageSquare, Search, ChevronRight, Send, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+// Hero images
+import heroAbout from '@/assets/hero-about.jpg';
+import heroContact from '@/assets/hero-contact.jpg';
+import heroCareers from '@/assets/hero-careers.jpg';
+import heroShipping from '@/assets/hero-shipping.jpg';
+import heroPayment from '@/assets/hero-payment.jpg';
+import heroHelp from '@/assets/hero-help.jpg';
 
 interface StaticPageData {
   id: string;
@@ -36,22 +48,40 @@ const pageIcons: Record<string, React.ReactNode> = {
   'help-center': <MessageSquare className="h-8 w-8" />,
 };
 
-const pageColors: Record<string, string> = {
-  'about-us': 'from-blue-500 to-indigo-600',
-  'contact-us': 'from-emerald-500 to-teal-600',
-  'careers': 'from-purple-500 to-violet-600',
-  'blog': 'from-orange-500 to-amber-600',
-  'faqs': 'from-cyan-500 to-blue-600',
-  'privacy-policy': 'from-slate-500 to-gray-600',
-  'terms-conditions': 'from-slate-600 to-zinc-700',
-  'track-order': 'from-green-500 to-emerald-600',
-  'returns-exchanges': 'from-rose-500 to-pink-600',
-  'refund-policy': 'from-amber-500 to-orange-600',
-  'shipping-info': 'from-sky-500 to-blue-600',
-  'seller-policy': 'from-indigo-500 to-purple-600',
-  'payment-methods': 'from-teal-500 to-cyan-600',
-  'help-center': 'from-violet-500 to-purple-600',
+const pageHeroImages: Record<string, string> = {
+  'about-us': heroAbout,
+  'contact-us': heroContact,
+  'careers': heroCareers,
+  'shipping-info': heroShipping,
+  'payment-methods': heroPayment,
+  'help-center': heroHelp,
 };
+
+const pageColors: Record<string, string> = {
+  'about-us': 'from-blue-600/90 to-indigo-700/90',
+  'contact-us': 'from-emerald-600/90 to-teal-700/90',
+  'careers': 'from-purple-600/90 to-violet-700/90',
+  'blog': 'from-orange-600/90 to-amber-700/90',
+  'faqs': 'from-cyan-600/90 to-blue-700/90',
+  'privacy-policy': 'from-slate-600/90 to-gray-700/90',
+  'terms-conditions': 'from-slate-700/90 to-zinc-800/90',
+  'track-order': 'from-green-600/90 to-emerald-700/90',
+  'returns-exchanges': 'from-rose-600/90 to-pink-700/90',
+  'refund-policy': 'from-amber-600/90 to-orange-700/90',
+  'shipping-info': 'from-sky-600/90 to-blue-700/90',
+  'seller-policy': 'from-indigo-600/90 to-purple-700/90',
+  'payment-methods': 'from-teal-600/90 to-cyan-700/90',
+  'help-center': 'from-violet-600/90 to-purple-700/90',
+};
+
+// Contact form schema
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  phone: z.string().trim().max(20, "Phone must be less than 20 characters").optional(),
+  subject: z.string().trim().max(200, "Subject must be less than 200 characters").optional(),
+  message: z.string().trim().min(1, "Message is required").max(2000, "Message must be less than 2000 characters"),
+});
 
 export default function StaticPage() {
   const location = useLocation();
@@ -60,6 +90,18 @@ export default function StaticPage() {
   const [loading, setLoading] = useState(true);
   const [orderNumber, setOrderNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  
+  // Contact form state
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function fetchPage() {
@@ -81,6 +123,7 @@ export default function StaticPage() {
     }
 
     fetchPage();
+    setSubmitted(false);
   }, [slug]);
 
   useEffect(() => {
@@ -88,6 +131,46 @@ export default function StaticPage() {
       document.title = page.meta_title;
     }
   }, [page]);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
+
+    // Validate form
+    const result = contactSchema.safeParse(contactForm);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach(err => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setSubmitting(true);
+    
+    const { error } = await supabase
+      .from('contact_inquiries')
+      .insert({
+        name: contactForm.name.trim(),
+        email: contactForm.email.trim(),
+        phone: contactForm.phone?.trim() || null,
+        subject: contactForm.subject?.trim() || null,
+        message: contactForm.message.trim(),
+      });
+
+    if (error) {
+      console.error('Error submitting contact form:', error);
+      toast.error('Failed to send message. Please try again.');
+    } else {
+      toast.success('Message sent successfully! We\'ll get back to you soon.');
+      setSubmitted(true);
+      setContactForm({ name: '', email: '', phone: '', subject: '', message: '' });
+    }
+    setSubmitting(false);
+  };
 
   const renderMarkdown = (content: string) => {
     // Simple markdown parser
@@ -190,7 +273,7 @@ export default function StaticPage() {
       // Q&A format
       if (line.startsWith('**Q:')) {
         elements.push(
-          <div key={index} className="bg-muted/50 rounded-xl p-4 mt-4 border border-border">
+          <div key={index} className="glass-card rounded-xl p-4 mt-4 border border-border">
             <p className="font-semibold text-foreground">{formatText(line)}</p>
           </div>
         );
@@ -232,8 +315,9 @@ export default function StaticPage() {
     );
   };
 
-  const gradientColor = slug ? pageColors[slug] || 'from-primary to-primary/80' : 'from-primary to-primary/80';
+  const gradientColor = slug ? pageColors[slug] || 'from-primary/90 to-primary/80' : 'from-primary/90 to-primary/80';
   const icon = slug ? pageIcons[slug] : <FileText className="h-8 w-8" />;
+  const heroImage = slug ? pageHeroImages[slug] : null;
 
   if (loading) {
     return (
@@ -283,13 +367,27 @@ export default function StaticPage() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Section */}
-      <section className={`relative overflow-hidden bg-gradient-to-br ${gradientColor} py-16 md:py-24`}>
+      {/* Hero Section with Image */}
+      <section className="relative overflow-hidden min-h-[280px] md:min-h-[350px] flex items-center">
+        {/* Background Image */}
+        {heroImage ? (
+          <>
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${heroImage})` }}
+            />
+            <div className={`absolute inset-0 bg-gradient-to-r ${gradientColor}`} />
+          </>
+        ) : (
+          <div className={`absolute inset-0 bg-gradient-to-br ${gradientColor.replace('/90', '')} ${gradientColor.replace('/90', '/80')}`} />
+        )}
+        
+        {/* Decorative Elements */}
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,white)]" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-black/10 rounded-full blur-3xl" />
         
-        <div className="container relative z-10">
+        <div className="container relative z-10 py-12 md:py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -305,16 +403,16 @@ export default function StaticPage() {
               <span className="text-white">{page.title}</span>
             </nav>
             
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
+            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white glass-card">
                 {icon}
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   {pageTitle}
                 </h1>
                 {page.meta_description && (
-                  <p className="text-white/80 mt-2 max-w-2xl">{page.meta_description}</p>
+                  <p className="text-white/90 mt-2 max-w-2xl text-sm md:text-base">{page.meta_description}</p>
                 )}
               </div>
             </div>
@@ -333,7 +431,7 @@ export default function StaticPage() {
           >
             {/* Track Order Form */}
             {slug === 'track-order' && (
-              <div className="bg-card border border-border rounded-2xl p-6 md:p-8 mb-8 shadow-lg">
+              <div className="glass-card rounded-2xl p-6 md:p-8 mb-8 shadow-lg border border-border">
                 <h2 className="text-xl font-bold text-foreground mb-6">Track Your Order</h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
@@ -362,29 +460,129 @@ export default function StaticPage() {
               </div>
             )}
 
-            {/* Contact Cards */}
+            {/* Contact Form */}
             {slug === 'contact-us' && (
-              <div className="grid gap-4 sm:grid-cols-3 mb-8">
-                <div className="bg-card border border-border rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <Phone className="h-6 w-6 text-primary" />
+              <div className="grid gap-8 lg:grid-cols-5 mb-12">
+                {/* Contact Info Cards */}
+                <div className="lg:col-span-2 space-y-4">
+                  <div className="glass-card rounded-2xl p-6 border border-border hover:shadow-lg transition-all duration-300">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      <Phone className="h-6 w-6 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">Call Us</h3>
+                    <p className="text-muted-foreground text-sm">+880 1234-567890</p>
+                    <p className="text-muted-foreground text-sm">Sat-Thu, 9AM-10PM</p>
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">Call Us</h3>
-                  <p className="text-muted-foreground text-sm">+880 1234-567890</p>
+                  <div className="glass-card rounded-2xl p-6 border border-border hover:shadow-lg transition-all duration-300">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      <Mail className="h-6 w-6 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">Email Us</h3>
+                    <p className="text-muted-foreground text-sm">support@bdmart.com</p>
+                    <p className="text-muted-foreground text-sm">Response within 24 hours</p>
+                  </div>
+                  <div className="glass-card rounded-2xl p-6 border border-border hover:shadow-lg transition-all duration-300">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      <MapPin className="h-6 w-6 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">Visit Us</h3>
+                    <p className="text-muted-foreground text-sm">House 45, Road 12, Block D</p>
+                    <p className="text-muted-foreground text-sm">Banani, Dhaka 1213</p>
+                  </div>
                 </div>
-                <div className="bg-card border border-border rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <Mail className="h-6 w-6 text-primary" />
+
+                {/* Contact Form */}
+                <div className="lg:col-span-3">
+                  <div className="glass-card rounded-2xl p-6 md:p-8 border border-border">
+                    {submitted ? (
+                      <div className="text-center py-8">
+                        <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
+                          <CheckCircle className="h-8 w-8 text-green-600" />
+                        </div>
+                        <h3 className="text-xl font-bold text-foreground mb-2">Message Sent!</h3>
+                        <p className="text-muted-foreground mb-6">Thank you for contacting us. We'll get back to you within 24 hours.</p>
+                        <Button variant="outline" onClick={() => setSubmitted(false)}>
+                          Send Another Message
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <h2 className="text-xl font-bold text-foreground mb-6">Send us a Message</h2>
+                        <form onSubmit={handleContactSubmit} className="space-y-5">
+                          <div className="grid gap-5 sm:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label htmlFor="name">Full Name *</Label>
+                              <Input
+                                id="name"
+                                placeholder="John Doe"
+                                value={contactForm.name}
+                                onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                                className={errors.name ? 'border-destructive' : ''}
+                              />
+                              {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="email">Email Address *</Label>
+                              <Input
+                                id="email"
+                                type="email"
+                                placeholder="john@example.com"
+                                value={contactForm.email}
+                                onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                                className={errors.email ? 'border-destructive' : ''}
+                              />
+                              {errors.email && <p className="text-destructive text-xs">{errors.email}</p>}
+                            </div>
+                          </div>
+                          <div className="grid gap-5 sm:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label htmlFor="phone">Phone Number</Label>
+                              <Input
+                                id="phone"
+                                placeholder="+880 1712345678"
+                                value={contactForm.phone}
+                                onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="subject">Subject</Label>
+                              <Input
+                                id="subject"
+                                placeholder="How can we help?"
+                                value={contactForm.subject}
+                                onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="message">Message *</Label>
+                            <Textarea
+                              id="message"
+                              placeholder="Tell us more about your inquiry..."
+                              rows={5}
+                              value={contactForm.message}
+                              onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                              className={errors.message ? 'border-destructive' : ''}
+                            />
+                            {errors.message && <p className="text-destructive text-xs">{errors.message}</p>}
+                          </div>
+                          <Button type="submit" className="w-full h-12" disabled={submitting}>
+                            {submitting ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Sending...
+                              </>
+                            ) : (
+                              <>
+                                <Send className="h-4 w-4 mr-2" />
+                                Send Message
+                              </>
+                            )}
+                          </Button>
+                        </form>
+                      </>
+                    )}
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">Email Us</h3>
-                  <p className="text-muted-foreground text-sm">support@bdmart.com</p>
-                </div>
-                <div className="bg-card border border-border rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <Clock className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">Working Hours</h3>
-                  <p className="text-muted-foreground text-sm">Sat-Thu, 9AM-10PM</p>
                 </div>
               </div>
             )}
@@ -398,7 +596,7 @@ export default function StaticPage() {
                   { label: 'Customers', value: '1M+' },
                   { label: 'Districts', value: '64' },
                 ].map((stat, i) => (
-                  <div key={i} className="bg-card border border-border rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
+                  <div key={i} className="glass-card rounded-2xl p-6 text-center border border-border hover:shadow-lg transition-all duration-300">
                     <p className="text-2xl md:text-3xl font-bold text-primary mb-1">{stat.value}</p>
                     <p className="text-muted-foreground text-sm">{stat.label}</p>
                   </div>
