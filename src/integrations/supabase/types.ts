@@ -86,6 +86,102 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_permissions: {
+        Row: {
+          created_at: string | null
+          id: string
+          permissions: Json
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          permissions?: Json
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          permissions?: Json
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      admin_settings: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      ai_suggestions: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          confidence: number | null
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          rejected_reason: string | null
+          status: string | null
+          suggestion: Json
+          type: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          rejected_reason?: string | null
+          status?: string | null
+          suggestion: Json
+          type: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          rejected_reason?: string | null
+          status?: string | null
+          suggestion?: Json
+          type?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -164,6 +260,69 @@ export type Database = {
           logo_url?: string | null
           name?: string
           slug?: string
+        }
+        Relationships: []
+      }
+      campaigns: {
+        Row: {
+          budget: number | null
+          categories: string[] | null
+          conversions: number | null
+          created_at: string | null
+          created_by: string | null
+          discount_config: Json | null
+          end_date: string | null
+          id: string
+          impressions: number | null
+          name: string
+          products: string[] | null
+          sellers: string[] | null
+          spent: number | null
+          start_date: string | null
+          status: string | null
+          target_audience: Json | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          budget?: number | null
+          categories?: string[] | null
+          conversions?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          discount_config?: Json | null
+          end_date?: string | null
+          id?: string
+          impressions?: number | null
+          name: string
+          products?: string[] | null
+          sellers?: string[] | null
+          spent?: number | null
+          start_date?: string | null
+          status?: string | null
+          target_audience?: Json | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          budget?: number | null
+          categories?: string[] | null
+          conversions?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          discount_config?: Json | null
+          end_date?: string | null
+          id?: string
+          impressions?: number | null
+          name?: string
+          products?: string[] | null
+          sellers?: string[] | null
+          spent?: number | null
+          start_date?: string | null
+          status?: string | null
+          target_audience?: Json | null
+          type?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -289,6 +448,252 @@ export type Database = {
         }
         Relationships: []
       }
+      courier_performance: {
+        Row: {
+          avg_delivery_hours: number | null
+          courier_id: string
+          created_at: string | null
+          date: string
+          failed_deliveries: number | null
+          id: string
+          sla_violations: number | null
+          successful_deliveries: number | null
+          total_deliveries: number | null
+        }
+        Insert: {
+          avg_delivery_hours?: number | null
+          courier_id: string
+          created_at?: string | null
+          date: string
+          failed_deliveries?: number | null
+          id?: string
+          sla_violations?: number | null
+          successful_deliveries?: number | null
+          total_deliveries?: number | null
+        }
+        Update: {
+          avg_delivery_hours?: number | null
+          courier_id?: string
+          created_at?: string | null
+          date?: string
+          failed_deliveries?: number | null
+          id?: string
+          sla_violations?: number | null
+          successful_deliveries?: number | null
+          total_deliveries?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_performance_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "couriers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couriers: {
+        Row: {
+          api_endpoint: string | null
+          api_key_encrypted: string | null
+          base_rate: number | null
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          sla_hours: number | null
+          supports_cod: boolean | null
+          weight_rate: number | null
+          zones: Json | null
+        }
+        Insert: {
+          api_endpoint?: string | null
+          api_key_encrypted?: string | null
+          base_rate?: number | null
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          sla_hours?: number | null
+          supports_cod?: boolean | null
+          weight_rate?: number | null
+          zones?: Json | null
+        }
+        Update: {
+          api_endpoint?: string | null
+          api_key_encrypted?: string | null
+          base_rate?: number | null
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          sla_hours?: number | null
+          supports_cod?: boolean | null
+          weight_rate?: number | null
+          zones?: Json | null
+        }
+        Relationships: []
+      }
+      fraud_alerts: {
+        Row: {
+          action_taken: string | null
+          alert_type: string
+          created_at: string | null
+          id: string
+          indicators: Json | null
+          notes: string | null
+          order_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          score: number | null
+          severity: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_taken?: string | null
+          alert_type: string
+          created_at?: string | null
+          id?: string
+          indicators?: Json | null
+          notes?: string | null
+          order_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          score?: number | null
+          severity?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_taken?: string | null
+          alert_type?: string
+          created_at?: string | null
+          id?: string
+          indicators?: Json | null
+          notes?: string | null
+          order_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          score?: number | null
+          severity?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fraud_alerts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_courier: {
+        Row: {
+          assigned_at: string | null
+          courier_id: string | null
+          created_at: string | null
+          delivered_at: string | null
+          failed_attempts: number | null
+          id: string
+          last_failed_reason: string | null
+          order_id: string
+          picked_up_at: string | null
+          status: string | null
+          tracking_number: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          courier_id?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          failed_attempts?: number | null
+          id?: string
+          last_failed_reason?: string | null
+          order_id: string
+          picked_up_at?: string | null
+          status?: string | null
+          tracking_number?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          courier_id?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          failed_attempts?: number | null
+          id?: string
+          last_failed_reason?: string | null
+          order_id?: string
+          picked_up_at?: string | null
+          status?: string | null
+          tracking_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_courier_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "couriers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_courier_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_edit_history: {
+        Row: {
+          admin_id: string | null
+          created_at: string | null
+          field_changed: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+          order_id: string
+          reason: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string | null
+          field_changed: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          order_id: string
+          reason?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string | null
+          field_changed?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          order_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_edit_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           commission_amount: number | null
@@ -355,6 +760,41 @@ export type Database = {
             columns: ["seller_id"]
             isOneToOne: false
             referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_notes: {
+        Row: {
+          admin_id: string | null
+          created_at: string | null
+          id: string
+          is_internal: boolean | null
+          note: string
+          order_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          note: string
+          order_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          note?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -433,6 +873,41 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      product_edit_history: {
+        Row: {
+          admin_id: string | null
+          changes: Json
+          created_at: string | null
+          id: string
+          product_id: string
+          seller_id: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          changes: Json
+          created_at?: string | null
+          id?: string
+          product_id: string
+          seller_id?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          changes?: Json
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          seller_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_edit_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_images: {
         Row: {
@@ -649,6 +1124,56 @@ export type Database = {
         }
         Relationships: []
       }
+      refunds: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          notes: string | null
+          order_id: string
+          processed_at: string | null
+          processed_by: string | null
+          reason: string
+          refund_method: string
+          status: string | null
+          wallet_credited: boolean | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          order_id: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reason: string
+          refund_method: string
+          status?: string | null
+          wallet_credited?: boolean | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string
+          refund_method?: string
+          status?: string | null
+          wallet_credited?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refunds_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           comment: string | null
@@ -699,6 +1224,165 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_action_logs: {
+        Row: {
+          action_type: string
+          admin_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          reason: string | null
+          seller_id: string
+        }
+        Insert: {
+          action_type: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          reason?: string | null
+          seller_id: string
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          reason?: string | null
+          seller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_action_logs_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_governance: {
+        Row: {
+          allowed_categories: string[] | null
+          avg_shipping_time_hours: number | null
+          cancellation_rate: number | null
+          created_at: string | null
+          fulfillment_rate: number | null
+          id: string
+          last_strike_at: string | null
+          last_warning_at: string | null
+          notes: string | null
+          reactivated_at: string | null
+          seller_id: string
+          sla_violation_count: number | null
+          strike_count: number | null
+          suspended_at: string | null
+          suspension_reason: string | null
+          trust_score: number | null
+          updated_at: string | null
+          warning_count: number | null
+        }
+        Insert: {
+          allowed_categories?: string[] | null
+          avg_shipping_time_hours?: number | null
+          cancellation_rate?: number | null
+          created_at?: string | null
+          fulfillment_rate?: number | null
+          id?: string
+          last_strike_at?: string | null
+          last_warning_at?: string | null
+          notes?: string | null
+          reactivated_at?: string | null
+          seller_id: string
+          sla_violation_count?: number | null
+          strike_count?: number | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          trust_score?: number | null
+          updated_at?: string | null
+          warning_count?: number | null
+        }
+        Update: {
+          allowed_categories?: string[] | null
+          avg_shipping_time_hours?: number | null
+          cancellation_rate?: number | null
+          created_at?: string | null
+          fulfillment_rate?: number | null
+          id?: string
+          last_strike_at?: string | null
+          last_warning_at?: string | null
+          notes?: string | null
+          reactivated_at?: string | null
+          seller_id?: string
+          sla_violation_count?: number | null
+          strike_count?: number | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          trust_score?: number | null
+          updated_at?: string | null
+          warning_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_governance_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_payouts: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          payment_method: string | null
+          payment_reference: string | null
+          processed_at: string | null
+          seller_id: string
+          status: string | null
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          processed_at?: string | null
+          seller_id: string
+          status?: string | null
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          processed_at?: string | null
+          seller_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_payouts_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
             referencedColumns: ["id"]
           },
         ]
@@ -799,6 +1483,36 @@ export type Database = {
           slug?: string
           title?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      system_health: {
+        Row: {
+          checked_at: string | null
+          component: string
+          details: Json | null
+          error_count: number | null
+          id: string
+          response_time_ms: number | null
+          status: string
+        }
+        Insert: {
+          checked_at?: string | null
+          component: string
+          details?: Json | null
+          error_count?: number | null
+          id?: string
+          response_time_ms?: number | null
+          status: string
+        }
+        Update: {
+          checked_at?: string | null
+          component?: string
+          details?: Json | null
+          error_count?: number | null
+          id?: string
+          response_time_ms?: number | null
+          status?: string
         }
         Relationships: []
       }
