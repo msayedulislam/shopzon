@@ -27,6 +27,9 @@ import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
 import SellerDashboard from '@/pages/seller/SellerDashboard';
 import SellerOverview from '@/pages/seller/SellerOverview';
 import SellerProducts from '@/pages/seller/SellerProducts';
+import SellerOrders from '@/pages/seller/SellerOrders';
+import SellerEarnings from '@/pages/seller/SellerEarnings';
+import SellerSettings from '@/pages/seller/SellerSettings';
 
 // Admin
 import AdminDashboard from '@/pages/admin/AdminDashboard';
@@ -85,6 +88,9 @@ export function AnimatedRoutes() {
         <Route path="/seller/dashboard" element={<ProtectedRoute requiredRole="seller"><PageTransition><SellerDashboard /></PageTransition></ProtectedRoute>}>
           <Route index element={<SellerOverview />} />
           <Route path="products" element={<SellerProducts />} />
+          <Route path="orders" element={<SellerOrders />} />
+          <Route path="earnings" element={<SellerEarnings />} />
+          <Route path="settings" element={<SellerSettings />} />
         </Route>
 
         {/* Admin Routes */}

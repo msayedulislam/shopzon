@@ -1,189 +1,437 @@
 import { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { Package, ShoppingBag, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react';
+import { useOutletContext, Link } from 'react-router-dom';
+import { 
+  Package, 
+  ShoppingBag, 
+  DollarSign, 
+  TrendingUp, 
+  AlertTriangle, 
+  ArrowRight,
+  Clock,
+  CheckCircle,
+  Eye,
+  Plus,
+  Star,
+  Loader2
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
 
 export default function SellerOverview() {
   const { seller } = useOutletContext<{ seller: any }>();
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalProducts: 0,
+    activeProducts: 0,
+    pendingProducts: 0,
     totalOrders: 0,
-    totalEarnings: 0,
     pendingOrders: 0,
+    totalEarnings: 0,
+    thisMonthEarnings: 0,
     lowStockProducts: 0,
   });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
 
   useEffect(() => {
     if (seller) {
-      fetchStats();
-      fetchRecentOrders();
+      fetchData();
     }
   }, [seller]);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     if (!seller) return;
 
     try {
-      // Get product count
-      const { count: productCount } = await supabase
+      // Get products
+      const { data: products } = await supabase
         .from('products')
-        .select('*', { count: 'exact', head: true })
+        .select('id, name, status, stock, sold, price')
         .eq('seller_id', seller.id);
 
-      // Get low stock products
-      const { count: lowStockCount } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true })
-        .eq('seller_id', seller.id)
-        .lt('stock', 10);
+      const totalProducts = products?.length || 0;
+      const activeProducts = products?.filter(p => p.status === 'approved').length || 0;
+      const pendingProducts = products?.filter(p => p.status === 'pending').length || 0;
+      const lowStockProducts = products?.filter(p => p.stock < 10).length || 0;
 
-      // Get order stats
+      // Top selling products
+      const sortedProducts = [...(products || [])].sort((a, b) => (b.sold || 0) - (a.sold || 0)).slice(0, 5);
+      setTopProducts(sortedProducts);
+
+      // Get order items
       const { data: orderItems } = await supabase
-        .from('order_items')
-        .select('price, quantity, seller_amount')
-        .eq('seller_id', seller.id);
-
-      const totalOrders = orderItems?.length || 0;
-      const totalEarnings = orderItems?.reduce((sum, item) => sum + (item.seller_amount || 0), 0) || 0;
-
-      setStats({
-        totalProducts: productCount || 0,
-        totalOrders,
-        totalEarnings,
-        pendingOrders: 0,
-        lowStockProducts: lowStockCount || 0,
-      });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
-
-  const fetchRecentOrders = async () => {
-    if (!seller) return;
-
-    try {
-      const { data } = await supabase
         .from('order_items')
         .select(`
           *,
           order:orders (
+            id,
             order_number,
             status,
-            created_at
+            created_at,
+            shipping_name
           )
         `)
         .eq('seller_id', seller.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
+        .order('created_at', { ascending: false });
 
-      setRecentOrders(data || []);
+      const now = new Date();
+      const thisMonth = now.getMonth();
+      const thisYear = now.getFullYear();
+
+      let totalEarnings = 0;
+      let thisMonthEarnings = 0;
+      const pendingOrderIds = new Set<string>();
+
+      (orderItems || []).forEach((item) => {
+        const sellerAmount = item.seller_amount || (item.price * item.quantity * 0.9);
+        
+        if (item.order?.status === 'delivered') {
+          totalEarnings += sellerAmount;
+          
+          const orderDate = new Date(item.order.created_at);
+          if (orderDate.getMonth() === thisMonth && orderDate.getFullYear() === thisYear) {
+            thisMonthEarnings += sellerAmount;
+          }
+        }
+
+        if (['pending', 'confirmed'].includes(item.order?.status)) {
+          pendingOrderIds.add(item.order.id);
+        }
+      });
+
+      // Group orders
+      const uniqueOrders = new Set((orderItems || []).map(i => i.order?.id)).size;
+
+      setStats({
+        totalProducts,
+        activeProducts,
+        pendingProducts,
+        totalOrders: uniqueOrders,
+        pendingOrders: pendingOrderIds.size,
+        totalEarnings,
+        thisMonthEarnings,
+        lowStockProducts,
+      });
+
+      // Recent orders (unique)
+      const ordersMap = new Map();
+      (orderItems || []).forEach(item => {
+        if (item.order && !ordersMap.has(item.order.id)) {
+          ordersMap.set(item.order.id, {
+            ...item.order,
+            items: [item],
+            totalAmount: item.seller_amount || item.price * item.quantity,
+          });
+        } else if (item.order) {
+          const existing = ordersMap.get(item.order.id);
+          existing.items.push(item);
+          existing.totalAmount += item.seller_amount || item.price * item.quantity;
+        }
+      });
+      setRecentOrders(Array.from(ordersMap.values()).slice(0, 5));
+
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const statusColors: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-700',
+    confirmed: 'bg-blue-100 text-blue-700',
+    processing: 'bg-purple-100 text-purple-700',
+    shipped: 'bg-indigo-100 text-indigo-700',
+    delivered: 'bg-green-100 text-green-700',
+    cancelled: 'bg-red-100 text-red-700',
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Welcome back, {seller?.shop_name}!</h1>
+      {/* Welcome Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Welcome back, {seller?.shop_name}! 👋</h1>
+          <p className="text-muted-foreground">Here's what's happening with your store today.</p>
+        </div>
+        <Button asChild className="gap-2">
+          <Link to="/seller/dashboard/products">
+            <Plus className="h-4 w-4" />
+            Add Product
+          </Link>
+        </Button>
+      </div>
 
       {/* Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Products
-            </CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalProducts}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Orders
-            </CardTitle>
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalOrders}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Earnings
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">
-              {formatPrice(stats.totalEarnings)}
+        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Earnings</p>
+                <p className="text-2xl font-bold text-primary mt-1">
+                  {formatPrice(stats.totalEarnings)}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  This month: {formatPrice(stats.thisMonthEarnings)}
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-primary/20">
+                <DollarSign className="h-6 w-6 text-primary" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Low Stock
-            </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-warning" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-warning">
-              {stats.lowStockProducts}
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Orders</p>
+                <p className="text-2xl font-bold mt-1">{stats.totalOrders}</p>
+                {stats.pendingOrders > 0 && (
+                  <p className="text-xs text-yellow-600 mt-1">
+                    {stats.pendingOrders} pending
+                  </p>
+                )}
+              </div>
+              <div className="p-3 rounded-xl bg-blue-100">
+                <ShoppingBag className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Products</p>
+                <p className="text-2xl font-bold mt-1">{stats.totalProducts}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.activeProducts} active, {stats.pendingProducts} pending
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-purple-100">
+                <Package className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={stats.lowStockProducts > 0 ? 'border-orange-200' : ''}>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Low Stock Alert</p>
+                <p className={`text-2xl font-bold mt-1 ${stats.lowStockProducts > 0 ? 'text-orange-600' : ''}`}>
+                  {stats.lowStockProducts}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  products need restock
+                </p>
+              </div>
+              <div className={`p-3 rounded-xl ${stats.lowStockProducts > 0 ? 'bg-orange-100' : 'bg-gray-100'}`}>
+                <AlertTriangle className={`h-6 w-6 ${stats.lowStockProducts > 0 ? 'text-orange-600' : 'text-gray-600'}`} />
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Orders */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {recentOrders.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              No orders yet. Start by adding products!
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {recentOrders.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-4 bg-secondary/50 rounded-xl"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center">
-                      <Package className="h-6 w-6 text-muted-foreground" />
+      {/* Quick Actions */}
+      <div className="grid sm:grid-cols-3 gap-4">
+        <Link to="/seller/dashboard/orders" className="group">
+          <Card className="hover:border-primary/50 transition-colors">
+            <CardContent className="pt-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <ShoppingBag className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-medium">View Orders</p>
+                  <p className="text-sm text-muted-foreground">Manage all orders</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/seller/dashboard/earnings" className="group">
+          <Card className="hover:border-primary/50 transition-colors">
+            <CardContent className="pt-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-green-100">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Earnings</p>
+                  <p className="text-sm text-muted-foreground">Track your income</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/seller/dashboard/settings" className="group">
+          <Card className="hover:border-primary/50 transition-colors">
+            <CardContent className="pt-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-purple-100">
+                  <TrendingUp className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Shop Settings</p>
+                  <p className="text-sm text-muted-foreground">Customize your store</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Recent Orders */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Recent Orders</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/seller/dashboard/orders" className="gap-1">
+                View All <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {recentOrders.length === 0 ? (
+              <div className="text-center py-8">
+                <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                <p className="text-muted-foreground">No orders yet</p>
+                <p className="text-sm text-muted-foreground">Orders will appear here when customers purchase your products.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center justify-between p-3 bg-secondary/50 rounded-xl hover:bg-secondary transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-background">
+                        <Package className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{order.order_number}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {order.shipping_name} • {order.items?.length} item(s)
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{item.product_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {item.order?.order_number} • Qty: {item.quantity}
+                    <div className="text-right">
+                      <Badge className={`${statusColors[order.status]} border-0 text-xs`}>
+                        {order.status}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(order.created_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-primary">
-                      {formatPrice(item.seller_amount || item.price * item.quantity)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </p>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Top Products */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Top Products</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/seller/dashboard/products" className="gap-1">
+                View All <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {topProducts.length === 0 ? (
+              <div className="text-center py-8">
+                <Package className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                <p className="text-muted-foreground">No products yet</p>
+                <Button variant="outline" size="sm" asChild className="mt-2">
+                  <Link to="/seller/dashboard/products">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Product
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {topProducts.map((product, index) => (
+                  <div
+                    key={product.id}
+                    className="flex items-center justify-between p-3 bg-secondary/50 rounded-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                        #{index + 1}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate max-w-[180px]">{product.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatPrice(product.price)} • {product.sold || 0} sold
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className={`${product.status === 'approved' ? 'border-green-300 text-green-700' : 'border-yellow-300 text-yellow-700'}`}>
+                      {product.status}
+                    </Badge>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Shop Performance */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Shop Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid sm:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                <span className="text-2xl font-bold">{seller?.rating?.toFixed(1) || '0.0'}</span>
+              </div>
+              <p className="text-sm text-muted-foreground">Shop Rating</p>
             </div>
-          )}
+            <div className="text-center">
+              <p className="text-2xl font-bold">{seller?.total_sales || 0}</p>
+              <p className="text-sm text-muted-foreground">Total Sales</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold capitalize">{seller?.level || 'bronze'}</p>
+              <p className="text-sm text-muted-foreground">Seller Level</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">{seller?.commission_rate || 10}%</p>
+              <p className="text-sm text-muted-foreground">Commission Rate</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
