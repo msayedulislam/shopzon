@@ -130,9 +130,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error as Error | null };
   };
 
-  const signIn = async (phone: string, password: string) => {
-    // Try to sign in with phone-based email
-    const authEmail = `${phone}@bdmart.local`;
+  const signIn = async (phoneOrEmail: string, password: string) => {
+    // Check if input is an email (contains @) or phone number
+    const isEmail = phoneOrEmail.includes('@') && !phoneOrEmail.endsWith('@bdmart.local');
+    const authEmail = isEmail ? phoneOrEmail : `${phoneOrEmail}@bdmart.local`;
     
     const { error } = await supabase.auth.signInWithPassword({
       email: authEmail,
