@@ -1,11 +1,21 @@
 import { motion } from 'framer-motion';
-import { Truck, ArrowRight } from 'lucide-react';
+import { Truck, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductCard } from '@/components/product/ProductCard';
+import { useFreeDeliveryProducts, toDisplayProduct } from '@/hooks/useProducts';
 import { getFreeDeliveryProducts } from '@/data/mockData';
 
 export function FreeDeliverySection() {
-  const freeDeliveryProducts = getFreeDeliveryProducts().slice(0, 4);
+  const { data: dbProducts, isLoading } = useFreeDeliveryProducts(4);
+  
+  // Use database products if available, otherwise fall back to mock data
+  const freeDeliveryProducts = dbProducts && dbProducts.length > 0
+    ? dbProducts.map(toDisplayProduct)
+    : getFreeDeliveryProducts().slice(0, 4);
+
+  if (freeDeliveryProducts.length === 0 && !isLoading) {
+    return null;
+  }
 
   return (
     <section className="py-16 lg:py-20 relative overflow-hidden">
@@ -43,19 +53,25 @@ export function FreeDeliverySection() {
         </motion.div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {freeDeliveryProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {freeDeliveryProducts.map((product, index) => (
+              <motion.div
+                key={`free-${product.id}-${index}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

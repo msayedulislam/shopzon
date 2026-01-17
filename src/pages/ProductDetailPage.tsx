@@ -154,9 +154,9 @@ export default function ProductDetailPage() {
                 
                 {/* Thumbnails */}
                 <div className="flex gap-3 overflow-x-auto pb-2 px-1">
-                  {[product.images[0], product.images[0], product.images[0], product.images[0]].map((img, index) => (
+                  {product.images.slice(0, 4).map((img, index) => (
                     <motion.button
-                      key={index}
+                      key={`thumb-${index}-${img.substring(0, 20)}`}
                       onClick={() => setSelectedImage(index)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -167,6 +167,22 @@ export default function ProductDetailPage() {
                       }`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" />
+                    </motion.button>
+                  ))}
+                  {/* Show placeholder thumbnails if less than 4 images */}
+                  {product.images.length < 4 && Array.from({ length: 4 - product.images.length }).map((_, i) => (
+                    <motion.button
+                      key={`placeholder-${i}`}
+                      onClick={() => setSelectedImage(0)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shadow-md ${
+                        selectedImage === product.images.length + i 
+                          ? 'border-primary ring-2 ring-primary/20' 
+                          : 'border-transparent hover:border-primary/50'
+                      }`}
+                    >
+                      <img src={product.images[0]} alt="" className="w-full h-full object-cover opacity-50" />
                     </motion.button>
                   ))}
                 </div>
