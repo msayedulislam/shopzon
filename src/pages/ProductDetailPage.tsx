@@ -381,7 +381,9 @@ export default function ProductDetailPage() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-lg">{product.seller.name}</span>
+                        <Link to={`/store/${product.seller.slug}`} className="font-bold text-lg hover:text-primary transition-colors">
+                          {product.seller.name}
+                        </Link>
                         {product.seller.verified && (
                           <span className="bg-blue-500 text-white p-0.5 rounded-full">
                             <Check className="h-3 w-3" />
@@ -400,9 +402,11 @@ export default function ProductDetailPage() {
                         <span>{product.seller.productCount} Products</span>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="font-semibold hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
-                      Visit Store
-                    </Button>
+                    <Link to={`/store/${product.seller.slug}`}>
+                      <Button variant="outline" size="sm" className="font-semibold hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
+                        Visit Store
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>
