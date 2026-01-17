@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Plus, Search, Edit2, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { formatPrice } from '@/data/mockData';
+import { ImageUpload } from '@/components/ImageUpload';
 
 export default function SellerProducts() {
   const { seller } = useOutletContext<{ seller: any }>();
@@ -34,6 +35,7 @@ export default function SellerProducts() {
   const [formLoading, setFormLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [productImages, setProductImages] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -61,7 +63,8 @@ export default function SellerProducts() {
         .from('products')
         .select(`
           *,
-          category:categories(name)
+          category:categories(name),
+          images:product_images(id, image_url, sort_order)
         `)
         .eq('seller_id', seller.id)
         .order('created_at', { ascending: false });
@@ -91,7 +94,7 @@ export default function SellerProducts() {
       .replace(/(^-|-$)/g, '');
   };
 
-  const openDialog = (product?: any) => {
+  const openDialog = async (product?: any) => {
     if (product) {
       setEditingProduct(product);
       setFormData({
@@ -104,6 +107,11 @@ export default function SellerProducts() {
         stock: product.stock.toString(),
         tags: product.tags?.join(', ') || '',
       });
+      // Load existing images
+      const existingImages = product.images
+        ?.sort((a: any, b: any) => a.sort_order - b.sort_order)
+        .map((img: any) => img.image_url) || [];
+      setProductImages(existingImages);
     } else {
       setEditingProduct(null);
       setFormData({
@@ -116,6 +124,7 @@ export default function SellerProducts() {
         stock: '',
         tags: '',
       });
+      setProductImages([]);
     }
     setDialogOpen(true);
   };
@@ -148,6 +157,8 @@ export default function SellerProducts() {
         status: 'pending' as const,
       };
 
+      let productId = editingProduct?.id;
+
       if (editingProduct) {
         const { error } = await supabase
           .from('products')
@@ -155,13 +166,41 @@ export default function SellerProducts() {
           .eq('id', editingProduct.id);
 
         if (error) throw error;
-        toast({ title: 'Product Updated' });
       } else {
-        const { error } = await supabase.from('products').insert(productData);
+        const { data, error } = await supabase
+          .from('products')
+          .insert(productData)
+          .select('id')
+          .single();
 
         if (error) throw error;
-        toast({ title: 'Product Added', description: 'Waiting for admin approval.' });
+        productId = data.id;
       }
+
+      // Handle product images
+      if (productId) {
+        // Delete existing images
+        await supabase
+          .from('product_images')
+          .delete()
+          .eq('product_id', productId);
+
+        // Insert new images
+        if (productImages.length > 0) {
+          const imageRecords = productImages.map((url, index) => ({
+            product_id: productId,
+            image_url: url,
+            sort_order: index,
+          }));
+
+          await supabase.from('product_images').insert(imageRecords);
+        }
+      }
+
+      toast({ 
+        title: editingProduct ? 'Product Updated' : 'Product Added',
+        description: editingProduct ? undefined : 'Waiting for admin approval.',
+      });
 
       setDialogOpen(false);
       fetchProducts();
@@ -180,6 +219,9 @@ export default function SellerProducts() {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
     try {
+      // Delete images first
+      await supabase.from('product_images').delete().eq('product_id', id);
+      
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) throw error;
       setProducts(products.filter((p) => p.id !== id));
@@ -226,6 +268,17 @@ export default function SellerProducts() {
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+              {/* Image Upload Section */}
+              <div>
+                <Label className="mb-2 block">Product Images</Label>
+                <ImageUpload
+                  images={productImages}
+                  onImagesChange={setProductImages}
+                  maxImages={5}
+                  folder={`sellers/${seller?.id}`}
+                />
+              </div>
+
               <div>
                 <Label>Product Name *</Label>
                 <Input
@@ -358,63 +411,74 @@ export default function SellerProducts() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-secondary/30">
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-secondary" />
-                        <div>
-                          <p className="font-medium line-clamp-1">{product.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {product.sold} sold
-                          </p>
+                {filteredProducts.map((product) => {
+                  const mainImage = product.images?.sort((a: any, b: any) => a.sort_order - b.sort_order)[0]?.image_url;
+                  return (
+                    <tr key={product.id} className="hover:bg-secondary/30">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-lg bg-secondary overflow-hidden">
+                            {mainImage ? (
+                              <img src={mainImage} alt={product.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                📷
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium line-clamp-1">{product.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {product.sold} sold
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="p-4 text-muted-foreground">
-                      {product.category?.name || '-'}
-                    </td>
-                    <td className="p-4">
-                      <span className="font-semibold">{formatPrice(product.price)}</span>
-                      {product.original_price && (
-                        <span className="text-sm text-muted-foreground line-through ml-2">
-                          {formatPrice(product.original_price)}
+                      </td>
+                      <td className="p-4 text-muted-foreground">
+                        {product.category?.name || '-'}
+                      </td>
+                      <td className="p-4">
+                        <span className="font-semibold">{formatPrice(product.price)}</span>
+                        {product.original_price && (
+                          <span className="text-sm text-muted-foreground line-through ml-2">
+                            {formatPrice(product.original_price)}
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <span
+                          className={product.stock < 10 ? 'text-warning font-medium' : ''}
+                        >
+                          {product.stock}
                         </span>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={product.stock < 10 ? 'text-warning font-medium' : ''}
-                      >
-                        {product.stock}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <Badge className={statusColors[product.status]}>
-                        {product.status}
-                      </Badge>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openDialog(product)}
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive"
-                          onClick={() => deleteProduct(product.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-4">
+                        <Badge className={statusColors[product.status]}>
+                          {product.status}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openDialog(product)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive"
+                            onClick={() => deleteProduct(product.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
