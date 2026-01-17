@@ -55,6 +55,7 @@ import AdminCampaigns from '@/pages/admin/AdminCampaigns';
 import AdminSystemHealth from '@/pages/admin/AdminSystemHealth';
 import AdminAdvancedOrders from '@/pages/admin/AdminAdvancedOrders';
 import AdminAISuggestions from '@/pages/admin/AdminAISuggestions';
+import AdminRefunds from '@/pages/admin/AdminRefunds';
 
 import StaticPage from '@/pages/StaticPage';
 
@@ -130,6 +131,7 @@ export function AnimatedRoutes() {
           <Route path="campaigns" element={<AdminCampaigns />} />
           <Route path="system-health" element={<AdminSystemHealth />} />
           <Route path="ai-suggestions" element={<AdminAISuggestions />} />
+          <Route path="refunds" element={<AdminRefunds />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
 

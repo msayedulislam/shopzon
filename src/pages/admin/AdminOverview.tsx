@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { format, subDays, startOfWeek, startOfMonth, startOfYear } from 'date-fns';
-import { Users, Store, Package, ShoppingBag, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, CalendarIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Users, Store, Package, ShoppingBag, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, CalendarIcon, Sparkles, Check, X, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import { Badge } from '@/components/ui/badge';
 import {
   Popover,
   PopoverContent,
@@ -59,6 +61,8 @@ export default function AdminOverview() {
   const [orderStatusData, setOrderStatusData] = useState<any[]>([]);
   const [dailyOrdersData, setDailyOrdersData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [pendingRefunds, setPendingRefunds] = useState(0);
   
   // Date range state
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -70,6 +74,8 @@ export default function AdminOverview() {
   useEffect(() => {
     fetchStats();
     fetchRecentOrders();
+    fetchAISuggestions();
+    fetchPendingRefunds();
   }, []);
 
   useEffect(() => {
@@ -169,6 +175,32 @@ export default function AdminOverview() {
       setRecentOrders(data || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
+    }
+  };
+
+  const fetchAISuggestions = async () => {
+    try {
+      const { data } = await supabase
+        .from('ai_suggestions')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      setAiSuggestions(data || []);
+    } catch (error) {
+      console.error('Error fetching AI suggestions:', error);
+    }
+  };
+
+  const fetchPendingRefunds = async () => {
+    try {
+      const { count } = await supabase
+        .from('refunds')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      setPendingRefunds(count || 0);
+    } catch (error) {
+      console.error('Error fetching pending refunds:', error);
     }
   };
 
@@ -500,12 +532,67 @@ export default function AdminOverview() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        {/* AI Suggestions Widget */}
+        <Card className="lg:col-span-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              AI Suggestions
+              {aiSuggestions.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {aiSuggestions.length} pending
+                </Badge>
+              )}
+            </CardTitle>
+            <Link to="/admin/ai-suggestions">
+              <Button variant="outline" size="sm">View All</Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {aiSuggestions.length === 0 ? (
+              <div className="text-center py-6">
+                <Sparkles className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                <p className="text-muted-foreground">No pending suggestions</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {aiSuggestions.slice(0, 3).map((suggestion) => (
+                  <div key={suggestion.id} className="flex items-center justify-between p-3 rounded-lg bg-background border">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="outline" className="text-xs capitalize">{suggestion.type}</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round((suggestion.confidence || 0) * 100)}% confidence
+                        </span>
+                      </div>
+                      <p className="text-sm truncate">
+                        {typeof suggestion.suggestion === 'object' 
+                          ? JSON.stringify(suggestion.suggestion).slice(0, 50) + '...'
+                          : String(suggestion.suggestion).slice(0, 50) + '...'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 ml-2">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50">
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50">
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats with Refunds */}
+        <Card>
           <CardHeader>
             <CardTitle>Quick Stats</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-2 rounded-lg bg-primary/20">
@@ -526,15 +613,24 @@ export default function AdminOverview() {
                 <p className="text-2xl font-bold text-blue-500">{stats.todayOrders}</p>
               </div>
 
-              <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-green-500/20">
-                    <Users className="h-5 w-5 text-green-500" />
+              {pendingRefunds > 0 && (
+                <Link to="/admin/refunds" className="block">
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/20 hover:border-orange-500/40 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-orange-500/20">
+                          <RotateCcw className="h-5 w-5 text-orange-500" />
+                        </div>
+                        <div>
+                          <span className="text-sm text-muted-foreground">Pending Refunds</span>
+                          <p className="text-xl font-bold text-orange-500">{pendingRefunds}</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-orange-600 border-orange-300">Action Required</Badge>
+                    </div>
                   </div>
-                  <span className="text-sm text-muted-foreground">Total Users</span>
-                </div>
-                <p className="text-2xl font-bold text-green-500">{stats.totalUsers}</p>
-              </div>
+                </Link>
+              )}
 
               <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20">
                 <div className="flex items-center gap-3 mb-2">

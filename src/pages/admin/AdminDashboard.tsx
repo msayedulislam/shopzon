@@ -22,6 +22,7 @@ import {
   ShieldAlert,
   Activity,
   UserCog,
+  RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -32,6 +33,7 @@ import { NotificationPanel } from '@/components/admin/NotificationPanel';
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
   { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
+  { icon: RotateCcw, label: 'Refunds', path: '/admin/refunds' },
   { icon: Package, label: 'Products', path: '/admin/products' },
   { icon: Store, label: 'Sellers', path: '/admin/sellers' },
   { icon: UserCog, label: 'Seller Governance', path: '/admin/seller-governance' },
