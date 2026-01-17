@@ -47,6 +47,14 @@ import AdminBlog from '@/pages/admin/AdminBlog';
 import AdminInquiries from '@/pages/admin/AdminInquiries';
 import AdminLogs from '@/pages/admin/AdminLogs';
 import AdminSettings from '@/pages/admin/AdminSettings';
+import AdminFinance from '@/pages/admin/AdminFinance';
+import AdminSellerGovernance from '@/pages/admin/AdminSellerGovernance';
+import AdminFraudDetection from '@/pages/admin/AdminFraudDetection';
+import AdminCouriers from '@/pages/admin/AdminCouriers';
+import AdminCampaigns from '@/pages/admin/AdminCampaigns';
+import AdminSystemHealth from '@/pages/admin/AdminSystemHealth';
+import AdminAdvancedOrders from '@/pages/admin/AdminAdvancedOrders';
+import AdminAISuggestions from '@/pages/admin/AdminAISuggestions';
 
 import StaticPage from '@/pages/StaticPage';
 
@@ -107,6 +115,7 @@ export function AnimatedRoutes() {
           <Route path="sellers" element={<AdminSellers />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="advanced-orders" element={<AdminAdvancedOrders />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="brands" element={<AdminBrands />} />
           <Route path="coupons" element={<AdminCoupons />} />
@@ -114,6 +123,13 @@ export function AnimatedRoutes() {
           <Route path="blog" element={<AdminBlog />} />
           <Route path="inquiries" element={<AdminInquiries />} />
           <Route path="logs" element={<AdminLogs />} />
+          <Route path="finance" element={<AdminFinance />} />
+          <Route path="seller-governance" element={<AdminSellerGovernance />} />
+          <Route path="fraud-detection" element={<AdminFraudDetection />} />
+          <Route path="couriers" element={<AdminCouriers />} />
+          <Route path="campaigns" element={<AdminCampaigns />} />
+          <Route path="system-health" element={<AdminSystemHealth />} />
+          <Route path="ai-suggestions" element={<AdminAISuggestions />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
 
