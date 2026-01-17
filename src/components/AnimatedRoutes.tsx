@@ -21,6 +21,7 @@ import ProfilePage from '@/pages/dashboard/ProfilePage';
 import OrdersPage from '@/pages/dashboard/OrdersPage';
 import DashboardWishlistPage from '@/pages/dashboard/WishlistPage';
 import AddressesPage from '@/pages/dashboard/AddressesPage';
+import DashboardWalletPage from '@/pages/dashboard/WalletPage';
 
 // Seller
 import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
@@ -94,6 +95,7 @@ export function AnimatedRoutes() {
           <Route index element={<DashboardOverview />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="orders" element={<OrdersPage />} />
+          <Route path="wallet" element={<DashboardWalletPage />} />
           <Route path="wishlist" element={<DashboardWishlistPage />} />
           <Route path="addresses" element={<AddressesPage />} />
         </Route>

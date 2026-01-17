@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, CreditCard, Truck, ChevronRight, Check, Plus, ArrowLeft } from 'lucide-react';
+import { MapPin, CreditCard, Truck, ChevronRight, Check, ArrowLeft, Wallet, Info } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Switch } from '@/components/ui/switch';
 import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
+import { toast } from 'sonner';
 
 const steps = [
   { id: 1, name: 'Shipping', icon: MapPin },
@@ -18,9 +22,14 @@ const steps = [
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { items, getSubtotal, clearCart } = useCart();
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [useWallet, setUseWallet] = useState(false);
+  const [walletAmountToUse, setWalletAmountToUse] = useState(0);
+  const [placingOrder, setPlacingOrder] = useState(false);
   
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
@@ -33,12 +42,115 @@ export default function CheckoutPage() {
 
   const subtotal = getSubtotal();
   const deliveryCharge = subtotal > 5000 ? 0 : 60;
-  const total = subtotal + deliveryCharge;
+  const walletDiscount = useWallet ? Math.min(walletAmountToUse, subtotal + deliveryCharge) : 0;
+  const total = subtotal + deliveryCharge - walletDiscount;
 
-  const handlePlaceOrder = () => {
-    // Simulate order placement
-    clearCart();
-    navigate('/order-success');
+  useEffect(() => {
+    if (user) {
+      fetchWalletBalance();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (useWallet && walletBalance > 0) {
+      setWalletAmountToUse(Math.min(walletBalance, subtotal + deliveryCharge));
+    } else {
+      setWalletAmountToUse(0);
+    }
+  }, [useWallet, walletBalance, subtotal, deliveryCharge]);
+
+  const fetchWalletBalance = async () => {
+    try {
+      const { data } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('user_id', user?.id)
+        .single();
+      
+      if (data) {
+        setWalletBalance(data.balance);
+      }
+    } catch (error) {
+      // Wallet doesn't exist yet, that's fine
+      console.log('No wallet found');
+    }
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!user) {
+      toast.error('Please login to place order');
+      return;
+    }
+
+    setPlacingOrder(true);
+    try {
+      // Create order
+      const orderNumber = `BDM-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
+      
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          order_number: orderNumber,
+          shipping_name: shippingInfo.name,
+          shipping_phone: shippingInfo.phone,
+          shipping_address: shippingInfo.address,
+          shipping_city: shippingInfo.city,
+          shipping_area: shippingInfo.area,
+          shipping_postal_code: shippingInfo.postalCode,
+          subtotal: subtotal,
+          delivery_charge: deliveryCharge,
+          discount: walletDiscount,
+          total: total,
+          payment_method: paymentMethod as any,
+          payment_status: 'pending',
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Add order items
+      const orderItems = items.map((item) => ({
+        order_id: order.id,
+        product_id: item.product.id,
+        product_name: item.product.name,
+        product_image: item.product.images[0],
+        quantity: item.quantity,
+        price: item.product.price,
+        seller_id: item.product.seller?.id || null,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      // Debit wallet if used
+      if (useWallet && walletDiscount > 0) {
+        const { error: walletError } = await supabase.rpc('debit_wallet', {
+          p_user_id: user.id,
+          p_amount: walletDiscount,
+          p_reference_type: 'order',
+          p_reference_id: order.id,
+          p_description: `Payment for order #${orderNumber}`,
+        });
+
+        if (walletError) {
+          console.error('Wallet debit error:', walletError);
+        }
+      }
+
+      clearCart();
+      navigate('/order-success');
+    } catch (error: any) {
+      console.error('Error placing order:', error);
+      toast.error(error.message || 'Failed to place order');
+    } finally {
+      setPlacingOrder(false);
+    }
   };
 
   return (
@@ -198,6 +310,39 @@ export default function CheckoutPage() {
                     Payment Method
                   </h2>
 
+                  {/* Wallet Balance Option */}
+                  {walletBalance > 0 && (
+                    <div className="mb-6 p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-primary/20">
+                            <Wallet className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Use Wallet Balance</p>
+                            <p className="text-sm text-muted-foreground">
+                              Available: {formatPrice(walletBalance)}
+                            </p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={useWallet}
+                          onCheckedChange={setUseWallet}
+                        />
+                      </div>
+                      {useWallet && (
+                        <div className="mt-3 pt-3 border-t border-primary/20">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>Amount to use:</span>
+                            <span className="font-semibold text-primary">
+                              -{formatPrice(walletDiscount)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                     <div className="space-y-3">
                       <label
@@ -345,6 +490,12 @@ export default function CheckoutPage() {
                     <p className="text-muted-foreground capitalize">
                       {paymentMethod === 'cod' ? 'Cash on Delivery' : paymentMethod}
                     </p>
+                    {useWallet && walletDiscount > 0 && (
+                      <div className="flex items-center gap-2 mt-2 text-primary">
+                        <Wallet className="h-4 w-4" />
+                        <span>Wallet: -{formatPrice(walletDiscount)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex justify-between">
@@ -352,8 +503,8 @@ export default function CheckoutPage() {
                       <ArrowLeft className="h-4 w-4" />
                       Back
                     </Button>
-                    <Button onClick={handlePlaceOrder} className="btn-hero">
-                      Place Order
+                    <Button onClick={handlePlaceOrder} disabled={placingOrder} className="btn-hero">
+                      {placingOrder ? 'Placing Order...' : 'Place Order'}
                       <Check className="h-5 w-5" />
                     </Button>
                   </div>
@@ -383,6 +534,15 @@ export default function CheckoutPage() {
                       )}
                     </span>
                   </div>
+                  {useWallet && walletDiscount > 0 && (
+                    <div className="flex justify-between text-primary">
+                      <span className="flex items-center gap-1">
+                        <Wallet className="h-4 w-4" />
+                        Wallet
+                      </span>
+                      <span className="font-medium">-{formatPrice(walletDiscount)}</span>
+                    </div>
+                  )}
                   <div className="border-t pt-3">
                     <div className="flex justify-between">
                       <span className="font-semibold">Total</span>
@@ -392,6 +552,16 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Wallet Info */}
+                {walletBalance > 0 && !useWallet && (
+                  <div className="mt-4 p-3 bg-primary/5 rounded-xl flex items-start gap-2">
+                    <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <p className="text-xs text-muted-foreground">
+                      You have {formatPrice(walletBalance)} in your wallet. Apply it during payment step.
+                    </p>
+                  </div>
+                )}
 
                 {/* Delivery Info */}
                 <div className="mt-6 p-4 bg-primary/5 rounded-xl">

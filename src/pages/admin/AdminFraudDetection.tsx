@@ -70,59 +70,7 @@ export default function AdminFraudDetection() {
 
   useEffect(() => {
     fetchAlerts();
-    generateDemoAlerts();
   }, []);
-
-  const generateDemoAlerts = async () => {
-    // Check if demo alerts already exist
-    const { data: existing } = await supabase
-      .from('fraud_alerts')
-      .select('id')
-      .limit(1);
-
-    if (existing && existing.length > 0) return;
-
-    // Generate demo fraud alerts for demonstration
-    const demoAlerts = [
-      {
-        alert_type: 'multiple_failed_payments',
-        severity: 'high',
-        score: 85,
-        indicators: {
-          failed_attempts: 5,
-          time_window: '10 minutes',
-          ip_address: '192.168.1.100',
-        },
-        status: 'pending',
-      },
-      {
-        alert_type: 'unusual_order_pattern',
-        severity: 'medium',
-        score: 65,
-        indicators: {
-          order_value: 50000,
-          items_count: 20,
-          new_customer: true,
-        },
-        status: 'pending',
-      },
-      {
-        alert_type: 'address_mismatch',
-        severity: 'low',
-        score: 45,
-        indicators: {
-          billing_city: 'Dhaka',
-          shipping_city: 'Chittagong',
-          phone_area: 'Sylhet',
-        },
-        status: 'pending',
-      },
-    ];
-
-    for (const alert of demoAlerts) {
-      await supabase.from('fraud_alerts').insert(alert);
-    }
-  };
 
   const fetchAlerts = async () => {
     try {
