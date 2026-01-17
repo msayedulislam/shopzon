@@ -14,12 +14,14 @@ import {
   LogOut,
   Menu,
   Shield,
+  MessageSquare,
+  BookOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
-
-import { MessageSquare, BookOpen } from 'lucide-react';
+import { useAdminNotifications } from '@/hooks/useAdminNotifications';
+import { NotificationPanel } from '@/components/admin/NotificationPanel';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
@@ -41,6 +43,7 @@ export default function AdminDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, isAdmin } = useAuth();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useAdminNotifications();
 
   useEffect(() => {
     if (!isAdmin) {
@@ -145,7 +148,14 @@ export default function AdminDashboard() {
             <h1 className="font-semibold">Admin Dashboard</h1>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <NotificationPanel
+              notifications={notifications}
+              unreadCount={unreadCount}
+              onMarkAsRead={markAsRead}
+              onMarkAllAsRead={markAllAsRead}
+              onClearAll={clearAll}
+            />
             <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
               ← Back to Store
             </Link>
