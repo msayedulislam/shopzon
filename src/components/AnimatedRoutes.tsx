@@ -35,12 +35,18 @@ import SellerSettings from '@/pages/seller/SellerSettings';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminLoginPage from '@/pages/admin/AdminLoginPage';
 import AdminOverview from '@/pages/admin/AdminOverview';
+import AdminUsers from '@/pages/admin/AdminUsers';
 import AdminSellers from '@/pages/admin/AdminSellers';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminOrders from '@/pages/admin/AdminOrders';
+import AdminCategories from '@/pages/admin/AdminCategories';
+import AdminBrands from '@/pages/admin/AdminBrands';
+import AdminCoupons from '@/pages/admin/AdminCoupons';
 import AdminPages from '@/pages/admin/AdminPages';
 import AdminBlog from '@/pages/admin/AdminBlog';
 import AdminInquiries from '@/pages/admin/AdminInquiries';
+import AdminLogs from '@/pages/admin/AdminLogs';
+import AdminSettings from '@/pages/admin/AdminSettings';
 
 import StaticPage from '@/pages/StaticPage';
 
@@ -97,12 +103,18 @@ export function AnimatedRoutes() {
         <Route path="/admin/login" element={<PageTransition><AdminLoginPage /></PageTransition>} />
         <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>}>
           <Route index element={<AdminOverview />} />
+          <Route path="users" element={<AdminUsers />} />
           <Route path="sellers" element={<AdminSellers />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="brands" element={<AdminBrands />} />
+          <Route path="coupons" element={<AdminCoupons />} />
           <Route path="pages" element={<AdminPages />} />
           <Route path="blog" element={<AdminBlog />} />
           <Route path="inquiries" element={<AdminInquiries />} />
+          <Route path="logs" element={<AdminLogs />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
 
         {/* Static Pages */}
