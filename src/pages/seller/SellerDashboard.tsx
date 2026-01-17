@@ -10,15 +10,22 @@ import {
   Menu,
   Store,
   AlertCircle,
+  TrendingUp,
+  Star,
+  Bell,
+  ChevronRight,
+  Home,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { formatPrice } from '@/data/mockData';
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/seller/dashboard' },
+  { icon: LayoutDashboard, label: 'Overview', path: '/seller/dashboard' },
   { icon: Package, label: 'Products', path: '/seller/dashboard/products' },
   { icon: ShoppingBag, label: 'Orders', path: '/seller/dashboard/orders' },
   { icon: DollarSign, label: 'Earnings', path: '/seller/dashboard/earnings' },
@@ -77,80 +84,116 @@ export default function SellerDashboard() {
   }
 
   const Sidebar = () => (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-card">
       {/* Logo */}
-      <div className="p-4 border-b">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
+      <div className="p-5 border-b">
+        <Link to="/" className="flex items-center gap-3">
+          <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
             <span className="text-primary-foreground font-bold text-xl">B</span>
           </div>
           <div>
-            <span className="font-display font-bold">BDMart</span>
+            <span className="font-display font-bold text-lg">BDMart</span>
             <p className="text-xs text-muted-foreground">Seller Center</p>
           </div>
         </Link>
       </div>
 
-      {/* Seller Info */}
-      <div className="p-4 border-b">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-            <Store className="h-5 w-5 text-primary" />
-          </div>
+      {/* Seller Info Card */}
+      <div className="p-4 m-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+        <div className="flex items-center gap-3 mb-3">
+          <Avatar className="h-12 w-12 border-2 border-primary/30">
+            <AvatarImage src={seller?.logo_url} />
+            <AvatarFallback className="bg-primary/20 text-primary font-semibold">
+              {seller?.shop_name?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
           <div className="min-w-0">
             <p className="font-semibold truncate">{seller?.shop_name}</p>
             <Badge
-              className={
+              className={`text-xs ${
                 seller?.status === 'active'
-                  ? 'bg-green-100 text-green-800'
+                  ? 'bg-green-100 text-green-700 border-0'
                   : seller?.status === 'pending'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : 'bg-red-100 text-red-800'
-              }
+                  ? 'bg-yellow-100 text-yellow-700 border-0'
+                  : 'bg-red-100 text-red-700 border-0'
+              }`}
             >
               {seller?.status}
             </Badge>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-center">
+          <div className="p-2 rounded-lg bg-background/50">
+            <p className="text-sm font-bold text-primary">{formatPrice(seller?.balance || 0)}</p>
+            <p className="text-xs text-muted-foreground">Balance</p>
+          </div>
+          <div className="p-2 rounded-lg bg-background/50">
+            <div className="flex items-center justify-center gap-1">
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              <p className="text-sm font-bold">{seller?.rating?.toFixed(1) || '0.0'}</p>
+            </div>
+            <p className="text-xs text-muted-foreground">Rating</p>
           </div>
         </div>
       </div>
 
       {/* Pending Approval Notice */}
       {seller?.status === 'pending' && (
-        <div className="p-4 m-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-          <div className="flex gap-2">
-            <AlertCircle className="h-5 w-5 text-yellow-600 shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-yellow-800">Pending Approval</p>
-              <p className="text-xs text-yellow-700">
-                Your shop is under review. You can add products but they won't be visible until approved.
-              </p>
+        <div className="px-4 pb-4">
+          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
+            <div className="flex gap-2">
+              <AlertCircle className="h-4 w-4 text-yellow-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-medium text-yellow-800">Pending Approval</p>
+                <p className="text-xs text-yellow-700">
+                  Your shop is under review.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 px-4 py-2">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-4">
+          Menu
+        </p>
         <div className="space-y-1">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                location.pathname === item.path
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-secondary'
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path || 
+              (item.path !== '/seller/dashboard' && location.pathname.startsWith(item.path));
+            
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'hover:bg-secondary text-foreground'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon className="h-5 w-5" />
+                  <span className="font-medium">{item.label}</span>
+                </div>
+                {isActive && <ChevronRight className="h-4 w-4" />}
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
-      {/* Sign Out */}
-      <div className="p-4 border-t">
+      {/* Bottom Actions */}
+      <div className="p-4 border-t space-y-2">
+        <Link
+          to="/"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl w-full hover:bg-secondary transition-colors text-muted-foreground"
+        >
+          <Home className="h-5 w-5" />
+          <span>Back to Store</span>
+        </Link>
         <button
           onClick={handleSignOut}
           className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-destructive hover:bg-destructive/10 transition-colors"
@@ -163,16 +206,16 @@ export default function SellerDashboard() {
   );
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-secondary/30">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-64 bg-card border-r shrink-0">
+      <aside className="hidden lg:block w-72 border-r shrink-0 sticky top-0 h-screen overflow-y-auto">
         <Sidebar />
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="h-16 border-b bg-card flex items-center justify-between px-4 lg:px-6">
+        <header className="h-16 border-b bg-card/80 backdrop-blur-sm flex items-center justify-between px-4 lg:px-6 sticky top-0 z-10">
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild className="lg:hidden">
@@ -180,24 +223,35 @@ export default function SellerDashboard() {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-64">
+            <SheetContent side="left" className="p-0 w-72">
               <Sidebar />
             </SheetContent>
           </Sheet>
 
-          <div className="hidden lg:block">
+          <div className="hidden lg:flex items-center gap-2">
+            <Store className="h-5 w-5 text-primary" />
             <h1 className="font-semibold">Seller Dashboard</h1>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-              ← Back to Store
-            </Link>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
+            </Button>
+            <div className="hidden sm:flex items-center gap-2 pl-3 border-l">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={seller?.logo_url} />
+                <AvatarFallback className="bg-primary/20 text-primary text-sm">
+                  {seller?.shop_name?.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-medium">{seller?.shop_name}</span>
+            </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-6 bg-secondary/30 overflow-auto">
+        <main className="flex-1 p-4 lg:p-6 overflow-auto">
           <Outlet context={{ seller, fetchSeller }} />
         </main>
       </div>
