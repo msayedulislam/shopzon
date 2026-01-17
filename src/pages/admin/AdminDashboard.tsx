@@ -16,6 +16,12 @@ import {
   Shield,
   MessageSquare,
   BookOpen,
+  DollarSign,
+  Truck,
+  Megaphone,
+  ShieldAlert,
+  Activity,
+  UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -25,10 +31,15 @@ import { NotificationPanel } from '@/components/admin/NotificationPanel';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
-  { icon: Users, label: 'Users', path: '/admin/users' },
-  { icon: Store, label: 'Sellers', path: '/admin/sellers' },
-  { icon: Package, label: 'Products', path: '/admin/products' },
   { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
+  { icon: Package, label: 'Products', path: '/admin/products' },
+  { icon: Store, label: 'Sellers', path: '/admin/sellers' },
+  { icon: UserCog, label: 'Seller Governance', path: '/admin/seller-governance' },
+  { icon: DollarSign, label: 'Finance', path: '/admin/finance' },
+  { icon: Truck, label: 'Couriers', path: '/admin/couriers' },
+  { icon: Megaphone, label: 'Campaigns', path: '/admin/campaigns' },
+  { icon: ShieldAlert, label: 'Fraud Detection', path: '/admin/fraud' },
+  { icon: Users, label: 'Users', path: '/admin/users' },
   { icon: Layers, label: 'Categories', path: '/admin/categories' },
   { icon: Tag, label: 'Brands', path: '/admin/brands' },
   { icon: Ticket, label: 'Coupons', path: '/admin/coupons' },
@@ -36,6 +47,7 @@ const menuItems = [
   { icon: BookOpen, label: 'Blog', path: '/admin/blog' },
   { icon: MessageSquare, label: 'Inquiries', path: '/admin/inquiries' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/logs' },
+  { icon: Activity, label: 'System Health', path: '/admin/system-health' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 
