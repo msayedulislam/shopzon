@@ -1,8 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Users, Store, Package, ShoppingBag, DollarSign, TrendingUp } from 'lucide-react';
+import { Users, Store, Package, ShoppingBag, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+
+const COLORS = ['hsl(var(--primary))', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 export default function AdminOverview() {
   const [stats, setStats] = useState({
@@ -14,17 +33,24 @@ export default function AdminOverview() {
     pendingSellers: 0,
     pendingProducts: 0,
     todayOrders: 0,
+    todayRevenue: 0,
+    yesterdayRevenue: 0,
   });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [revenueData, setRevenueData] = useState<any[]>([]);
+  const [orderStatusData, setOrderStatusData] = useState<any[]>([]);
+  const [dailyOrdersData, setDailyOrdersData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchStats();
     fetchRecentOrders();
+    fetchRevenueData();
+    fetchOrderStatusData();
   }, []);
 
   const fetchStats = async () => {
     try {
-      // Get counts
       const [
         { count: usersCount },
         { count: sellersCount },
@@ -41,17 +67,24 @@ export default function AdminOverview() {
         supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
       ]);
 
-      // Get revenue
-      const { data: orders } = await supabase.from('orders').select('total');
+      // Get all orders for revenue calculation
+      const { data: orders } = await supabase.from('orders').select('total, created_at');
       const totalRevenue = orders?.reduce((sum, o) => sum + (o.total || 0), 0) || 0;
 
-      // Today's orders
+      // Today's stats
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const { count: todayOrdersCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', today.toISOString());
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const todayOrders = orders?.filter(o => new Date(o.created_at) >= today) || [];
+      const yesterdayOrders = orders?.filter(o => {
+        const date = new Date(o.created_at);
+        return date >= yesterday && date < today;
+      }) || [];
+
+      const todayRevenue = todayOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+      const yesterdayRevenue = yesterdayOrders.reduce((sum, o) => sum + (o.total || 0), 0);
 
       setStats({
         totalUsers: usersCount || 0,
@@ -61,10 +94,14 @@ export default function AdminOverview() {
         totalRevenue,
         pendingSellers: pendingSellersCount || 0,
         pendingProducts: pendingProductsCount || 0,
-        todayOrders: todayOrdersCount || 0,
+        todayOrders: todayOrders.length,
+        todayRevenue,
+        yesterdayRevenue,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,6 +118,86 @@ export default function AdminOverview() {
     }
   };
 
+  const fetchRevenueData = async () => {
+    try {
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('total, created_at')
+        .order('created_at', { ascending: true });
+
+      if (!orders || orders.length === 0) {
+        // Generate sample data for demo
+        const sampleData = Array.from({ length: 7 }, (_, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() - (6 - i));
+          return {
+            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            revenue: Math.floor(Math.random() * 50000) + 10000,
+            orders: Math.floor(Math.random() * 20) + 5,
+          };
+        });
+        setRevenueData(sampleData);
+        setDailyOrdersData(sampleData);
+        return;
+      }
+
+      // Group orders by date
+      const grouped = orders.reduce((acc: any, order) => {
+        const date = new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        if (!acc[date]) {
+          acc[date] = { revenue: 0, orders: 0 };
+        }
+        acc[date].revenue += order.total || 0;
+        acc[date].orders += 1;
+        return acc;
+      }, {});
+
+      const chartData = Object.entries(grouped).slice(-7).map(([date, data]: [string, any]) => ({
+        date,
+        revenue: data.revenue,
+        orders: data.orders,
+      }));
+
+      setRevenueData(chartData);
+      setDailyOrdersData(chartData);
+    } catch (error) {
+      console.error('Error fetching revenue data:', error);
+    }
+  };
+
+  const fetchOrderStatusData = async () => {
+    try {
+      const { data: orders } = await supabase.from('orders').select('status');
+
+      if (!orders || orders.length === 0) {
+        // Sample data
+        setOrderStatusData([
+          { name: 'Pending', value: 12 },
+          { name: 'Processing', value: 8 },
+          { name: 'Shipped', value: 15 },
+          { name: 'Delivered', value: 45 },
+          { name: 'Cancelled', value: 5 },
+        ]);
+        return;
+      }
+
+      const statusCounts = orders.reduce((acc: any, order) => {
+        const status = order.status || 'pending';
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      const chartData = Object.entries(statusCounts).map(([name, value]) => ({
+        name: name.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        value: value as number,
+      }));
+
+      setOrderStatusData(chartData);
+    } catch (error) {
+      console.error('Error fetching order status data:', error);
+    }
+  };
+
   const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',
     confirmed: 'bg-blue-100 text-blue-800',
@@ -90,92 +207,253 @@ export default function AdminOverview() {
     cancelled: 'bg-red-100 text-red-800',
   };
 
+  const revenueChange = stats.yesterdayRevenue > 0 
+    ? ((stats.todayRevenue - stats.yesterdayRevenue) / stats.yesterdayRevenue * 100).toFixed(1)
+    : stats.todayRevenue > 0 ? '100' : '0';
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Dashboard Overview</h1>
+        <p className="text-sm text-muted-foreground">
+          Last updated: {new Date().toLocaleTimeString()}
+        </p>
+      </div>
 
       {/* Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Users
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalUsers}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Active Sellers
-            </CardTitle>
-            <Store className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalSellers}</div>
-            {stats.pendingSellers > 0 && (
-              <p className="text-xs text-warning">{stats.pendingSellers} pending</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Products
-            </CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalProducts}</div>
-            {stats.pendingProducts > 0 && (
-              <p className="text-xs text-warning">{stats.pendingProducts} pending</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Revenue
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">
-              {formatPrice(stats.totalRevenue)}
+            <div className="text-2xl font-bold text-primary">{formatPrice(stats.totalRevenue)}</div>
+            <div className="flex items-center gap-1 mt-1">
+              {Number(revenueChange) >= 0 ? (
+                <ArrowUpRight className="h-4 w-4 text-green-500" />
+              ) : (
+                <ArrowDownRight className="h-4 w-4 text-red-500" />
+              )}
+              <span className={`text-xs ${Number(revenueChange) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {revenueChange}% from yesterday
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full -mr-10 -mt-10" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Orders
+            </CardTitle>
+            <ShoppingBag className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalOrders}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {stats.todayOrders} orders today
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full -mr-10 -mt-10" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Active Sellers
+            </CardTitle>
+            <Store className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalSellers}</div>
+            {stats.pendingSellers > 0 && (
+              <p className="text-xs text-orange-500 mt-1">{stats.pendingSellers} pending approval</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full -mr-10 -mt-10" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Products
+            </CardTitle>
+            <Package className="h-4 w-4 text-purple-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalProducts}</div>
+            {stats.pendingProducts > 0 && (
+              <p className="text-xs text-orange-500 mt-1">{stats.pendingProducts} pending review</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Revenue Trend Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              Revenue Trend
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={revenueData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(value) => `৳${(value / 1000).toFixed(0)}k`} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                    }}
+                    formatter={(value: number) => [formatPrice(value), 'Revenue']}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#colorRevenue)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Daily Orders Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShoppingBag className="h-5 w-5 text-blue-500" />
+              Daily Orders
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dailyOrdersData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <Bar dataKey="orders" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Second Row Stats */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Second Charts Row */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Order Status Pie Chart */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Orders
-            </CardTitle>
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+          <CardHeader>
+            <CardTitle>Order Status Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalOrders}</div>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={orderStatusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={3}
+                    dataKey="value"
+                  >
+                    {orderStatusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Today's Orders
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        {/* Quick Stats */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Quick Stats</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.todayOrders}</div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-lg bg-primary/20">
+                    <DollarSign className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">Today's Revenue</span>
+                </div>
+                <p className="text-2xl font-bold text-primary">{formatPrice(stats.todayRevenue)}</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-lg bg-blue-500/20">
+                    <ShoppingBag className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">Today's Orders</span>
+                </div>
+                <p className="text-2xl font-bold text-blue-500">{stats.todayOrders}</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-lg bg-green-500/20">
+                    <Users className="h-5 w-5 text-green-500" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">Total Users</span>
+                </div>
+                <p className="text-2xl font-bold text-green-500">{stats.totalUsers}</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-lg bg-purple-500/20">
+                    <Store className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">Pending Reviews</span>
+                </div>
+                <p className="text-2xl font-bold text-purple-500">{stats.pendingSellers + stats.pendingProducts}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
