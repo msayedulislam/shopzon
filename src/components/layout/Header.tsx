@@ -12,7 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { categories } from '@/data/mockData';
+import { categories as mockCategories } from '@/data/mockData';
+import { useCategories } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -24,6 +25,12 @@ export function Header() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  
+  // Fetch categories from database, fall back to mock data
+  const { data: dbCategories } = useCategories();
+  const categories = dbCategories && dbCategories.length > 0 
+    ? dbCategories.map(c => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon || '📦', productCount: 0 }))
+    : mockCategories;
   
   // Scroll state
   const [isVisible, setIsVisible] = useState(true);

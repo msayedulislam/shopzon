@@ -219,9 +219,7 @@ export default function SellerProducts() {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
     try {
-      // Delete images first
-      await supabase.from('product_images').delete().eq('product_id', id);
-      
+      // Cascade delete handles images and variations automatically
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) throw error;
       setProducts(products.filter((p) => p.id !== id));

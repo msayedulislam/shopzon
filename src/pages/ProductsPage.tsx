@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Filter, SlidersHorizontal, Grid, List, ChevronDown } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { Filter, SlidersHorizontal, Grid, List, ChevronDown, Loader2 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -20,7 +20,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { products, categories, formatPrice } from '@/data/mockData';
+import { products as mockProducts, categories as mockCategories, formatPrice } from '@/data/mockData';
+import { useProducts, useCategories, toDisplayProduct } from '@/hooks/useProducts';
 
 const brands = [
   { id: 'samsung', name: 'Samsung', count: 45 },
@@ -34,21 +35,40 @@ const ratings = [5, 4, 3, 2, 1];
 
 export default function ProductsPage() {
   const { slug } = useParams();
+  const [searchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [priceRange, setPriceRange] = useState([0, 200000]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState('popular');
 
+  // Fetch products from database
+  const { data: dbProducts, isLoading } = useProducts({ limit: 100 });
+  const { data: dbCategories } = useCategories();
+
+  // Use database products or fall back to mock
+  const allProducts = useMemo(() => {
+    if (dbProducts && dbProducts.length > 0) {
+      return dbProducts.map(toDisplayProduct);
+    }
+    return mockProducts;
+  }, [dbProducts]);
+
+  const categories = dbCategories && dbCategories.length > 0 
+    ? dbCategories.map(c => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon || '📦', productCount: 0 }))
+    : mockCategories;
+
   const category = categories.find((c) => c.slug === slug);
 
-  const filteredProducts = products.filter((product) => {
-    if (slug && product.category.slug !== slug) return false;
-    if (product.price < priceRange[0] || product.price > priceRange[1]) return false;
-    if (selectedBrands.length > 0 && product.brand && !selectedBrands.includes(product.brand.slug)) return false;
-    if (selectedRating && product.rating < selectedRating) return false;
-    return true;
-  });
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((product) => {
+      if (slug && product.category.slug !== slug) return false;
+      if (product.price < priceRange[0] || product.price > priceRange[1]) return false;
+      if (selectedBrands.length > 0 && product.brand && !selectedBrands.includes(product.brand.slug)) return false;
+      if (selectedRating && product.rating < selectedRating) return false;
+      return true;
+    });
+  }, [allProducts, slug, priceRange, selectedBrands, selectedRating]);
 
   const FilterContent = () => (
     <div className="space-y-6">
@@ -271,7 +291,11 @@ export default function ProductsPage() {
               </div>
 
               {/* Products Grid */}
-              {filteredProducts.length > 0 ? (
+              {isLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : filteredProducts.length > 0 ? (
                 <div
                   className={
                     viewMode === 'grid'
@@ -279,9 +303,9 @@ export default function ProductsPage() {
                       : 'space-y-4'
                   }
                 >
-                  {filteredProducts.map((product) => (
+                  {filteredProducts.map((product, index) => (
                     <ProductCard
-                      key={product.id}
+                      key={`prod-${product.id}-${index}`}
                       product={product}
                       variant={viewMode === 'list' ? 'horizontal' : 'default'}
                     />
