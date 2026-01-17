@@ -1,8 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Users, Store, Package, ShoppingBag, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { format, subDays, startOfWeek, startOfMonth, startOfYear } from 'date-fns';
+import { Users, Store, Package, ShoppingBag, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, CalendarIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
+import { cn } from '@/lib/utils';
 import {
   LineChart,
   Line,
@@ -23,6 +39,8 @@ import {
 
 const COLORS = ['hsl(var(--primary))', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
+type DateRange = { from: Date; to: Date };
+
 export default function AdminOverview() {
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -41,13 +59,51 @@ export default function AdminOverview() {
   const [orderStatusData, setOrderStatusData] = useState<any[]>([]);
   const [dailyOrdersData, setDailyOrdersData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Date range state
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  });
+  const [datePreset, setDatePreset] = useState('7days');
 
   useEffect(() => {
     fetchStats();
     fetchRecentOrders();
+  }, []);
+
+  useEffect(() => {
     fetchRevenueData();
     fetchOrderStatusData();
-  }, []);
+  }, [dateRange]);
+
+  const handlePresetChange = (preset: string) => {
+    setDatePreset(preset);
+    const now = new Date();
+    let from: Date;
+
+    switch (preset) {
+      case '7days':
+        from = subDays(now, 7);
+        break;
+      case '30days':
+        from = subDays(now, 30);
+        break;
+      case 'week':
+        from = startOfWeek(now);
+        break;
+      case 'month':
+        from = startOfMonth(now);
+        break;
+      case 'year':
+        from = startOfYear(now);
+        break;
+      default:
+        from = subDays(now, 7);
+    }
+
+    setDateRange({ from, to: now });
+  };
 
   const fetchStats = async () => {
     try {
@@ -67,11 +123,9 @@ export default function AdminOverview() {
         supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
       ]);
 
-      // Get all orders for revenue calculation
       const { data: orders } = await supabase.from('orders').select('total, created_at');
       const totalRevenue = orders?.reduce((sum, o) => sum + (o.total || 0), 0) || 0;
 
-      // Today's stats
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const yesterday = new Date(today);
@@ -123,15 +177,17 @@ export default function AdminOverview() {
       const { data: orders } = await supabase
         .from('orders')
         .select('total, created_at')
+        .gte('created_at', dateRange.from.toISOString())
+        .lte('created_at', dateRange.to.toISOString())
         .order('created_at', { ascending: true });
 
       if (!orders || orders.length === 0) {
-        // Generate sample data for demo
-        const sampleData = Array.from({ length: 7 }, (_, i) => {
-          const date = new Date();
-          date.setDate(date.getDate() - (6 - i));
+        const daysDiff = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
+        const sampleData = Array.from({ length: Math.min(daysDiff, 14) }, (_, i) => {
+          const date = new Date(dateRange.from);
+          date.setDate(date.getDate() + i);
           return {
-            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            date: format(date, 'MMM d'),
             revenue: Math.floor(Math.random() * 50000) + 10000,
             orders: Math.floor(Math.random() * 20) + 5,
           };
@@ -141,9 +197,8 @@ export default function AdminOverview() {
         return;
       }
 
-      // Group orders by date
       const grouped = orders.reduce((acc: any, order) => {
-        const date = new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const date = format(new Date(order.created_at), 'MMM d');
         if (!acc[date]) {
           acc[date] = { revenue: 0, orders: 0 };
         }
@@ -152,7 +207,7 @@ export default function AdminOverview() {
         return acc;
       }, {});
 
-      const chartData = Object.entries(grouped).slice(-7).map(([date, data]: [string, any]) => ({
+      const chartData = Object.entries(grouped).map(([date, data]: [string, any]) => ({
         date,
         revenue: data.revenue,
         orders: data.orders,
@@ -167,10 +222,13 @@ export default function AdminOverview() {
 
   const fetchOrderStatusData = async () => {
     try {
-      const { data: orders } = await supabase.from('orders').select('status');
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('status')
+        .gte('created_at', dateRange.from.toISOString())
+        .lte('created_at', dateRange.to.toISOString());
 
       if (!orders || orders.length === 0) {
-        // Sample data
         setOrderStatusData([
           { name: 'Pending', value: 12 },
           { name: 'Processing', value: 8 },
@@ -213,11 +271,49 @@ export default function AdminOverview() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Dashboard Overview</h1>
-        <p className="text-sm text-muted-foreground">
-          Last updated: {new Date().toLocaleTimeString()}
-        </p>
+        
+        {/* Date Range Filter */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <Select value={datePreset} onValueChange={handlePresetChange}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7days">Last 7 days</SelectItem>
+              <SelectItem value="30days">Last 30 days</SelectItem>
+              <SelectItem value="week">This week</SelectItem>
+              <SelectItem value="month">This month</SelectItem>
+              <SelectItem value="year">This year</SelectItem>
+              <SelectItem value="custom">Custom range</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {datePreset === 'custom' && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <CalendarIcon className="h-4 w-4" />
+                  {format(dateRange.from, 'MMM d')} - {format(dateRange.to, 'MMM d')}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="range"
+                  selected={{ from: dateRange.from, to: dateRange.to }}
+                  onSelect={(range) => {
+                    if (range?.from && range?.to) {
+                      setDateRange({ from: range.from, to: range.to });
+                    }
+                  }}
+                  numberOfMonths={2}
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -296,7 +392,6 @@ export default function AdminOverview() {
 
       {/* Charts Row */}
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Revenue Trend Chart */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -339,7 +434,6 @@ export default function AdminOverview() {
           </CardContent>
         </Card>
 
-        {/* Daily Orders Chart */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -371,7 +465,6 @@ export default function AdminOverview() {
 
       {/* Second Charts Row */}
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Order Status Pie Chart */}
         <Card>
           <CardHeader>
             <CardTitle>Order Status Distribution</CardTitle>
@@ -407,7 +500,6 @@ export default function AdminOverview() {
           </CardContent>
         </Card>
 
-        {/* Quick Stats */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Quick Stats</CardTitle>
