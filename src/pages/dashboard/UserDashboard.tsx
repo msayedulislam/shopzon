@@ -9,7 +9,8 @@ import {
   Menu,
   LayoutDashboard,
   ChevronRight,
-  Settings
+  Settings,
+  Wallet
 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -25,6 +26,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Overview', path: '/dashboard', exact: true },
   { icon: User, label: 'Profile', path: '/dashboard/profile' },
   { icon: Package, label: 'My Orders', path: '/dashboard/orders' },
+  { icon: Wallet, label: 'Wallet', path: '/dashboard/wallet' },
   { icon: Heart, label: 'Wishlist', path: '/dashboard/wishlist' },
   { icon: MapPin, label: 'Addresses', path: '/dashboard/addresses' },
   { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
