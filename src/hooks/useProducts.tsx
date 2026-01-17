@@ -161,7 +161,15 @@ export function toDisplayProduct(product: ProductData) {
     images: sortedImages.length > 0 
       ? sortedImages.map(img => img.image_url) 
       : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop'],
-    category: product.category || { id: '', name: 'Uncategorized', slug: 'uncategorized' },
+    category: product.category 
+      ? { 
+          id: product.category.id, 
+          name: product.category.name, 
+          slug: product.category.slug,
+          icon: '📦',
+          productCount: 0,
+        } 
+      : { id: '', name: 'Uncategorized', slug: 'uncategorized', icon: '📦', productCount: 0 },
     brand: product.brand ? {
       id: product.brand.id,
       name: product.brand.name,

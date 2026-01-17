@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { categories } from '@/data/mockData';
+import { categories as mockCategories } from '@/data/mockData';
+import { useCategories } from '@/hooks/useProducts';
 import { Zap } from 'lucide-react';
 
 interface StickyCategoriesProps {
@@ -8,6 +9,13 @@ interface StickyCategoriesProps {
 }
 
 export function StickyCategories({ isVisible }: StickyCategoriesProps) {
+  const { data: dbCategories } = useCategories();
+  
+  // Use database categories or fall back to mock
+  const categories = dbCategories && dbCategories.length > 0 
+    ? dbCategories.map(c => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon || '📦', productCount: 0 }))
+    : mockCategories;
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -22,7 +30,7 @@ export function StickyCategories({ isVisible }: StickyCategoriesProps) {
             <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-3">
               {categories.map((category, index) => (
                 <motion.div
-                  key={category.id}
+                  key={`sticky-${category.id}`}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}

@@ -1,10 +1,18 @@
 import { motion } from 'framer-motion';
-import { Package, ArrowRight } from 'lucide-react';
+import { Package, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductCard } from '@/components/product/ProductCard';
-import { products } from '@/data/mockData';
+import { products as mockProducts } from '@/data/mockData';
+import { useProducts, toDisplayProduct } from '@/hooks/useProducts';
 
 export function AllProductsSection() {
+  const { data: dbProducts, isLoading } = useProducts({ limit: 10 });
+  
+  // Use database products or fall back to mock
+  const allProducts = dbProducts && dbProducts.length > 0
+    ? dbProducts.map(toDisplayProduct)
+    : mockProducts;
+
   return (
     <section className="py-10 md:py-16 lg:py-20 relative overflow-hidden">
       {/* Background Effects */}
@@ -41,20 +49,26 @@ export function AllProductsSection() {
         </motion.div>
 
         {/* Products Grid - Pixel Perfect Square Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
-          {products.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: index * 0.03 }}
-              className="aspect-square"
-            >
-              <ProductCard product={product} compact />
-            </motion.div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+            {allProducts.map((product, index) => (
+              <motion.div
+                key={`all-${product.id}-${index}`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: index * 0.03 }}
+                className="aspect-square"
+              >
+                <ProductCard product={product} compact />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
