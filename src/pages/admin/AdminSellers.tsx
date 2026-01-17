@@ -22,7 +22,7 @@ export default function AdminSellers() {
     try {
       const { data, error } = await supabase
         .from('sellers')
-        .select('*, profile:profiles!sellers_user_id_fkey(full_name, email)')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
