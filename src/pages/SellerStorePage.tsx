@@ -6,9 +6,11 @@ import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toDisplayProduct } from '@/hooks/useProducts';
-import { Star, MapPin, Calendar, Package, ShieldCheck, Store, Grid3X3, List } from 'lucide-react';
+import { SellerReviews } from '@/components/seller/SellerReviews';
+import { Star, MapPin, Calendar, Package, ShieldCheck, Store, Grid3X3, List, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Product } from '@/types';
 
@@ -196,63 +198,76 @@ export default function SellerStorePage() {
           </div>
         </div>
         
-        {/* Products Section */}
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="text-xl font-semibold">All Products ({products.length})</h2>
-          
-          <div className="flex items-center gap-3">
-            {/* Sort */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="px-3 py-2 rounded-lg border border-border bg-card text-sm"
-            >
-              <option value="newest">Newest</option>
-              <option value="popular">Most Popular</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-            </select>
-            
-            {/* View Toggle */}
-            <div className="flex rounded-lg border border-border overflow-hidden">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted'}`}
+        {/* Tabs for Products and Reviews */}
+        <Tabs defaultValue="products" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="products" className="gap-2">
+              <Package className="h-4 w-4" />
+              Products ({products.length})
+            </TabsTrigger>
+            <TabsTrigger value="reviews" className="gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Reviews
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="products">
+            {/* Sort and View Controls */}
+            <div className="mb-6 flex justify-end items-center gap-3">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="px-3 py-2 rounded-lg border border-border bg-card text-sm"
               >
-                <Grid3X3 className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted'}`}
-              >
-                <List className="h-4 w-4" />
-              </button>
+                <option value="newest">Newest</option>
+                <option value="popular">Most Popular</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+              
+              <div className="flex rounded-lg border border-border overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 ${viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted'}`}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted'}`}
+                >
+                  <List className="h-4 w-4" />
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-        
-        {/* Products Grid/List */}
-        {sortedProducts.length > 0 ? (
-          <div className={viewMode === 'grid' 
-            ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-            : "flex flex-col gap-4"
-          }>
-            {sortedProducts.map((product, index) => (
-              <ProductCard 
-                key={`seller-product-${product.id}-${index}`} 
-                product={product} 
-                variant={viewMode === 'list' ? 'horizontal' : 'default'}
-                compact={viewMode === 'grid'}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No Products Yet</h3>
-            <p className="text-muted-foreground">This seller hasn't added any products yet.</p>
-          </div>
-        )}
+            
+            {sortedProducts.length > 0 ? (
+              <div className={viewMode === 'grid' 
+                ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+                : "flex flex-col gap-4"
+              }>
+                {sortedProducts.map((product, index) => (
+                  <ProductCard 
+                    key={`seller-product-${product.id}-${index}`} 
+                    product={product} 
+                    variant={viewMode === 'list' ? 'horizontal' : 'default'}
+                    compact={viewMode === 'grid'}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">No Products Yet</h3>
+                <p className="text-muted-foreground">This seller hasn't added any products yet.</p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <SellerReviews sellerId={seller.id} sellerName={seller.shop_name} />
+          </TabsContent>
+        </Tabs>
       </main>
       
       <Footer />

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Heart, User, Menu, MapPin, Phone, ChevronDown, Sparkles, ChevronUp, LogOut } from 'lucide-react';
+import { ShoppingCart, Heart, User, Menu, MapPin, Phone, ChevronDown, Sparkles, ChevronUp, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -18,9 +17,9 @@ import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { StickyCategories } from '@/components/StickyCategories';
+import { SearchAutocomplete } from '@/components/search/SearchAutocomplete';
 
 export function Header() {
-  const [searchQuery, setSearchQuery] = useState('');
   const { items } = useCart();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -167,21 +166,11 @@ export function Header() {
                 </span>
               </Link>
 
-              {/* Search Bar - Smaller when scrolled */}
-              <div className="flex-1 max-w-2xl">
-                <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input
-                    type="search"
-                    placeholder="Search products, brands, categories..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`pl-12 pr-4 rounded-2xl glass border-white/10 focus:border-primary/50 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground transition-all duration-500 ${
-                      isAtTop ? 'h-14' : 'h-11'
-                    }`}
-                  />
-                </div>
-              </div>
+              {/* Search Bar with Autocomplete */}
+              <SearchAutocomplete 
+                className="flex-1 max-w-2xl"
+                isCompact={!isAtTop}
+              />
 
               {/* Action Buttons - Smaller when scrolled */}
               <div className="flex items-center gap-2">

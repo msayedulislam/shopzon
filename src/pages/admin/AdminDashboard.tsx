@@ -24,6 +24,7 @@ import {
   UserCog,
   RotateCcw,
   Wallet,
+  Image,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -41,6 +42,7 @@ const menuItems = [
   { icon: DollarSign, label: 'Finance', path: '/admin/finance' },
   { icon: Truck, label: 'Couriers', path: '/admin/couriers' },
   { icon: Megaphone, label: 'Campaigns', path: '/admin/campaigns' },
+  { icon: Image, label: 'Banners', path: '/admin/banners' },
   { icon: ShieldAlert, label: 'Fraud Detection', path: '/admin/fraud' },
   { icon: Users, label: 'Users', path: '/admin/users' },
   { icon: Wallet, label: 'Wallets', path: '/admin/wallets' },
