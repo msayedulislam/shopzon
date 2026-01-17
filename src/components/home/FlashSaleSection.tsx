@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, Zap, Flame } from 'lucide-react';
+import { ArrowRight, Clock, Zap, Flame, Loader2 } from 'lucide-react';
 import { ProductCard } from '@/components/product/ProductCard';
-import { getFlashSaleProducts } from '@/data/mockData';
+import { useFlashSaleProducts, toDisplayProduct } from '@/hooks/useProducts';
+import { products as mockProducts, getFlashSaleProducts } from '@/data/mockData';
 import { motion } from 'framer-motion';
 
 export function FlashSaleSection() {
-  const flashSaleProducts = getFlashSaleProducts();
+  const { data: dbProducts, isLoading } = useFlashSaleProducts(5);
+  
+  // Use database products if available, otherwise fall back to mock data
+  const flashSaleProducts = dbProducts && dbProducts.length > 0
+    ? dbProducts.map(toDisplayProduct)
+    : getFlashSaleProducts().slice(0, 5);
+
   const [timeLeft, setTimeLeft] = useState({
     hours: 12,
     minutes: 45,
@@ -56,6 +63,10 @@ export function FlashSaleSection() {
       <span className="text-xs text-muted-foreground mt-2 uppercase tracking-wider font-medium">{label}</span>
     </div>
   );
+
+  if (flashSaleProducts.length === 0 && !isLoading) {
+    return null;
+  }
 
   return (
     <section className="py-16 lg:py-24 relative overflow-hidden">
@@ -140,19 +151,25 @@ export function FlashSaleSection() {
         </motion.div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-6">
-          {flashSaleProducts.slice(0, 5).map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-6">
+            {flashSaleProducts.map((product, index) => (
+              <motion.div
+                key={`flash-${product.id}-${index}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

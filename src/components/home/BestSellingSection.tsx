@@ -1,11 +1,21 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, ArrowRight, Flame } from 'lucide-react';
+import { TrendingUp, ArrowRight, Flame, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductCard } from '@/components/product/ProductCard';
+import { useBestSelling, toDisplayProduct } from '@/hooks/useProducts';
 import { getBestSellingProducts } from '@/data/mockData';
 
 export function BestSellingSection() {
-  const bestSellers = getBestSellingProducts().slice(0, 8);
+  const { data: dbProducts, isLoading } = useBestSelling(8);
+  
+  // Use database products if available, otherwise fall back to mock data
+  const bestSellers = dbProducts && dbProducts.length > 0
+    ? dbProducts.map(toDisplayProduct)
+    : getBestSellingProducts().slice(0, 8);
+
+  if (bestSellers.length === 0 && !isLoading) {
+    return null;
+  }
 
   return (
     <section className="py-12 lg:py-16 bg-gradient-to-b from-background to-muted/30">
@@ -42,19 +52,25 @@ export function BestSellingSection() {
         </motion.div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {bestSellers.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {bestSellers.map((product, index) => (
+              <motion.div
+                key={`best-${product.id}-${index}`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
