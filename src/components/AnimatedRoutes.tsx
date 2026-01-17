@@ -58,6 +58,7 @@ import AdminAdvancedOrders from '@/pages/admin/AdminAdvancedOrders';
 import AdminAISuggestions from '@/pages/admin/AdminAISuggestions';
 import AdminRefunds from '@/pages/admin/AdminRefunds';
 import AdminWallets from '@/pages/admin/AdminWallets';
+import AdminBanners from '@/pages/admin/AdminBanners';
 
 import StaticPage from '@/pages/StaticPage';
 
@@ -140,6 +141,7 @@ export function AnimatedRoutes() {
           <Route path="ai-suggestions" element={<AdminAISuggestions />} />
           <Route path="refunds" element={<AdminRefunds />} />
           <Route path="wallets" element={<AdminWallets />} />
+          <Route path="banners" element={<AdminBanners />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
 
