@@ -26,6 +26,8 @@ import {
   Wallet,
   Image,
   Sparkles,
+  Database,
+  Key,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -58,6 +60,8 @@ const menuItems = [
   { icon: MessageSquare, label: 'Notifications', path: '/admin/notifications' },
   { icon: Sparkles, label: 'AI Suggestions', path: '/admin/ai-suggestions' },
   { icon: FileText, label: 'Reports', path: '/admin/reports' },
+  { icon: Key, label: 'Role Presets', path: '/admin/role-presets' },
+  { icon: Database, label: 'Backup & Restore', path: '/admin/backup' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/logs' },
   { icon: Activity, label: 'System Health', path: '/admin/system-health' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
