@@ -140,13 +140,34 @@ export default function SellerDashboard() {
       {/* Pending Approval Notice */}
       {seller?.status === 'pending' && (
         <div className="px-4 pb-4">
-          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
-            <div className="flex gap-2">
-              <AlertCircle className="h-4 w-4 text-yellow-600 shrink-0 mt-0.5" />
+          <div className="p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/30 dark:to-amber-950/30 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+            <div className="flex gap-3">
+              <div className="h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-900/50 flex items-center justify-center shrink-0">
+                <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+              </div>
               <div>
-                <p className="text-xs font-medium text-yellow-800">Pending Approval</p>
-                <p className="text-xs text-yellow-700">
-                  Your shop is under review.
+                <p className="font-semibold text-yellow-800 dark:text-yellow-200">Pending Approval</p>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-0.5">
+                  Your seller account is under review. This usually takes 24-48 hours. You'll be notified once approved.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Suspended Notice */}
+      {seller?.status === 'suspended' && (
+        <div className="px-4 pb-4">
+          <div className="p-4 bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30 border border-red-200 dark:border-red-800 rounded-xl">
+            <div className="flex gap-3">
+              <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center shrink-0">
+                <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-red-800 dark:text-red-200">Account Suspended</p>
+                <p className="text-sm text-red-700 dark:text-red-300 mt-0.5">
+                  Your seller account has been suspended. Please contact support for assistance.
                 </p>
               </div>
             </div>
@@ -231,6 +252,16 @@ export default function SellerDashboard() {
           <div className="hidden lg:flex items-center gap-2">
             <Store className="h-5 w-5 text-primary" />
             <h1 className="font-semibold">Seller Dashboard</h1>
+            {seller?.status === 'pending' && (
+              <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200 border-0 animate-pulse">
+                Pending Approval
+              </Badge>
+            )}
+            {seller?.status === 'suspended' && (
+              <Badge className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200 border-0">
+                Suspended
+              </Badge>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
