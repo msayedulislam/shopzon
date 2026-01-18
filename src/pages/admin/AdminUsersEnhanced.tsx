@@ -6,11 +6,9 @@ import {
   User, 
   UserPlus, 
   Ban, 
-  Check, 
   MoreHorizontal,
   Mail,
   Phone,
-  Calendar,
   Filter,
   Download,
   RefreshCw,
@@ -18,12 +16,21 @@ import {
   Edit,
   Wallet,
   ShoppingBag,
-  AlertTriangle
+  Trash2,
+  LogIn,
+  AlertTriangle,
+  Key,
+  UserX,
+  UserCheck,
+  Copy,
+  Plus,
+  Save
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -34,6 +41,8 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -52,7 +61,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -70,6 +90,7 @@ interface UserProfile {
   ordersCount?: number;
   totalSpent?: number;
   walletBalance?: number;
+  isSuspended?: boolean;
 }
 
 export default function AdminUsersEnhanced() {
@@ -80,6 +101,38 @@ export default function AdminUsersEnhanced() {
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [userOrders, setUserOrders] = useState<any[]>([]);
   const [userWallet, setUserWallet] = useState<any>(null);
+  
+  // New states for enhanced controls
+  const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [showEditUserDialog, setShowEditUserDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showImpersonateDialog, setShowImpersonateDialog] = useState(false);
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [showWalletAdjustDialog, setShowWalletAdjustDialog] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
+  const [userToImpersonate, setUserToImpersonate] = useState<UserProfile | null>(null);
+  const [userToResetPassword, setUserToResetPassword] = useState<UserProfile | null>(null);
+  const [userToAdjustWallet, setUserToAdjustWallet] = useState<UserProfile | null>(null);
+  const [processing, setProcessing] = useState(false);
+  
+  // Form states
+  const [newUserForm, setNewUserForm] = useState({
+    email: '',
+    password: '',
+    full_name: '',
+    phone: '',
+    role: 'customer' as 'admin' | 'seller' | 'customer'
+  });
+  const [editUserForm, setEditUserForm] = useState({
+    full_name: '',
+    email: '',
+    phone: ''
+  });
+  const [walletAdjustment, setWalletAdjustment] = useState({
+    amount: '',
+    type: 'credit' as 'credit' | 'debit',
+    reason: ''
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -95,7 +148,6 @@ export default function AdminUsersEnhanced() {
 
       if (error) throw error;
 
-      // Fetch roles, orders count, and wallet for each user
       const usersWithDetails = await Promise.all(
         (profiles || []).map(async (profile) => {
           const [rolesResult, ordersResult, walletResult] = await Promise.all([
@@ -127,7 +179,6 @@ export default function AdminUsersEnhanced() {
   const fetchUserDetails = async (user: UserProfile) => {
     setSelectedUser(user);
     
-    // Fetch user orders
     const { data: orders } = await supabase
       .from('orders')
       .select('*, order_items(*)')
@@ -137,7 +188,6 @@ export default function AdminUsersEnhanced() {
     
     setUserOrders(orders || []);
 
-    // Fetch wallet details
     const { data: wallet } = await supabase
       .from('wallets')
       .select('*, wallet_transactions(*)')
@@ -155,6 +205,15 @@ export default function AdminUsersEnhanced() {
       toast.error('Failed to add role');
     } else {
       toast.success(`${role} role added`);
+      
+      // Log action
+      await supabase.from('admin_audit_logs').insert({
+        action: 'add_role',
+        entity_type: 'user',
+        entity_id: userId,
+        details: { role }
+      });
+      
       fetchUsers();
     }
   };
@@ -170,15 +229,299 @@ export default function AdminUsersEnhanced() {
       toast.error('Failed to remove role');
     } else {
       toast.success(`${role} role removed`);
+      
+      await supabase.from('admin_audit_logs').insert({
+        action: 'remove_role',
+        entity_type: 'user',
+        entity_id: userId,
+        details: { role }
+      });
+      
       fetchUsers();
     }
+  };
+
+  const handleCreateUser = async () => {
+    if (!newUserForm.email || !newUserForm.password) {
+      toast.error('Email and password are required');
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      // Create user profile entry (in production, this would be done via edge function)
+      const userId = crypto.randomUUID();
+      
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          user_id: userId,
+          email: newUserForm.email,
+          full_name: newUserForm.full_name,
+          phone: newUserForm.phone
+        });
+
+      if (profileError) throw profileError;
+
+      // Add role
+      await supabase.from('user_roles').insert({
+        user_id: userId,
+        role: newUserForm.role
+      });
+
+      // Create wallet
+      await supabase.from('wallets').insert({
+        user_id: userId,
+        balance: 0,
+        total_credited: 0,
+        total_spent: 0
+      });
+
+      // Log action
+      await supabase.from('admin_audit_logs').insert({
+        action: 'create_user',
+        entity_type: 'user',
+        entity_id: userId,
+        details: { email: newUserForm.email, role: newUserForm.role }
+      });
+
+      toast.success('User created successfully');
+      setShowAddUserDialog(false);
+      setNewUserForm({ email: '', password: '', full_name: '', phone: '', role: 'customer' });
+      fetchUsers();
+    } catch (error) {
+      console.error('Error creating user:', error);
+      toast.error('Failed to create user');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return;
+
+    setProcessing(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: editUserForm.full_name,
+          email: editUserForm.email,
+          phone: editUserForm.phone
+        })
+        .eq('user_id', selectedUser.user_id);
+
+      if (error) throw error;
+
+      await supabase.from('admin_audit_logs').insert({
+        action: 'update_user',
+        entity_type: 'user',
+        entity_id: selectedUser.user_id,
+        details: editUserForm
+      });
+
+      toast.success('User updated successfully');
+      setShowEditUserDialog(false);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error updating user:', error);
+      toast.error('Failed to update user');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    setProcessing(true);
+    try {
+      // Delete all user data
+      await Promise.all([
+        supabase.from('user_roles').delete().eq('user_id', userToDelete.user_id),
+        supabase.from('wallets').delete().eq('user_id', userToDelete.user_id),
+        supabase.from('addresses').delete().eq('user_id', userToDelete.user_id),
+        supabase.from('wishlists').delete().eq('user_id', userToDelete.user_id),
+        supabase.from('profiles').delete().eq('user_id', userToDelete.user_id),
+      ]);
+
+      await supabase.from('admin_audit_logs').insert({
+        action: 'delete_user',
+        entity_type: 'user',
+        entity_id: userToDelete.user_id,
+        details: { email: userToDelete.email, full_name: userToDelete.full_name }
+      });
+
+      toast.success('User deleted successfully');
+      setShowDeleteDialog(false);
+      setUserToDelete(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('Failed to delete user');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleImpersonateUser = async () => {
+    if (!userToImpersonate) return;
+
+    // Log the impersonation action
+    await supabase.from('admin_audit_logs').insert({
+      action: 'impersonate_user',
+      entity_type: 'user',
+      entity_id: userToImpersonate.user_id,
+      details: { email: userToImpersonate.email }
+    });
+
+    toast.success(`Impersonation mode for ${userToImpersonate.email || userToImpersonate.full_name}`, {
+      description: 'You are now viewing the platform as this user. Click the banner to exit.',
+      duration: 5000
+    });
+
+    // Store impersonation state in sessionStorage
+    sessionStorage.setItem('impersonating', JSON.stringify({
+      userId: userToImpersonate.user_id,
+      email: userToImpersonate.email,
+      name: userToImpersonate.full_name
+    }));
+
+    setShowImpersonateDialog(false);
+    setUserToImpersonate(null);
+    
+    // Redirect to home page
+    window.location.href = '/';
+  };
+
+  const handleResetPassword = async () => {
+    if (!userToResetPassword?.email) {
+      toast.error('User has no email address');
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(userToResetPassword.email, {
+        redirectTo: `${window.location.origin}/auth?mode=reset`
+      });
+
+      if (error) throw error;
+
+      await supabase.from('admin_audit_logs').insert({
+        action: 'reset_password',
+        entity_type: 'user',
+        entity_id: userToResetPassword.user_id,
+        details: { email: userToResetPassword.email }
+      });
+
+      toast.success('Password reset email sent');
+      setShowResetPasswordDialog(false);
+      setUserToResetPassword(null);
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      toast.error('Failed to send reset email');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleWalletAdjustment = async () => {
+    if (!userToAdjustWallet || !walletAdjustment.amount) return;
+
+    const amount = parseFloat(walletAdjustment.amount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      // Get current wallet
+      const { data: wallet } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('user_id', userToAdjustWallet.user_id)
+        .single();
+
+      if (!wallet) {
+        // Create wallet if it doesn't exist
+        await supabase.from('wallets').insert({
+          user_id: userToAdjustWallet.user_id,
+          balance: walletAdjustment.type === 'credit' ? amount : 0,
+          total_credited: walletAdjustment.type === 'credit' ? amount : 0,
+          total_spent: walletAdjustment.type === 'debit' ? amount : 0
+        });
+      } else {
+        const newBalance = walletAdjustment.type === 'credit' 
+          ? wallet.balance + amount 
+          : Math.max(0, wallet.balance - amount);
+
+        await supabase
+          .from('wallets')
+          .update({
+            balance: newBalance,
+            total_credited: walletAdjustment.type === 'credit' 
+              ? wallet.total_credited + amount 
+              : wallet.total_credited,
+            total_spent: walletAdjustment.type === 'debit' 
+              ? wallet.total_spent + amount 
+              : wallet.total_spent
+          })
+          .eq('user_id', userToAdjustWallet.user_id);
+
+        // Add transaction record
+        await supabase.from('wallet_transactions').insert({
+          wallet_id: wallet.id,
+          user_id: userToAdjustWallet.user_id,
+          type: walletAdjustment.type,
+          amount: amount,
+          balance_after: newBalance,
+          description: walletAdjustment.reason || `Admin ${walletAdjustment.type}`
+        });
+      }
+
+      await supabase.from('admin_audit_logs').insert({
+        action: `wallet_${walletAdjustment.type}`,
+        entity_type: 'wallet',
+        entity_id: userToAdjustWallet.user_id,
+        details: { amount, reason: walletAdjustment.reason }
+      });
+
+      toast.success(`Wallet ${walletAdjustment.type}ed ${formatPrice(amount)}`);
+      setShowWalletAdjustDialog(false);
+      setUserToAdjustWallet(null);
+      setWalletAdjustment({ amount: '', type: 'credit', reason: '' });
+      fetchUsers();
+    } catch (error) {
+      console.error('Error adjusting wallet:', error);
+      toast.error('Failed to adjust wallet');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const openEditDialog = (user: UserProfile) => {
+    setEditUserForm({
+      full_name: user.full_name || '',
+      email: user.email || '',
+      phone: user.phone || ''
+    });
+    setSelectedUser(user);
+    setShowEditUserDialog(true);
+  };
+
+  const copyUserId = (userId: string) => {
+    navigator.clipboard.writeText(userId);
+    toast.success('User ID copied to clipboard');
   };
 
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
       u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.phone?.toLowerCase().includes(searchQuery.toLowerCase());
+      u.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.user_id.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesRole =
       roleFilter === 'all' || u.roles.includes(roleFilter);
@@ -191,6 +534,33 @@ export default function AdminUsersEnhanced() {
     admins: users.filter((u) => u.roles.includes('admin')).length,
     sellers: users.filter((u) => u.roles.includes('seller')).length,
     customers: users.filter((u) => u.roles.includes('customer')).length,
+  };
+
+  const exportUsers = () => {
+    const csvData = filteredUsers.map(u => ({
+      id: u.user_id,
+      name: u.full_name,
+      email: u.email,
+      phone: u.phone,
+      roles: u.roles.join('; '),
+      orders: u.ordersCount,
+      spent: u.totalSpent,
+      wallet: u.walletBalance,
+      joined: u.created_at
+    }));
+    
+    const headers = Object.keys(csvData[0] || {}).join(',');
+    const rows = csvData.map(row => Object.values(row).map(v => `"${v || ''}"`).join(','));
+    const csv = [headers, ...rows].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `users-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Users exported');
   };
 
   if (loading) {
@@ -206,14 +576,18 @@ export default function AdminUsersEnhanced() {
       <div className="flex flex-col sm:flex-row justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">User Management</h1>
-          <p className="text-muted-foreground">Manage users, roles, and permissions</p>
+          <p className="text-muted-foreground">Full admin control over all user accounts</p>
         </div>
         <div className="flex gap-2">
+          <Button onClick={() => setShowAddUserDialog(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add User
+          </Button>
           <Button variant="outline" onClick={fetchUsers} className="gap-2">
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" onClick={exportUsers} className="gap-2">
             <Download className="h-4 w-4" />
             Export
           </Button>
@@ -281,7 +655,7 @@ export default function AdminUsersEnhanced() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name, email, or phone..."
+            placeholder="Search by name, email, phone, or user ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -330,7 +704,10 @@ export default function AdminUsersEnhanced() {
                         <User className="h-5 w-5 text-muted-foreground" />
                       )}
                     </div>
-                    <p className="font-medium">{user.full_name || 'No name'}</p>
+                    <div>
+                      <p className="font-medium">{user.full_name || 'No name'}</p>
+                      <p className="text-xs text-muted-foreground font-mono">{user.user_id.slice(0, 8)}...</p>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -387,10 +764,38 @@ export default function AdminUsersEnhanced() {
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="w-56">
                       <DropdownMenuItem onClick={() => fetchUserDetails(user)}>
                         <Eye className="h-4 w-4 mr-2" />
                         View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => openEditDialog(user)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit User
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => copyUserId(user.user_id)}>
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy User ID
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => { setUserToImpersonate(user); setShowImpersonateDialog(true); }}
+                        className="text-blue-600"
+                      >
+                        <LogIn className="h-4 w-4 mr-2" />
+                        Login as User
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => { setUserToResetPassword(user); setShowResetPasswordDialog(true); }}
+                      >
+                        <Key className="h-4 w-4 mr-2" />
+                        Reset Password
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => { setUserToAdjustWallet(user); setShowWalletAdjustDialog(true); }}
+                      >
+                        <Wallet className="h-4 w-4 mr-2" />
+                        Adjust Wallet
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       {!user.roles.includes('seller') && (
@@ -411,6 +816,20 @@ export default function AdminUsersEnhanced() {
                           Make Admin
                         </DropdownMenuItem>
                       )}
+                      {user.roles.includes('admin') && (
+                        <DropdownMenuItem onClick={() => removeRole(user.user_id, 'admin')}>
+                          <UserX className="h-4 w-4 mr-2" />
+                          Remove Admin Role
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => { setUserToDelete(user); setShowDeleteDialog(true); }}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete User
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -420,8 +839,240 @@ export default function AdminUsersEnhanced() {
         </Table>
       </div>
 
+      {/* Add User Dialog */}
+      <Dialog open={showAddUserDialog} onOpenChange={setShowAddUserDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+            <DialogDescription>Create a new user account with specified role</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Full Name</Label>
+                <Input
+                  value={newUserForm.full_name}
+                  onChange={(e) => setNewUserForm({ ...newUserForm, full_name: e.target.value })}
+                  placeholder="John Doe"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Phone</Label>
+                <Input
+                  value={newUserForm.phone}
+                  onChange={(e) => setNewUserForm({ ...newUserForm, phone: e.target.value })}
+                  placeholder="+880..."
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Email *</Label>
+              <Input
+                type="email"
+                value={newUserForm.email}
+                onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
+                placeholder="user@example.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Password *</Label>
+              <Input
+                type="password"
+                value={newUserForm.password}
+                onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
+                placeholder="••••••••"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Role</Label>
+              <Select value={newUserForm.role} onValueChange={(v: any) => setNewUserForm({ ...newUserForm, role: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="customer">Customer</SelectItem>
+                  <SelectItem value="seller">Seller</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddUserDialog(false)}>Cancel</Button>
+            <Button onClick={handleCreateUser} disabled={processing}>
+              {processing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Create User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={showEditUserDialog} onOpenChange={setShowEditUserDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>Update user profile information</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Full Name</Label>
+              <Input
+                value={editUserForm.full_name}
+                onChange={(e) => setEditUserForm({ ...editUserForm, full_name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={editUserForm.email}
+                onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Phone</Label>
+              <Input
+                value={editUserForm.phone}
+                onChange={(e) => setEditUserForm({ ...editUserForm, phone: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditUserDialog(false)}>Cancel</Button>
+            <Button onClick={handleUpdateUser} disabled={processing}>
+              {processing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Delete User Permanently
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete {userToDelete?.full_name || userToDelete?.email}'s
+              account and all associated data including orders, wallet, and addresses.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {processing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Delete User
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Impersonate Confirmation */}
+      <AlertDialog open={showImpersonateDialog} onOpenChange={setShowImpersonateDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <LogIn className="h-5 w-5 text-blue-600" />
+              Login as User
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              You will be logged in as {userToImpersonate?.full_name || userToImpersonate?.email} and can view the 
+              platform from their perspective. This action will be logged for security purposes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleImpersonateUser} className="bg-blue-600 hover:bg-blue-700">
+              Login as User
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reset Password Confirmation */}
+      <AlertDialog open={showResetPasswordDialog} onOpenChange={setShowResetPasswordDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              Reset User Password
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              A password reset email will be sent to {userToResetPassword?.email}. The user will be able to 
+              set a new password using the link in the email.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleResetPassword}>
+              {processing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Send Reset Email
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Wallet Adjustment Dialog */}
+      <Dialog open={showWalletAdjustDialog} onOpenChange={setShowWalletAdjustDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wallet className="h-5 w-5" />
+              Adjust Wallet Balance
+            </DialogTitle>
+            <DialogDescription>
+              Current balance: {formatPrice(userToAdjustWallet?.walletBalance || 0)}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select value={walletAdjustment.type} onValueChange={(v: any) => setWalletAdjustment({ ...walletAdjustment, type: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="credit">Credit (Add)</SelectItem>
+                  <SelectItem value="debit">Debit (Subtract)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Amount</Label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={walletAdjustment.amount}
+                onChange={(e) => setWalletAdjustment({ ...walletAdjustment, amount: e.target.value })}
+                placeholder="0.00"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Reason</Label>
+              <Textarea
+                value={walletAdjustment.reason}
+                onChange={(e) => setWalletAdjustment({ ...walletAdjustment, reason: e.target.value })}
+                placeholder="Reason for adjustment..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowWalletAdjustDialog(false)}>Cancel</Button>
+            <Button onClick={handleWalletAdjustment} disabled={processing}>
+              {processing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Apply {walletAdjustment.type === 'credit' ? 'Credit' : 'Debit'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* User Details Dialog */}
-      <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+      <Dialog open={!!selectedUser && !showEditUserDialog} onOpenChange={() => setSelectedUser(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
@@ -442,6 +1093,10 @@ export default function AdminUsersEnhanced() {
 
               <TabsContent value="overview" className="space-y-4 mt-4">
                 <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">User ID</p>
+                    <p className="font-mono text-sm">{selectedUser.user_id}</p>
+                  </div>
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">Email</p>
                     <p className="font-medium">{selectedUser.email || '-'}</p>
