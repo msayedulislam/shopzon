@@ -72,7 +72,7 @@ export const useCart = create<CartState>()(
       },
     }),
     {
-      name: 'bdmart-cart',
+      name: 'shopzon-cart',
     }
   )
 );
