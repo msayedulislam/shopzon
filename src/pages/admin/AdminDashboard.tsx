@@ -25,6 +25,7 @@ import {
   RotateCcw,
   Wallet,
   Image,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -52,6 +53,7 @@ const menuItems = [
   { icon: FileText, label: 'Pages', path: '/admin/pages' },
   { icon: BookOpen, label: 'Blog', path: '/admin/blog' },
   { icon: MessageSquare, label: 'Inquiries', path: '/admin/inquiries' },
+  { icon: Sparkles, label: 'AI Suggestions', path: '/admin/ai-suggestions' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/logs' },
   { icon: Activity, label: 'System Health', path: '/admin/system-health' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },

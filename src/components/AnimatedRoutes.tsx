@@ -61,6 +61,10 @@ import AdminWallets from '@/pages/admin/AdminWallets';
 import AdminBanners from '@/pages/admin/AdminBanners';
 import AdminOrdersEnhanced from '@/pages/admin/AdminOrdersEnhanced';
 import AdminProductsEnhanced from '@/pages/admin/AdminProductsEnhanced';
+import AdminUsersEnhanced from '@/pages/admin/AdminUsersEnhanced';
+import AdminCategoriesEnhanced from '@/pages/admin/AdminCategoriesEnhanced';
+import AdminCouponsEnhanced from '@/pages/admin/AdminCouponsEnhanced';
+import AdminBrandsEnhanced from '@/pages/admin/AdminBrandsEnhanced';
 
 import StaticPage from '@/pages/StaticPage';
 
@@ -122,23 +126,27 @@ export function AnimatedRoutes() {
         <Route path="/admin/login" element={<PageTransition><AdminLoginPage /></PageTransition>} />
         <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>}>
           <Route index element={<AdminOverview />} />
-          <Route path="users" element={<AdminUsers />} />
+          <Route path="users" element={<AdminUsersEnhanced />} />
           <Route path="sellers" element={<AdminSellers />} />
           <Route path="products" element={<AdminProductsEnhanced />} />
           <Route path="orders" element={<AdminOrdersEnhanced />} />
           <Route path="advanced-orders" element={<AdminAdvancedOrders />} />
           <Route path="products-basic" element={<AdminProducts />} />
           <Route path="orders-basic" element={<AdminOrders />} />
-          <Route path="categories" element={<AdminCategories />} />
-          <Route path="brands" element={<AdminBrands />} />
-          <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="users-basic" element={<AdminUsers />} />
+          <Route path="categories" element={<AdminCategoriesEnhanced />} />
+          <Route path="brands" element={<AdminBrandsEnhanced />} />
+          <Route path="coupons" element={<AdminCouponsEnhanced />} />
+          <Route path="categories-basic" element={<AdminCategories />} />
+          <Route path="brands-basic" element={<AdminBrands />} />
+          <Route path="coupons-basic" element={<AdminCoupons />} />
           <Route path="pages" element={<AdminPages />} />
           <Route path="blog" element={<AdminBlog />} />
           <Route path="inquiries" element={<AdminInquiries />} />
           <Route path="logs" element={<AdminLogs />} />
           <Route path="finance" element={<AdminFinance />} />
           <Route path="seller-governance" element={<AdminSellerGovernance />} />
-          <Route path="fraud-detection" element={<AdminFraudDetection />} />
+          <Route path="fraud" element={<AdminFraudDetection />} />
           <Route path="couriers" element={<AdminCouriers />} />
           <Route path="campaigns" element={<AdminCampaigns />} />
           <Route path="system-health" element={<AdminSystemHealth />} />
