@@ -35,6 +35,7 @@ import { NotificationPanel } from '@/components/admin/NotificationPanel';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
+  { icon: Activity, label: 'Activity', path: '/admin/activity' },
   { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
   { icon: RotateCcw, label: 'Refunds', path: '/admin/refunds' },
   { icon: Package, label: 'Products', path: '/admin/products' },
