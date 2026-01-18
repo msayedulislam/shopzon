@@ -36,6 +36,7 @@ import { NotificationPanel } from '@/components/admin/NotificationPanel';
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
   { icon: Activity, label: 'Activity', path: '/admin/activity' },
+  { icon: Shield, label: 'Admin Profiles', path: '/admin/profiles' },
   { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
   { icon: RotateCcw, label: 'Refunds', path: '/admin/refunds' },
   { icon: Package, label: 'Products', path: '/admin/products' },
@@ -54,7 +55,9 @@ const menuItems = [
   { icon: FileText, label: 'Pages', path: '/admin/pages' },
   { icon: BookOpen, label: 'Blog', path: '/admin/blog' },
   { icon: MessageSquare, label: 'Inquiries', path: '/admin/inquiries' },
+  { icon: MessageSquare, label: 'Notifications', path: '/admin/notifications' },
   { icon: Sparkles, label: 'AI Suggestions', path: '/admin/ai-suggestions' },
+  { icon: FileText, label: 'Reports', path: '/admin/reports' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/logs' },
   { icon: Activity, label: 'System Health', path: '/admin/system-health' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },

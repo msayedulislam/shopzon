@@ -66,6 +66,9 @@ import AdminCategoriesEnhanced from '@/pages/admin/AdminCategoriesEnhanced';
 import AdminCouponsEnhanced from '@/pages/admin/AdminCouponsEnhanced';
 import AdminBrandsEnhanced from '@/pages/admin/AdminBrandsEnhanced';
 import AdminActivityDashboard from '@/pages/admin/AdminActivityDashboard';
+import AdminProfiles from '@/pages/admin/AdminProfiles';
+import AdminReports from '@/pages/admin/AdminReports';
+import AdminNotifications from '@/pages/admin/AdminNotifications';
 
 import StaticPage from '@/pages/StaticPage';
 
@@ -146,6 +149,9 @@ export function AnimatedRoutes() {
           <Route path="inquiries" element={<AdminInquiries />} />
           <Route path="logs" element={<AdminLogs />} />
           <Route path="activity" element={<AdminActivityDashboard />} />
+          <Route path="profiles" element={<AdminProfiles />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="notifications" element={<AdminNotifications />} />
           <Route path="finance" element={<AdminFinance />} />
           <Route path="seller-governance" element={<AdminSellerGovernance />} />
           <Route path="fraud" element={<AdminFraudDetection />} />
