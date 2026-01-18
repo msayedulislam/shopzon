@@ -12,6 +12,7 @@ import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { BestSellingSection } from '@/components/home/BestSellingSection';
 import { TopSellersSection } from '@/components/home/TopSellersSection';
 import { TrendingDealsSection } from '@/components/home/TrendingDealsSection';
+import { PromoBannerCarousel } from '@/components/home/PromoBannerCarousel';
 
 const Index = () => {
   return (
@@ -19,6 +20,7 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <HeroSection />
+        <PromoBannerCarousel />
         <MarketingFeatures />
         <CategoriesSection />
         <FlashSaleSection />
