@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 
 const AdminBackup = lazy(() => import('@/pages/admin/AdminBackup'));
 const AdminRolePresets = lazy(() => import('@/pages/admin/AdminRolePresets'));
+const AdminMasterData = lazy(() => import('@/pages/admin/AdminMasterData'));
 import { AnimatePresence } from 'framer-motion';
 import { PageTransition } from './PageTransition';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -168,6 +169,7 @@ export function AnimatedRoutes() {
           <Route path="banners" element={<AdminBanners />} />
           <Route path="backup" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminBackup /></Suspense>} />
           <Route path="role-presets" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminRolePresets /></Suspense>} />
+          <Route path="master-data" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminMasterData /></Suspense>} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
 

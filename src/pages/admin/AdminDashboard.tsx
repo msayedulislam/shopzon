@@ -62,6 +62,7 @@ const menuItems = [
   { icon: FileText, label: 'Reports', path: '/admin/reports' },
   { icon: Key, label: 'Role Presets', path: '/admin/role-presets' },
   { icon: Database, label: 'Backup & Restore', path: '/admin/backup' },
+  { icon: Database, label: 'Master Data', path: '/admin/master-data' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/logs' },
   { icon: Activity, label: 'System Health', path: '/admin/system-health' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
