@@ -59,6 +59,8 @@ import AdminAISuggestions from '@/pages/admin/AdminAISuggestions';
 import AdminRefunds from '@/pages/admin/AdminRefunds';
 import AdminWallets from '@/pages/admin/AdminWallets';
 import AdminBanners from '@/pages/admin/AdminBanners';
+import AdminOrdersEnhanced from '@/pages/admin/AdminOrdersEnhanced';
+import AdminProductsEnhanced from '@/pages/admin/AdminProductsEnhanced';
 
 import StaticPage from '@/pages/StaticPage';
 
@@ -122,9 +124,11 @@ export function AnimatedRoutes() {
           <Route index element={<AdminOverview />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="sellers" element={<AdminSellers />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="orders" element={<AdminOrders />} />
+          <Route path="products" element={<AdminProductsEnhanced />} />
+          <Route path="orders" element={<AdminOrdersEnhanced />} />
           <Route path="advanced-orders" element={<AdminAdvancedOrders />} />
+          <Route path="products-basic" element={<AdminProducts />} />
+          <Route path="orders-basic" element={<AdminOrders />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="brands" element={<AdminBrands />} />
           <Route path="coupons" element={<AdminCoupons />} />
