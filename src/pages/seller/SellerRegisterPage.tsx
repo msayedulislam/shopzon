@@ -21,7 +21,7 @@ const sellerSchema = z.object({
 });
 
 export default function SellerRegisterPage() {
-  const { user } = useAuth();
+  const { user, refreshRoles } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -105,6 +105,9 @@ export default function SellerRegisterPage() {
         user_id: user.id,
         role: 'seller',
       });
+
+      // Refresh roles so the seller dashboard link appears immediately
+      await refreshRoles();
 
       toast({
         title: 'Application Submitted!',

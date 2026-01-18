@@ -14,6 +14,7 @@ interface AuthContextType {
   signUp: (phone: string, password: string, fullName: string, email?: string) => Promise<{ error: Error | null }>;
   signIn: (phone: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  refreshRoles: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -148,6 +149,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRoles([]);
   };
 
+  const refreshRoles = async () => {
+    if (user) {
+      await fetchUserRoles(user.id);
+    }
+  };
+
   const isAdmin = roles.includes('admin');
   const isSeller = roles.includes('seller');
 
@@ -163,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signUp,
         signIn,
         signOut,
+        refreshRoles,
       }}
     >
       {children}
