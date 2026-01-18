@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Shield, Bell, Globe, Store, CreditCard, Truck, Loader2, Save } from 'lucide-react';
+import { Settings, Shield, Bell, Globe, Store, CreditCard, Truck, Loader2, Save, MapPin, Plus, Trash2, Percent } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -14,16 +15,73 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 type SettingValue = string | number | boolean | object;
+
+interface ShippingZone {
+  id: string;
+  name: string;
+  areas: string[];
+  rate: number;
+  slaHours: number;
+  isActive: boolean;
+}
+
+interface CommissionTier {
+  id: string;
+  name: string;
+  minSales: number;
+  maxSales: number | null;
+  rate: number;
+}
 
 export default function AdminSettings() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<Record<string, any>>({});
+  
+  // Shipping zones state
+  const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
+  const [zoneDialogOpen, setZoneDialogOpen] = useState(false);
+  const [editingZone, setEditingZone] = useState<ShippingZone | null>(null);
+  const [newZone, setNewZone] = useState<Partial<ShippingZone>>({
+    name: '',
+    areas: [],
+    rate: 0,
+    slaHours: 24,
+    isActive: true
+  });
+  const [newAreaInput, setNewAreaInput] = useState('');
+
+  // Commission tiers state
+  const [commissionTiers, setCommissionTiers] = useState<CommissionTier[]>([]);
+  const [tierDialogOpen, setTierDialogOpen] = useState(false);
+  const [editingTier, setEditingTier] = useState<CommissionTier | null>(null);
+  const [newTier, setNewTier] = useState<Partial<CommissionTier>>({
+    name: '',
+    minSales: 0,
+    maxSales: null,
+    rate: 10
+  });
 
   useEffect(() => {
     fetchSettings();
@@ -42,6 +100,28 @@ export default function AdminSettings() {
         settingsMap[s.key] = s.value;
       });
       setSettings(settingsMap);
+      
+      // Load shipping zones from settings
+      if (settingsMap.shipping_zones) {
+        setShippingZones(settingsMap.shipping_zones as ShippingZone[]);
+      } else {
+        // Default zones
+        setShippingZones([
+          { id: '1', name: 'Inside Dhaka', areas: ['Dhaka', 'Mirpur', 'Uttara', 'Gulshan', 'Banani', 'Dhanmondi'], rate: 60, slaHours: 24, isActive: true },
+          { id: '2', name: 'Outside Dhaka', areas: ['Chittagong', 'Sylhet', 'Rajshahi', 'Khulna', 'Barisal', 'Rangpur'], rate: 120, slaHours: 72, isActive: true },
+        ]);
+      }
+      
+      // Load commission tiers
+      if (settingsMap.commission_tiers) {
+        setCommissionTiers(settingsMap.commission_tiers as CommissionTier[]);
+      } else {
+        setCommissionTiers([
+          { id: '1', name: 'Bronze', minSales: 0, maxSales: 50000, rate: 10 },
+          { id: '2', name: 'Silver', minSales: 50001, maxSales: 200000, rate: 8 },
+          { id: '3', name: 'Gold', minSales: 200001, maxSales: null, rate: 5 },
+        ]);
+      }
     } catch (error) {
       console.error('Error fetching settings:', error);
     } finally {
@@ -77,6 +157,90 @@ export default function AdminSettings() {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  // Shipping zone handlers
+  const handleAddArea = () => {
+    if (newAreaInput.trim()) {
+      setNewZone(prev => ({
+        ...prev,
+        areas: [...(prev.areas || []), newAreaInput.trim()]
+      }));
+      setNewAreaInput('');
+    }
+  };
+
+  const handleRemoveArea = (area: string) => {
+    setNewZone(prev => ({
+      ...prev,
+      areas: (prev.areas || []).filter(a => a !== area)
+    }));
+  };
+
+  const handleSaveZone = async () => {
+    const zone: ShippingZone = {
+      id: editingZone?.id || Date.now().toString(),
+      name: newZone.name || '',
+      areas: newZone.areas || [],
+      rate: newZone.rate || 0,
+      slaHours: newZone.slaHours || 24,
+      isActive: newZone.isActive ?? true
+    };
+
+    const updatedZones = editingZone
+      ? shippingZones.map(z => z.id === editingZone.id ? zone : z)
+      : [...shippingZones, zone];
+
+    setShippingZones(updatedZones);
+    await saveSetting('shipping_zones', updatedZones, 'shipping', 'Shipping zone configuration');
+    setZoneDialogOpen(false);
+    setEditingZone(null);
+    setNewZone({ name: '', areas: [], rate: 0, slaHours: 24, isActive: true });
+  };
+
+  const handleDeleteZone = async (id: string) => {
+    const updatedZones = shippingZones.filter(z => z.id !== id);
+    setShippingZones(updatedZones);
+    await saveSetting('shipping_zones', updatedZones, 'shipping');
+  };
+
+  const handleEditZone = (zone: ShippingZone) => {
+    setEditingZone(zone);
+    setNewZone(zone);
+    setZoneDialogOpen(true);
+  };
+
+  // Commission tier handlers
+  const handleSaveTier = async () => {
+    const tier: CommissionTier = {
+      id: editingTier?.id || Date.now().toString(),
+      name: newTier.name || '',
+      minSales: newTier.minSales || 0,
+      maxSales: newTier.maxSales || null,
+      rate: newTier.rate || 10
+    };
+
+    const updatedTiers = editingTier
+      ? commissionTiers.map(t => t.id === editingTier.id ? tier : t)
+      : [...commissionTiers, tier];
+
+    setCommissionTiers(updatedTiers);
+    await saveSetting('commission_tiers', updatedTiers, 'commission', 'Commission tier configuration');
+    setTierDialogOpen(false);
+    setEditingTier(null);
+    setNewTier({ name: '', minSales: 0, maxSales: null, rate: 10 });
+  };
+
+  const handleDeleteTier = async (id: string) => {
+    const updatedTiers = commissionTiers.filter(t => t.id !== id);
+    setCommissionTiers(updatedTiers);
+    await saveSetting('commission_tiers', updatedTiers, 'commission');
+  };
+
+  const handleEditTier = (tier: CommissionTier) => {
+    setEditingTier(tier);
+    setNewTier(tier);
+    setTierDialogOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -95,7 +259,7 @@ export default function AdminSettings() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
           <TabsTrigger value="general" className="gap-2">
             <Store className="h-4 w-4" />
             <span className="hidden sm:inline">General</span>
@@ -107,6 +271,14 @@ export default function AdminSettings() {
           <TabsTrigger value="shipping" className="gap-2">
             <Truck className="h-4 w-4" />
             <span className="hidden sm:inline">Shipping</span>
+          </TabsTrigger>
+          <TabsTrigger value="zones" className="gap-2">
+            <MapPin className="h-4 w-4" />
+            <span className="hidden sm:inline">Zones</span>
+          </TabsTrigger>
+          <TabsTrigger value="commission" className="gap-2">
+            <Percent className="h-4 w-4" />
+            <span className="hidden sm:inline">Commission</span>
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2">
             <Bell className="h-4 w-4" />
@@ -420,6 +592,92 @@ export default function AdminSettings() {
           </Card>
         </TabsContent>
 
+        {/* Shipping Zones */}
+        <TabsContent value="zones" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Shipping Zones</CardTitle>
+                <CardDescription>Configure delivery areas and rates</CardDescription>
+              </div>
+              <Button onClick={() => { setEditingZone(null); setNewZone({ name: '', areas: [], rate: 0, slaHours: 24, isActive: true }); setZoneDialogOpen(true); }} className="gap-2">
+                <Plus className="h-4 w-4" /> Add Zone
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Zone Name</TableHead>
+                    <TableHead>Areas</TableHead>
+                    <TableHead>Rate (৳)</TableHead>
+                    <TableHead>SLA (hrs)</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {shippingZones.map((zone) => (
+                    <TableRow key={zone.id}>
+                      <TableCell className="font-medium">{zone.name}</TableCell>
+                      <TableCell><div className="flex flex-wrap gap-1">{zone.areas.slice(0, 3).map(a => <Badge key={a} variant="secondary">{a}</Badge>)}{zone.areas.length > 3 && <Badge variant="outline">+{zone.areas.length - 3}</Badge>}</div></TableCell>
+                      <TableCell>৳{zone.rate}</TableCell>
+                      <TableCell>{zone.slaHours}h</TableCell>
+                      <TableCell><Badge variant={zone.isActive ? "default" : "secondary"}>{zone.isActive ? 'Active' : 'Inactive'}</Badge></TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => handleEditZone(zone)}>Edit</Button>
+                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteZone(zone.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Commission Tiers */}
+        <TabsContent value="commission" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Commission Tiers</CardTitle>
+                <CardDescription>Configure seller commission rates based on sales volume</CardDescription>
+              </div>
+              <Button onClick={() => { setEditingTier(null); setNewTier({ name: '', minSales: 0, maxSales: null, rate: 10 }); setTierDialogOpen(true); }} className="gap-2">
+                <Plus className="h-4 w-4" /> Add Tier
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tier Name</TableHead>
+                    <TableHead>Min Sales (৳)</TableHead>
+                    <TableHead>Max Sales (৳)</TableHead>
+                    <TableHead>Commission Rate</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {commissionTiers.map((tier) => (
+                    <TableRow key={tier.id}>
+                      <TableCell className="font-medium">{tier.name}</TableCell>
+                      <TableCell>৳{tier.minSales.toLocaleString()}</TableCell>
+                      <TableCell>{tier.maxSales ? `৳${tier.maxSales.toLocaleString()}` : 'Unlimited'}</TableCell>
+                      <TableCell><Badge>{tier.rate}%</Badge></TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => handleEditTier(tier)}>Edit</Button>
+                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteTier(tier.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Notification Settings */}
         <TabsContent value="notifications" className="space-y-6">
           <Card>
@@ -600,6 +858,86 @@ export default function AdminSettings() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Zone Dialog */}
+      <Dialog open={zoneDialogOpen} onOpenChange={setZoneDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingZone ? 'Edit Zone' : 'Add Zone'}</DialogTitle>
+            <DialogDescription>Configure shipping zone details</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Zone Name</Label>
+              <Input value={newZone.name || ''} onChange={(e) => setNewZone(prev => ({ ...prev, name: e.target.value }))} placeholder="Zone name" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Rate (৳)</Label>
+                <Input type="number" value={newZone.rate || 0} onChange={(e) => setNewZone(prev => ({ ...prev, rate: Number(e.target.value) }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>SLA (hours)</Label>
+                <Input type="number" value={newZone.slaHours || 24} onChange={(e) => setNewZone(prev => ({ ...prev, slaHours: Number(e.target.value) }))} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Areas</Label>
+              <div className="flex gap-2">
+                <Input value={newAreaInput} onChange={(e) => setNewAreaInput(e.target.value)} placeholder="Add area" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddArea())} />
+                <Button type="button" onClick={handleAddArea}>Add</Button>
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {(newZone.areas || []).map(area => (
+                  <Badge key={area} variant="secondary" className="gap-1">{area}<button onClick={() => handleRemoveArea(area)} className="ml-1 hover:text-destructive">×</button></Badge>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch checked={newZone.isActive ?? true} onCheckedChange={(checked) => setNewZone(prev => ({ ...prev, isActive: checked }))} />
+              <Label>Active</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setZoneDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveZone}>Save Zone</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tier Dialog */}
+      <Dialog open={tierDialogOpen} onOpenChange={setTierDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingTier ? 'Edit Tier' : 'Add Tier'}</DialogTitle>
+            <DialogDescription>Configure commission tier</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Tier Name</Label>
+              <Input value={newTier.name || ''} onChange={(e) => setNewTier(prev => ({ ...prev, name: e.target.value }))} placeholder="e.g. Gold" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Min Sales (৳)</Label>
+                <Input type="number" value={newTier.minSales || 0} onChange={(e) => setNewTier(prev => ({ ...prev, minSales: Number(e.target.value) }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Max Sales (৳)</Label>
+                <Input type="number" value={newTier.maxSales || ''} onChange={(e) => setNewTier(prev => ({ ...prev, maxSales: e.target.value ? Number(e.target.value) : null }))} placeholder="Leave empty for unlimited" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Commission Rate (%)</Label>
+              <Input type="number" min="0" max="100" value={newTier.rate || 10} onChange={(e) => setNewTier(prev => ({ ...prev, rate: Number(e.target.value) }))} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTierDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveTier}>Save Tier</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
