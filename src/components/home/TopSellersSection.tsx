@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 const topSellers = [
   {
     id: '1',
-    name: 'BD Mart Official',
-    slug: 'bd-mart-official',
+    name: 'Shopzon Official',
+    slug: 'shopzon-official',
     logo: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop',
     coverImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=300&fit=crop',
     rating: 4.9,

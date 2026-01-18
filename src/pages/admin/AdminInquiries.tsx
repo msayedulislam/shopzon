@@ -124,7 +124,7 @@ export default function AdminInquiries() {
 
   const handleReply = (inquiry: Inquiry) => {
     setSelectedInquiry(inquiry);
-    setReplyMessage(`Dear ${inquiry.name},\n\nThank you for contacting us regarding "${inquiry.subject || 'your inquiry'}".\n\n[Your reply here]\n\nBest regards,\nBDMart Support Team`);
+    setReplyMessage(`Dear ${inquiry.name},\n\nThank you for contacting us regarding "${inquiry.subject || 'your inquiry'}".\n\n[Your reply here]\n\nBest regards,\nShopzon Support Team`);
     setReplyDialogOpen(true);
   };
 

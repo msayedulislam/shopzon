@@ -128,9 +128,9 @@ export function Header() {
                   <div className="p-6 border-b border-white/10">
                     <Link to="/" className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow">
-                        <span className="text-primary-foreground font-bold text-2xl">B</span>
+                        <span className="text-primary-foreground font-bold text-2xl">S</span>
                       </div>
-                      <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>BDMart</span>
+                      <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Shopzon</span>
                     </Link>
                   </div>
                   <nav className="p-4">
@@ -157,12 +157,12 @@ export function Header() {
                 }`}>
                   <span className={`text-primary-foreground font-bold transition-all duration-500 ${
                     isAtTop ? 'text-2xl' : 'text-xl'
-                  }`}>B</span>
+                  }`}>S</span>
                 </div>
                 <span className={`font-bold hidden sm:block transition-all duration-500 ${
                   isAtTop ? 'text-2xl' : 'text-xl'
                 }`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  <span className="text-gradient">BD</span>Mart
+                  <span className="text-gradient">Shop</span>zon
                 </span>
               </Link>
 

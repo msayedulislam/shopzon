@@ -137,7 +137,7 @@ export default function SellerRegisterPage() {
               </div>
               <h1 className="text-3xl font-bold mb-2">Become a Seller</h1>
               <p className="text-muted-foreground">
-                Start selling on BDMart and reach millions of customers in Bangladesh
+                Start selling on Shopzon and reach millions of customers in Bangladesh
               </p>
             </div>
 

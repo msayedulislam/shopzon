@@ -143,10 +143,10 @@ export default function AdminLoginPage() {
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8">
             <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-2xl">B</span>
+              <span className="text-primary-foreground font-bold text-2xl">S</span>
             </div>
             <div>
-              <span className="font-display font-bold text-2xl text-white">BDMart</span>
+              <span className="font-display font-bold text-2xl text-white">Shopzon</span>
               <span className="block text-xs text-slate-500 uppercase tracking-wider">Admin Portal</span>
             </div>
           </div>

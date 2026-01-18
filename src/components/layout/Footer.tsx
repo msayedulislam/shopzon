@@ -44,10 +44,10 @@ export function Footer() {
             <div>
               <Link to="/" className="flex items-center gap-3 mb-6 group">
                 <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow group-hover:shadow-accent transition-shadow duration-500">
-                  <span className="text-primary-foreground font-bold text-2xl">B</span>
+                  <span className="text-primary-foreground font-bold text-2xl">S</span>
                 </div>
                 <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  <span className="text-gradient">BD</span>Mart
+                  <span className="text-gradient">Shop</span>zon
                 </span>
               </Link>
               <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -60,11 +60,11 @@ export function Footer() {
                   </div>
                   +880 1234-567890
                 </a>
-                <a href="mailto:support@bdmart.com" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors duration-300">
+                <a href="mailto:support@shopzon.com" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors duration-300">
                   <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
                     <Mail className="h-4 w-4" />
                   </div>
-                  support@bdmart.com
+                  support@shopzon.com
                 </a>
                 <p className="flex items-center gap-3 text-muted-foreground">
                   <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
@@ -168,7 +168,7 @@ export function Footer() {
           {/* Copyright */}
           <div className="mt-10 text-center text-sm text-muted-foreground">
             <p className="flex items-center justify-center gap-2">
-              © 2024 BDMart. All rights reserved. Made with 
+              © 2024 Shopzon. All rights reserved. Made with 
               <Heart className="h-4 w-4 text-primary fill-primary animate-pulse" /> 
               in Bangladesh
             </p>

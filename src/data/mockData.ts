@@ -13,8 +13,8 @@ export const categories: Category[] = [
 
 const defaultSeller: Seller = {
   id: 's1',
-  name: 'BD Mart Official',
-  slug: 'bd-mart-official',
+  name: 'Shopzon Official',
+  slug: 'shopzon-official',
   rating: 4.8,
   productCount: 520,
   joinedAt: new Date('2022-01-15'),

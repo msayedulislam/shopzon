@@ -196,8 +196,8 @@ export function toDisplayProduct(product: ProductData) {
       level: 'bronze' as const,
     } : {
       id: '',
-      name: 'BDMart Seller',
-      slug: 'bdmart-seller',
+      name: 'Shopzon Seller',
+      slug: 'shopzon-seller',
       rating: 4.5,
       productCount: 0,
       joinedAt: new Date(),

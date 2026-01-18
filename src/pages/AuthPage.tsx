@@ -133,7 +133,7 @@ export default function AuthPage() {
         } else {
           toast({
             title: 'Account Created!',
-            description: 'Welcome to BDMart! Your account has been created.',
+            description: 'Welcome to Shopzon! Your account has been created.',
           });
           navigate('/');
         }
@@ -157,9 +157,9 @@ export default function AuthPage() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 mb-8">
             <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-2xl">B</span>
+              <span className="text-primary-foreground font-bold text-2xl">S</span>
             </div>
-            <span className="font-display font-bold text-2xl">BDMart</span>
+            <span className="font-display font-bold text-2xl">Shopzon</span>
           </Link>
 
           <h1 className="text-3xl font-bold mb-2">
@@ -168,7 +168,7 @@ export default function AuthPage() {
           <p className="text-muted-foreground mb-8">
             {isLogin
               ? 'Enter your phone number and password to login'
-              : 'Join BDMart to start shopping'}
+              : 'Join Shopzon to start shopping'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
