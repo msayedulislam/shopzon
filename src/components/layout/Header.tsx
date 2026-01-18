@@ -21,7 +21,7 @@ import { SearchAutocomplete } from '@/components/search/SearchAutocomplete';
 
 export function Header() {
   const { items } = useCart();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isSeller, isAdmin } = useAuth();
   const navigate = useNavigate();
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
   
@@ -233,6 +233,23 @@ export function Header() {
                             <span>❤️</span> My Wishlist
                           </Link>
                         </DropdownMenuItem>
+                        {isSeller && (
+                          <>
+                            <DropdownMenuSeparator className="bg-white/10" />
+                            <DropdownMenuItem asChild className="rounded-xl hover:bg-primary/10 cursor-pointer p-3">
+                              <Link to="/seller/dashboard" className="flex items-center gap-3 text-primary">
+                                <span>🏪</span> Seller Dashboard
+                              </Link>
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {isAdmin && (
+                          <DropdownMenuItem asChild className="rounded-xl hover:bg-primary/10 cursor-pointer p-3">
+                            <Link to="/admin" className="flex items-center gap-3 text-primary">
+                              <span>⚙️</span> Admin Panel
+                            </Link>
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuSeparator className="bg-white/10" />
                         <DropdownMenuItem 
                           onClick={handleSignOut}
