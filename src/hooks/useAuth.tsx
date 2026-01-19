@@ -28,6 +28,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [sellerStatus, setSellerStatus] = useState<'pending' | 'active' | 'suspended' | null>(null);
 
+  // Subscribe to realtime seller status changes
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`seller-status-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'sellers',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const newStatus = payload.new?.status as 'pending' | 'active' | 'suspended' | null;
+          if (newStatus) {
+            setSellerStatus(newStatus);
+            // If approved, ensure seller role is present
+            if (newStatus === 'active') {
+              setRoles((prev) => (prev.includes('seller') ? prev : [...prev, 'seller']));
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
