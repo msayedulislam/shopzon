@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
+import { SellerOnboardingChecklist } from '@/components/seller/SellerOnboardingChecklist';
 
 export default function SellerOverview() {
   const { seller } = useOutletContext<{ seller: any }>();
@@ -160,6 +161,9 @@ export default function SellerOverview() {
 
   return (
     <div className="space-y-6">
+      {/* Onboarding Checklist */}
+      {seller && <SellerOnboardingChecklist seller={seller} />}
+
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
