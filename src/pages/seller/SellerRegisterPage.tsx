@@ -100,13 +100,27 @@ export default function SellerRegisterPage() {
 
       if (error) throw error;
 
-      // Add seller role
-      await supabase.from('user_roles').insert({
-        user_id: user.id,
-        role: 'seller',
-      });
+      // Add seller role - check if not already exists
+      const { data: existingRole } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('role', 'seller')
+        .maybeSingle();
 
-      // Refresh roles so the seller dashboard link appears immediately
+      if (!existingRole) {
+        const { error: roleError } = await supabase.from('user_roles').insert({
+          user_id: user.id,
+          role: 'seller',
+        });
+        
+        if (roleError) {
+          console.error('Error adding seller role:', roleError);
+        }
+      }
+
+      // Small delay to ensure database commit, then refresh roles
+      await new Promise(resolve => setTimeout(resolve, 500));
       await refreshRoles();
 
       toast({
