@@ -9,8 +9,10 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   roles: AppRole[];
+  sellerStatus: 'pending' | 'active' | 'suspended' | null;
   isAdmin: boolean;
   isSeller: boolean;
+  isApprovedSeller: boolean;
   signUp: (phone: string, password: string, fullName: string, email?: string) => Promise<{ error: Error | null }>;
   signIn: (phone: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -24,6 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<AppRole[]>([]);
+  const [sellerStatus, setSellerStatus] = useState<'pending' | 'active' | 'suspended' | null>(null);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -31,14 +34,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
-        // Fetch roles with setTimeout to avoid deadlock
+
         if (session?.user) {
+          // Fetch roles + seller status async (avoid potential auth listener deadlocks)
           setTimeout(() => {
             fetchUserRoles(session.user.id);
+            fetchSellerStatus(session.user.id);
           }, 0);
         } else {
           setRoles([]);
+          setSellerStatus(null);
         }
       }
     );
@@ -49,6 +54,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserRoles(session.user.id);
+        fetchSellerStatus(session.user.id);
+      } else {
+        setSellerStatus(null);
       }
       setLoading(false);
     });
@@ -64,21 +72,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId);
 
       if (error) throw error;
-      
+
       const fetchedRoles = data?.map(r => r.role as AppRole) || [];
-      
-      // If no roles found and this is first attempt, retry after a short delay
-      // This handles race conditions where role insert hasn't committed yet
+
+      // If no roles found, retry briefly (handles eventual consistency)
       if (fetchedRoles.length === 0 && retryCount < 2) {
         await new Promise(resolve => setTimeout(resolve, 300));
         return fetchUserRoles(userId, retryCount + 1);
       }
-      
-      // Default to customer if no roles found
+
       setRoles(fetchedRoles.length > 0 ? fetchedRoles : ['customer']);
     } catch (error) {
       console.error('Error fetching user roles:', error);
       setRoles(['customer']);
+    }
+  };
+
+  const fetchSellerStatus = async (userId: string, retryCount = 0): Promise<void> => {
+    try {
+      const { data, error } = await supabase
+        .from('sellers')
+        .select('status')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      const status = (data?.status as 'pending' | 'active' | 'suspended' | null) ?? null;
+      setSellerStatus(status);
+
+      // If seller is approved but missing seller role, ensure the role exists
+      if (status === 'active' && !roles.includes('seller')) {
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({ user_id: userId, role: 'seller' });
+
+        // Ignore duplicate unique constraint errors
+        if (roleError) {
+          const msg = String((roleError as any).message || '').toLowerCase();
+          if (!msg.includes('duplicate') && !msg.includes('unique')) {
+            console.error('Error ensuring seller role:', roleError);
+          }
+        } else {
+          setRoles((prev) => (prev.includes('seller') ? prev : [...prev, 'seller']));
+        }
+      }
+
+      // If row not visible yet, retry once
+      if (!data && retryCount < 1) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        return fetchSellerStatus(userId, retryCount + 1);
+      }
+    } catch (error) {
+      console.error('Error fetching seller status:', error);
+      setSellerStatus(null);
     }
   };
 
@@ -158,17 +205,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setRoles([]);
+    setSellerStatus(null);
   };
 
   const refreshRoles = async () => {
     if (user) {
-      // Force a fresh fetch with retry logic
       await fetchUserRoles(user.id, 0);
+      await fetchSellerStatus(user.id, 0);
     }
   };
 
   const isAdmin = roles.includes('admin');
   const isSeller = roles.includes('seller');
+  const isApprovedSeller = sellerStatus === 'active';
 
   return (
     <AuthContext.Provider
@@ -177,8 +226,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         loading,
         roles,
+        sellerStatus,
         isAdmin,
         isSeller,
+        isApprovedSeller,
         signUp,
         signIn,
         signOut,
