@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const { user, loading, roles, isAdmin, isSeller } = useAuth();
+  const { user, loading, isAdmin, isApprovedSeller } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -27,8 +27,8 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     if (requiredRole === 'admin' && !isAdmin) {
       return <Navigate to="/" replace />;
     }
-    if (requiredRole === 'seller' && !isSeller && !isAdmin) {
-      return <Navigate to="/" replace />;
+    if (requiredRole === 'seller' && !isApprovedSeller && !isAdmin) {
+      return <Navigate to="/seller/register" replace />;
     }
   }
 

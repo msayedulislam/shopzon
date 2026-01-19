@@ -21,7 +21,7 @@ import { SearchAutocomplete } from '@/components/search/SearchAutocomplete';
 
 export function Header() {
   const { items } = useCart();
-  const { user, signOut, isSeller, isAdmin } = useAuth();
+  const { user, signOut, isApprovedSeller, isAdmin } = useAuth();
   const navigate = useNavigate();
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
   
@@ -233,7 +233,7 @@ export function Header() {
                             <span>❤️</span> My Wishlist
                           </Link>
                         </DropdownMenuItem>
-                        {isSeller && (
+                        {isApprovedSeller && (
                           <>
                             <DropdownMenuSeparator className="bg-white/10" />
                             <DropdownMenuItem asChild className="rounded-xl hover:bg-primary/10 cursor-pointer p-3">
