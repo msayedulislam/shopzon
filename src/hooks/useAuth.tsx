@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserRoles = async (userId: string) => {
+  const fetchUserRoles = async (userId: string, retryCount = 0): Promise<void> => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -64,7 +64,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId);
 
       if (error) throw error;
-      setRoles(data?.map(r => r.role as AppRole) || ['customer']);
+      
+      const fetchedRoles = data?.map(r => r.role as AppRole) || [];
+      
+      // If no roles found and this is first attempt, retry after a short delay
+      // This handles race conditions where role insert hasn't committed yet
+      if (fetchedRoles.length === 0 && retryCount < 2) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        return fetchUserRoles(userId, retryCount + 1);
+      }
+      
+      // Default to customer if no roles found
+      setRoles(fetchedRoles.length > 0 ? fetchedRoles : ['customer']);
     } catch (error) {
       console.error('Error fetching user roles:', error);
       setRoles(['customer']);
@@ -151,7 +162,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshRoles = async () => {
     if (user) {
-      await fetchUserRoles(user.id);
+      // Force a fresh fetch with retry logic
+      await fetchUserRoles(user.id, 0);
     }
   };
 
