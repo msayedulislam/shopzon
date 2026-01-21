@@ -83,7 +83,7 @@ export function SellerOnboardingChecklist({ seller }: SellerOnboardingChecklistP
         {
           id: 'first-product',
           title: 'Add Your First Product',
-          description: 'List your first product to start selling on Shopzon.',
+          description: 'List your first product to start selling on Jhuri.',
           completed: hasProducts,
           link: '/seller/dashboard/products',
           icon: Package,
