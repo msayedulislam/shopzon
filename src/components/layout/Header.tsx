@@ -16,7 +16,6 @@ import { useCategories } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { StickyCategories } from '@/components/StickyCategories';
 import { SearchAutocomplete } from '@/components/search/SearchAutocomplete';
 
 export function Header() {
@@ -31,10 +30,8 @@ export function Header() {
     ? dbCategories.map(c => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon || '📦', productCount: 0 }))
     : mockCategories;
   
-  // Scroll state
-  const [isVisible, setIsVisible] = useState(true);
+  // Scroll state - header always visible now
   const [isAtTop, setIsAtTop] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   const handleSignOut = async () => {
     await signOut();
@@ -44,38 +41,19 @@ export function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
-      // Check if at top
       setIsAtTop(currentScrollY < 10);
-      
-      // Determine scroll direction
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down & past threshold
-        setIsVisible(false);
-      } else {
-        // Scrolling up
-        setIsVisible(true);
-      }
-      
-      setLastScrollY(currentScrollY);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
-
-  // Show sticky categories when header is hidden
-  const showStickyCategories = !isVisible && !isAtTop;
+  }, []);
 
   return (
     <>
-      {/* Sticky Categories Bar */}
-      <StickyCategories isVisible={showStickyCategories} />
-      
       <header
-        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-out ${
-          isVisible ? 'translate-y-0' : '-translate-y-full'
-        } ${!isAtTop ? 'shadow-2xl' : ''}`}
+        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ease-out ${
+          !isAtTop ? 'shadow-xl' : ''
+        }`}
       >
         {/* Top Bar - Collapses when scrolled */}
         <div 
@@ -109,14 +87,12 @@ export function Header() {
           </div>
         </div>
 
-        {/* Main Header - Compact when scrolled */}
-        <div className={`glass-strong border-b border-white/5 backdrop-blur-xl transition-all duration-500 ${
-          !isAtTop ? 'bg-background/95 dark:bg-background/95' : ''
+        {/* Main Header - Compact height */}
+        <div className={`glass-strong border-b border-white/5 backdrop-blur-xl transition-all duration-300 ${
+          !isAtTop ? 'bg-background/98 dark:bg-background/98' : ''
         }`}>
           <div className="container">
-            <div className={`flex items-center gap-4 transition-all duration-500 ${
-              isAtTop ? 'py-4' : 'py-2'
-            }`}>
+            <div className="flex items-center gap-4 py-2">
               {/* Mobile Menu */}
               <Sheet>
                 <SheetTrigger asChild className="lg:hidden">
@@ -150,18 +126,12 @@ export function Header() {
                 </SheetContent>
               </Sheet>
 
-              {/* Logo - Smaller when scrolled */}
-              <Link to="/" className="flex items-center gap-3 shrink-0 group">
-                <div className={`rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow group-hover:shadow-accent transition-all duration-500 ${
-                  isAtTop ? 'h-12 w-12' : 'h-10 w-10'
-                }`}>
-                  <span className={`text-primary-foreground font-bold transition-all duration-500 ${
-                    isAtTop ? 'text-2xl' : 'text-xl'
-                  }`}>J</span>
+              {/* Logo - Compact size */}
+              <Link to="/" className="flex items-center gap-2 shrink-0 group">
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow group-hover:shadow-accent transition-all duration-300">
+                  <span className="text-primary-foreground font-bold text-lg">J</span>
                 </div>
-                <span className={`font-bold hidden sm:block transition-all duration-500 ${
-                  isAtTop ? 'text-2xl' : 'text-xl'
-                }`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                <span className="font-bold text-lg hidden sm:block" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   <span className="text-gradient">Jhu</span>ri
                 </span>
               </Link>
@@ -169,26 +139,22 @@ export function Header() {
               {/* Search Bar with Autocomplete */}
               <SearchAutocomplete 
                 className="flex-1 max-w-2xl"
-                isCompact={!isAtTop}
+                isCompact={true}
               />
 
-              {/* Action Buttons - Smaller when scrolled */}
-              <div className="flex items-center gap-2">
+              {/* Action Buttons - Compact size */}
+              <div className="flex items-center gap-1">
                 <ThemeToggle />
                 <Link to="/wishlist">
-                  <Button variant="ghost" size="icon" className={`relative rounded-2xl hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-500 ${
-                    isAtTop ? 'h-12 w-12' : 'h-10 w-10'
-                  }`}>
-                    <Heart className={`transition-all duration-500 ${isAtTop ? 'h-5 w-5' : 'h-4 w-4'}`} />
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300">
+                    <Heart className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link to="/cart">
-                  <Button variant="ghost" size="icon" className={`relative rounded-2xl hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-500 ${
-                    isAtTop ? 'h-12 w-12' : 'h-10 w-10'
-                  }`}>
-                    <ShoppingCart className={`transition-all duration-500 ${isAtTop ? 'h-5 w-5' : 'h-4 w-4'}`} />
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300">
+                    <ShoppingCart className="h-4 w-4" />
                     {cartCount > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xs font-bold shadow-glow">
+                      <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-[10px] font-bold shadow-glow">
                         {cartCount}
                       </Badge>
                     )}
@@ -196,10 +162,8 @@ export function Header() {
                 </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className={`rounded-2xl hover:bg-white/10 transition-all duration-500 ${
-                      isAtTop ? 'h-12 w-12' : 'h-10 w-10'
-                    }`}>
-                      <User className={`transition-all duration-500 ${isAtTop ? 'h-5 w-5' : 'h-4 w-4'}`} />
+                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10 transition-all duration-300">
+                      <User className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 glass-card border-white/10 rounded-2xl p-2">
@@ -318,7 +282,7 @@ export function Header() {
       </header>
 
       {/* Spacer for fixed header */}
-      <div className={`transition-all duration-500 ${isAtTop ? 'h-[180px]' : 'h-[60px]'}`} />
+      <div className={`transition-all duration-300 ${isAtTop ? 'h-[140px]' : 'h-[52px]'}`} />
 
       {/* Floating button to scroll to top / show header */}
       <button
