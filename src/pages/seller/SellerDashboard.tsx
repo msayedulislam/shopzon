@@ -89,10 +89,10 @@ export default function SellerDashboard() {
       <div className="p-5 border-b">
         <Link to="/" className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
-            <span className="text-primary-foreground font-bold text-xl">S</span>
+            <span className="text-primary-foreground font-bold text-xl">J</span>
           </div>
           <div>
-            <span className="font-display font-bold text-lg">Shopzon</span>
+            <span className="font-display font-bold text-lg">Jhuri</span>
             <p className="text-xs text-muted-foreground">Seller Center</p>
           </div>
         </Link>

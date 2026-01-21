@@ -133,7 +133,7 @@ export default function AuthPage() {
         } else {
           toast({
             title: 'Account Created!',
-            description: 'Welcome to Shopzon! Your account has been created.',
+            description: 'Welcome to Jhuri! Your account has been created.',
           });
           navigate('/');
         }
@@ -157,9 +157,9 @@ export default function AuthPage() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 mb-8">
             <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-2xl">S</span>
+              <span className="text-primary-foreground font-bold text-2xl">J</span>
             </div>
-            <span className="font-display font-bold text-2xl">Shopzon</span>
+            <span className="font-display font-bold text-2xl">Jhuri</span>
           </Link>
 
           <h1 className="text-3xl font-bold mb-2">
@@ -168,7 +168,7 @@ export default function AuthPage() {
           <p className="text-muted-foreground mb-8">
             {isLogin
               ? 'Enter your phone number and password to login'
-              : 'Join Shopzon to start shopping'}
+              : 'Join Jhuri to start shopping'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -91,10 +91,10 @@ export default function AdminDashboard() {
       <div className="p-4 border-b">
         <Link to="/" className="flex items-center gap-2">
           <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-xl">S</span>
+            <span className="text-primary-foreground font-bold text-xl">J</span>
           </div>
           <div>
-            <span className="font-display font-bold">Shopzon</span>
+            <span className="font-display font-bold">Jhuri</span>
             <p className="text-xs text-muted-foreground">Admin Panel</p>
           </div>
         </Link>

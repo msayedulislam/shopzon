@@ -196,8 +196,8 @@ export function toDisplayProduct(product: ProductData) {
       level: 'bronze' as const,
     } : {
       id: '',
-      name: 'Shopzon Seller',
-      slug: 'shopzon-seller',
+      name: 'Jhuri Seller',
+      slug: 'jhuri-seller',
       rating: 4.5,
       productCount: 0,
       joinedAt: new Date(),
