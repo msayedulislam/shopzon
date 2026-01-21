@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Grid3X3, Smartphone, Shirt, Home, Dumbbell, Sparkles as SparklesIcon, Car, Baby, BookOpen, ShoppingBag } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
 // Icon mapping
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  electronics: Smartphone,
-  fashion: Shirt,
-  'home-living': Home,
-  sports: Dumbbell,
-  beauty: SparklesIcon,
-  automotive: Car,
-  'baby-kids': Baby,
-  books: BookOpen,
-  default: ShoppingBag
+const iconMap: Record<string, LucideIcon> = {
+  electronics: LucideIcons.Smartphone,
+  fashion: LucideIcons.Shirt,
+  'home-living': LucideIcons.Home,
+  sports: LucideIcons.Dumbbell,
+  beauty: LucideIcons.Sparkles,
+  automotive: LucideIcons.Car,
+  'baby-kids': LucideIcons.Baby,
+  books: LucideIcons.BookOpen,
+  default: LucideIcons.ShoppingBag
 };
 
 const categoryData = [
@@ -96,7 +97,7 @@ export function CategoriesSection() {
             transition={{ duration: 0.5 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium text-muted-foreground mb-4">
-              <Grid3X3 className="h-4 w-4 text-primary animate-pulse" />
+              <LucideIcons.Grid3X3 className="h-4 w-4 text-primary animate-pulse" />
               <span>Browse Categories</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -117,7 +118,7 @@ export function CategoriesSection() {
               className="group inline-flex items-center gap-2 px-6 py-3 rounded-full glass-primary text-primary font-semibold transition-all duration-300 hover:gap-4"
             >
               View All Categories
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <LucideIcons.ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
         </div>
