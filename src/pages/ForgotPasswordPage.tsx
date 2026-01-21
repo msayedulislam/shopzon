@@ -145,9 +145,9 @@ export default function ForgotPasswordPage() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 mb-8">
             <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-2xl">S</span>
+              <span className="text-primary-foreground font-bold text-2xl">J</span>
             </div>
-            <span className="font-display font-bold text-2xl">Shopzon</span>
+            <span className="font-display font-bold text-2xl">Jhuri</span>
           </Link>
 
           {/* Back Link */}

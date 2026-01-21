@@ -165,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const redirectUrl = `${window.location.origin}/`;
     
     // Use provided email or generate one from phone number
-    const authEmail = email && email.trim() ? email.trim() : `${phone}@shopzon.local`;
+    const authEmail = email && email.trim() ? email.trim() : `${phone}@jhuri.local`;
     
     const { data, error } = await supabase.auth.signUp({
       email: authEmail,
@@ -223,8 +223,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (phoneOrEmail: string, password: string) => {
     // Check if input is an email (contains @) or phone number
-    const isEmail = phoneOrEmail.includes('@') && !phoneOrEmail.endsWith('@shopzon.local');
-    const authEmail = isEmail ? phoneOrEmail : `${phoneOrEmail}@shopzon.local`;
+    const isEmail = phoneOrEmail.includes('@') && !phoneOrEmail.endsWith('@jhuri.local');
+    const authEmail = isEmail ? phoneOrEmail : `${phoneOrEmail}@jhuri.local`;
     
     const { error } = await supabase.auth.signInWithPassword({
       email: authEmail,
