@@ -12,6 +12,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import Index from '@/pages/Index';
 import ProductsPage from '@/pages/ProductsPage';
 import ProductDetailPage from '@/pages/ProductDetailPage';
+import CategoriesPage from '@/pages/CategoriesPage';
 import CartPage from '@/pages/CartPage';
 import CheckoutPage from '@/pages/CheckoutPage';
 import OrderSuccessPage from '@/pages/OrderSuccessPage';
@@ -96,6 +97,7 @@ export function AnimatedRoutes() {
         {/* Public Routes */}
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/products" element={<PageTransition><ProductsPage /></PageTransition>} />
+        <Route path="/categories" element={<PageTransition><CategoriesPage /></PageTransition>} />
         <Route path="/category/:slug" element={<PageTransition><ProductsPage /></PageTransition>} />
         <Route path="/product/:slug" element={<PageTransition><ProductDetailPage /></PageTransition>} />
         <Route path="/cart" element={<PageTransition><CartPage /></PageTransition>} />
