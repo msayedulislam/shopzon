@@ -1,20 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LucideIcon } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
-
-// Icon mapping
-const iconMap: Record<string, LucideIcon> = {
-  electronics: LucideIcons.Smartphone,
-  fashion: LucideIcons.Shirt,
-  'home-living': LucideIcons.Home,
-  sports: LucideIcons.Dumbbell,
-  beauty: LucideIcons.Sparkles,
-  automotive: LucideIcons.Car,
-  'baby-kids': LucideIcons.Baby,
-  books: LucideIcons.BookOpen,
-  default: LucideIcons.ShoppingBag
-};
+import { ArrowRight, Grid3X3 } from 'lucide-react';
 
 const categoryData = [
   {
@@ -75,8 +61,8 @@ const categoryData = [
   },
 ];
 
-const getIconForSlug = (slug: string) => {
-  return iconMap[slug] || iconMap.default;
+const getInitials = (name: string) => {
+  return name.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
 };
 
 export function CategoriesSection() {
@@ -97,7 +83,7 @@ export function CategoriesSection() {
             transition={{ duration: 0.5 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium text-muted-foreground mb-4">
-              <LucideIcons.Grid3X3 className="h-4 w-4 text-primary animate-pulse" />
+              <Grid3X3 className="h-4 w-4 text-primary animate-pulse" />
               <span>Browse Categories</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -118,63 +104,59 @@ export function CategoriesSection() {
               className="group inline-flex items-center gap-2 px-6 py-3 rounded-full glass-primary text-primary font-semibold transition-all duration-300 hover:gap-4"
             >
               View All Categories
-              <LucideIcons.ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
         </div>
 
         {/* Categories Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4 lg:gap-6">
-          {categoryData.map((category, index) => {
-            const IconComponent = getIconForSlug(category.slug);
-            
-            return (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
+          {categoryData.map((category, index) => (
+            <motion.div
+              key={category.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
+            >
+              <Link
+                to={`/category/${category.slug}`}
+                className="group relative flex flex-col items-center justify-center aspect-square rounded-3xl overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl"
               >
-                <Link
-                  to={`/category/${category.slug}`}
-                  className="group relative flex flex-col items-center justify-center aspect-square rounded-3xl overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl"
-                >
-                  {/* Background Gradient */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-90 group-hover:opacity-100 transition-opacity duration-300`} />
-                  
-                  {/* Overlay Pattern */}
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
-                  
-                  {/* Shine Effect */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                {/* Background Gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-90 group-hover:opacity-100 transition-opacity duration-300`} />
+                
+                {/* Overlay Pattern */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
+                
+                {/* Shine Effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                </div>
+                
+                {/* Content */}
+                <div className="relative z-10 flex flex-col items-center p-4 text-center">
+                  {/* Initials Badge */}
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                    <span className="text-xl font-bold text-white">{getInitials(category.name)}</span>
                   </div>
                   
-                  {/* Content */}
-                  <div className="relative z-10 flex flex-col items-center p-4 text-center">
-                    {/* Icon */}
-                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
-                      <IconComponent className="h-7 w-7 text-white" />
-                    </div>
-                    
-                    {/* Category Name */}
-                    <span className="font-bold text-sm text-white drop-shadow-lg">
-                      {category.name}
-                    </span>
-                    
-                    {/* Product Count */}
-                    <span className="text-xs text-white/80 mt-1">
-                      {category.productCount} items
-                    </span>
-                  </div>
+                  {/* Category Name */}
+                  <span className="font-bold text-sm text-white drop-shadow-lg">
+                    {category.name}
+                  </span>
                   
-                  {/* Bottom Glow */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
-                </Link>
-              </motion.div>
-            );
-          })}
+                  {/* Product Count */}
+                  <span className="text-xs text-white/80 mt-1">
+                    {category.productCount} items
+                  </span>
+                </div>
+                
+                {/* Bottom Glow */}
+                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

@@ -4,37 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useCategories } from '@/hooks/useProducts';
 import { categories as mockCategories } from '@/data/mockData';
-import { LucideIcon } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
-
-// Icon mapping for categories using string keys
-const iconMap: Record<string, LucideIcon> = {
-  electronics: LucideIcons.Smartphone,
-  fashion: LucideIcons.Shirt,
-  'home-living': LucideIcons.Home,
-  sports: LucideIcons.Dumbbell,
-  beauty: LucideIcons.Sparkles,
-  automotive: LucideIcons.Car,
-  'baby-kids': LucideIcons.Baby,
-  books: LucideIcons.BookOpen,
-  watches: LucideIcons.Watch,
-  computers: LucideIcons.Laptop,
-  cameras: LucideIcons.Camera,
-  audio: LucideIcons.Headphones,
-  gaming: LucideIcons.Gamepad2,
-  gifts: LucideIcons.Gift,
-  'food-grocery': LucideIcons.Utensils,
-  groceries: LucideIcons.ShoppingCart,
-  garden: LucideIcons.Flower2,
-  pets: LucideIcons.PawPrint,
-  tools: LucideIcons.Wrench,
-  art: LucideIcons.Palette,
-  music: LucideIcons.Music,
-  travel: LucideIcons.Plane,
-  health: LucideIcons.Heart,
-  toys: LucideIcons.Gamepad2,
-  default: LucideIcons.ShoppingBag
-};
+import { Grid3X3, ArrowRight } from 'lucide-react';
 
 // Color gradients for categories
 const colorGradients = [
@@ -52,12 +22,12 @@ const colorGradients = [
   'from-fuchsia-500 to-purple-500',
 ];
 
-const getIconForCategory = (slug: string) => {
-  return iconMap[slug] || iconMap.default;
-};
-
 const getGradientForIndex = (index: number) => {
   return colorGradients[index % colorGradients.length];
+};
+
+const getInitials = (name: string) => {
+  return name.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
 };
 
 export default function CategoriesPage() {
@@ -95,7 +65,7 @@ export default function CategoriesPage() {
               className="text-center max-w-3xl mx-auto mb-12"
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium text-muted-foreground mb-6">
-                <LucideIcons.Grid3X3 className="h-4 w-4 text-primary" />
+                <Grid3X3 className="h-4 w-4 text-primary" />
                 <span>Browse All Categories</span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -117,7 +87,6 @@ export default function CategoriesPage() {
               /* Categories Grid */
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-6">
                 {categories.map((category, index) => {
-                  const IconComponent = getIconForCategory(category.slug);
                   const gradient = getGradientForIndex(index);
                   
                   return (
@@ -144,9 +113,9 @@ export default function CategoriesPage() {
                         
                         {/* Content */}
                         <div className="relative z-10 flex flex-col items-center p-4 text-center">
-                          {/* Icon */}
+                          {/* Initials Badge */}
                           <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
-                            <IconComponent className="h-8 w-8 md:h-10 md:w-10 text-white" />
+                            <span className="text-2xl md:text-3xl font-bold text-white">{getInitials(category.name)}</span>
                           </div>
                           
                           {/* Category Name */}
@@ -156,7 +125,7 @@ export default function CategoriesPage() {
                           
                           {/* Arrow on Hover */}
                           <div className="absolute bottom-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                            <LucideIcons.ArrowRight className="h-5 w-5 text-white" />
+                            <ArrowRight className="h-5 w-5 text-white" />
                           </div>
                         </div>
                         

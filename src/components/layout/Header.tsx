@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, User, Menu, MapPin, Phone, ChevronDown, Sparkles, ChevronUp, LogOut } from 'lucide-react';
+import shopzonLogo from '@/assets/shopzon-logo-new.png';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -103,10 +104,8 @@ export function Header() {
                 <SheetContent side="left" className="w-[300px] p-0 glass-dark border-r border-white/10">
                   <div className="p-6 border-b border-white/10">
                     <Link to="/" className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow">
-                        <span className="text-primary-foreground font-bold text-2xl">J</span>
-                      </div>
-                      <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Jhuri</span>
+                      <img src={shopzonLogo} alt="Shopzon" className="h-10 w-10 object-contain" />
+                      <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Shopzon</span>
                     </Link>
                   </div>
                   <nav className="p-4">
@@ -117,7 +116,6 @@ export function Header() {
                           to={`/category/${category.slug}`}
                           className="flex items-center gap-4 p-4 rounded-2xl glass transition-all duration-300 hover:bg-primary/10 hover:border-primary/30"
                         >
-                          <span className="text-3xl">{category.icon}</span>
                           <span className="font-medium text-foreground">{category.name}</span>
                         </Link>
                       ))}
@@ -128,11 +126,9 @@ export function Header() {
 
               {/* Logo - Compact size */}
               <Link to="/" className="flex items-center gap-2 shrink-0 group">
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow group-hover:shadow-accent transition-all duration-300">
-                  <span className="text-primary-foreground font-bold text-lg">J</span>
-                </div>
+                <img src={shopzonLogo} alt="Shopzon" className="h-9 w-9 object-contain group-hover:scale-110 transition-transform duration-300" />
                 <span className="font-bold text-lg hidden sm:block" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  <span className="text-gradient">Jhu</span>ri
+                  <span className="text-gradient">Shop</span>zon
                 </span>
               </Link>
 
@@ -245,13 +241,12 @@ export function Header() {
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-72 glass-card border-white/10 rounded-2xl p-2">
+                <DropdownMenuContent align="start" className="w-64 glass-card border-white/10 rounded-2xl p-2">
                   {categories.map((category) => (
                     <DropdownMenuItem key={category.id} asChild className="rounded-xl hover:bg-white/10 cursor-pointer p-3">
-                      <Link to={`/category/${category.slug}`} className="flex items-center gap-4">
-                        <span className="text-2xl">{category.icon}</span>
+                      <Link to={`/category/${category.slug}`} className="flex items-center justify-between">
                         <span className="font-medium">{category.name}</span>
-                        <span className="ml-auto text-muted-foreground text-sm">
+                        <span className="text-muted-foreground text-sm">
                           {category.productCount}
                         </span>
                       </Link>
