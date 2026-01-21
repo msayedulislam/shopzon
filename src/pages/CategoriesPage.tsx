@@ -4,59 +4,36 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useCategories } from '@/hooks/useProducts';
 import { categories as mockCategories } from '@/data/mockData';
-import { 
-  Smartphone, 
-  Shirt, 
-  Home, 
-  Dumbbell, 
-  Sparkles, 
-  Car, 
-  Baby, 
-  BookOpen,
-  Watch,
-  Laptop,
-  Camera,
-  Headphones,
-  Gamepad2,
-  Gift,
-  Utensils,
-  Flower2,
-  PawPrint,
-  Wrench,
-  Palette,
-  Music,
-  Plane,
-  Heart,
-  ShoppingBag,
-  Grid3X3,
-  ArrowRight
-} from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
-// Icon mapping for categories
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  electronics: Smartphone,
-  fashion: Shirt,
-  'home-living': Home,
-  sports: Dumbbell,
-  beauty: Sparkles,
-  automotive: Car,
-  'baby-kids': Baby,
-  books: BookOpen,
-  watches: Watch,
-  computers: Laptop,
-  cameras: Camera,
-  audio: Headphones,
-  gaming: Gamepad2,
-  gifts: Gift,
-  'food-grocery': Utensils,
-  garden: Flower2,
-  pets: PawPrint,
-  tools: Wrench,
-  art: Palette,
-  music: Music,
-  travel: Plane,
-  health: Heart,
-  default: ShoppingBag
+// Icon mapping for categories using string keys
+const iconMap: Record<string, LucideIcon> = {
+  electronics: LucideIcons.Smartphone,
+  fashion: LucideIcons.Shirt,
+  'home-living': LucideIcons.Home,
+  sports: LucideIcons.Dumbbell,
+  beauty: LucideIcons.Sparkles,
+  automotive: LucideIcons.Car,
+  'baby-kids': LucideIcons.Baby,
+  books: LucideIcons.BookOpen,
+  watches: LucideIcons.Watch,
+  computers: LucideIcons.Laptop,
+  cameras: LucideIcons.Camera,
+  audio: LucideIcons.Headphones,
+  gaming: LucideIcons.Gamepad2,
+  gifts: LucideIcons.Gift,
+  'food-grocery': LucideIcons.Utensils,
+  groceries: LucideIcons.ShoppingCart,
+  garden: LucideIcons.Flower2,
+  pets: LucideIcons.PawPrint,
+  tools: LucideIcons.Wrench,
+  art: LucideIcons.Palette,
+  music: LucideIcons.Music,
+  travel: LucideIcons.Plane,
+  health: LucideIcons.Heart,
+  toys: LucideIcons.Gamepad2,
+  default: LucideIcons.ShoppingBag
 };
 
 // Color gradients for categories
@@ -118,7 +95,7 @@ export default function CategoriesPage() {
               className="text-center max-w-3xl mx-auto mb-12"
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium text-muted-foreground mb-6">
-                <Grid3X3 className="h-4 w-4 text-primary" />
+                <LucideIcons.Grid3X3 className="h-4 w-4 text-primary" />
                 <span>Browse All Categories</span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -179,7 +156,7 @@ export default function CategoriesPage() {
                           
                           {/* Arrow on Hover */}
                           <div className="absolute bottom-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                            <ArrowRight className="h-5 w-5 text-white" />
+                            <LucideIcons.ArrowRight className="h-5 w-5 text-white" />
                           </div>
                         </div>
                         
