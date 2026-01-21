@@ -508,7 +508,51 @@ export default function ProductDetailPage() {
             </div>
           </section>
         )}
+
+        {/* Spacer for sticky mobile bar */}
+        <div className="h-20 lg:hidden" />
       </main>
+
+      {/* Sticky Mobile Add to Cart Bar */}
+      <motion.div 
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-xl border-t border-border shadow-2xl shadow-black/20"
+      >
+        <div className="container flex items-center gap-3 py-3">
+          {/* Price */}
+          <div className="flex-1">
+            <span className="text-xl font-bold text-primary">{formatPrice(product.price)}</span>
+            {product.originalPrice && (
+              <span className="text-sm text-muted-foreground line-through ml-2">
+                {formatPrice(product.originalPrice)}
+              </span>
+            )}
+          </div>
+          
+          {/* Wishlist */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-11 w-11 rounded-xl border-2 shrink-0"
+            onClick={handleWishlistToggle}
+            disabled={wishlistLoading}
+          >
+            <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+          </Button>
+          
+          {/* Add to Cart */}
+          <Button
+            size="lg"
+            className="h-11 px-6 gap-2 font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25"
+            onClick={handleAddToCart}
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Add to Cart
+          </Button>
+        </div>
+      </motion.div>
+
       <Footer />
     </div>
   );
