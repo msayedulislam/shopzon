@@ -7,9 +7,6 @@ import {
   TrendingUp, 
   AlertTriangle, 
   ArrowRight,
-  Clock,
-  CheckCircle,
-  Eye,
   Plus,
   Star,
   Loader2
@@ -17,10 +14,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
 import { SellerOnboardingChecklist } from '@/components/seller/SellerOnboardingChecklist';
+import { SellerQuickActions } from '@/components/seller/SellerQuickActions';
+import { SellerPerformanceChart } from '@/components/seller/SellerPerformanceChart';
 
 export default function SellerOverview() {
   const { seller } = useOutletContext<{ seller: any }>();
@@ -256,56 +254,7 @@ export default function SellerOverview() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid sm:grid-cols-3 gap-4">
-        <Link to="/seller/dashboard/orders" className="group">
-          <Card className="hover:border-primary/50 transition-colors">
-            <CardContent className="pt-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-100">
-                  <ShoppingBag className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="font-medium">View Orders</p>
-                  <p className="text-sm text-muted-foreground">Manage all orders</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            </CardContent>
-          </Card>
-        </Link>
-        <Link to="/seller/dashboard/earnings" className="group">
-          <Card className="hover:border-primary/50 transition-colors">
-            <CardContent className="pt-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-100">
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Earnings</p>
-                  <p className="text-sm text-muted-foreground">Track your income</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            </CardContent>
-          </Card>
-        </Link>
-        <Link to="/seller/dashboard/settings" className="group">
-          <Card className="hover:border-primary/50 transition-colors">
-            <CardContent className="pt-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-100">
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Shop Settings</p>
-                  <p className="text-sm text-muted-foreground">Customize your store</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
+      <SellerQuickActions />
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Recent Orders */}
@@ -409,35 +358,41 @@ export default function SellerOverview() {
         </Card>
       </div>
 
-      {/* Shop Performance */}
+      {/* Shop Performance Summary */}
       <Card>
         <CardHeader>
-          <CardTitle>Shop Performance</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-yellow-500" />
+            Shop Performance
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid sm:grid-cols-4 gap-6">
-            <div className="text-center">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+            <div className="text-center p-4 rounded-xl bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                 <span className="text-2xl font-bold">{seller?.rating?.toFixed(1) || '0.0'}</span>
               </div>
               <p className="text-sm text-muted-foreground">Shop Rating</p>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{seller?.total_sales || 0}</p>
+            <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+              <p className="text-2xl font-bold text-blue-600">{seller?.total_sales || 0}</p>
               <p className="text-sm text-muted-foreground">Total Sales</p>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold capitalize">{seller?.level || 'bronze'}</p>
+            <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/20 dark:to-violet-950/20">
+              <p className="text-2xl font-bold capitalize text-purple-600">{seller?.level || 'bronze'}</p>
               <p className="text-sm text-muted-foreground">Seller Level</p>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{seller?.commission_rate || 10}%</p>
+            <div className="text-center p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+              <p className="text-2xl font-bold text-green-600">{seller?.commission_rate || 10}%</p>
               <p className="text-sm text-muted-foreground">Commission Rate</p>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Performance Analytics Dashboard */}
+      {seller && <SellerPerformanceChart sellerId={seller.id} />}
     </div>
   );
 }
