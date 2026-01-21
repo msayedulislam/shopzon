@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, User, Menu, MapPin, Phone, ChevronDown, Sparkles, ChevronUp, LogOut } from 'lucide-react';
-import shopzonLogo from '@/assets/shopzon-logo-new.png';
+import jhuriLogo from '@/assets/jhuri-logo.png';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -104,8 +104,8 @@ export function Header() {
                 <SheetContent side="left" className="w-[300px] p-0 glass-dark border-r border-white/10">
                   <div className="p-6 border-b border-white/10">
                     <Link to="/" className="flex items-center gap-3">
-                      <img src={shopzonLogo} alt="Shopzon" className="h-10 w-10 object-contain" />
-                      <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Shopzon</span>
+                      <img src={jhuriLogo} alt="Jhuri" className="h-10 w-10 object-contain rounded-xl" />
+                      <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Jhuri</span>
                     </Link>
                   </div>
                   <nav className="p-4">
@@ -126,9 +126,9 @@ export function Header() {
 
               {/* Logo - Compact size */}
               <Link to="/" className="flex items-center gap-2 shrink-0 group">
-                <img src={shopzonLogo} alt="Shopzon" className="h-9 w-9 object-contain group-hover:scale-110 transition-transform duration-300" />
+                <img src={jhuriLogo} alt="Jhuri" className="h-9 w-9 object-contain rounded-xl group-hover:scale-110 transition-transform duration-300" />
                 <span className="font-bold text-lg hidden sm:block" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  <span className="text-gradient">Shop</span>zon
+                  <span className="text-gradient">Jhu</span>ri
                 </span>
               </Link>
 

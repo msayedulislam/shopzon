@@ -44,10 +44,10 @@ export function Footer() {
             <div>
               <Link to="/" className="flex items-center gap-3 mb-6 group">
                 <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow group-hover:shadow-accent transition-shadow duration-500">
-                  <span className="text-primary-foreground font-bold text-2xl">S</span>
+                  <span className="text-primary-foreground font-bold text-2xl">J</span>
                 </div>
                 <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  <span className="text-gradient">Shop</span>zon
+                  <span className="text-gradient">Jhu</span>ri
                 </span>
               </Link>
               <p className="text-muted-foreground mb-6 leading-relaxed">
