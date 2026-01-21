@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Zap, Sparkles, Star, ShoppingBag, Truck, Shield, Gift } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Zap, Sparkles, Star, ShoppingBag, Truck, Shield, Gift, TrendingUp, Award, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function HeroSection() {
@@ -7,102 +8,208 @@ export function HeroSection() {
     <section className="relative min-h-[90vh] overflow-hidden bg-background">
       {/* Animated Background */}
       <div className="absolute inset-0">
-        {/* Gradient Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-primary/20 dark:bg-primary/20 blur-[120px] animate-pulse-glow" />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-accent/15 dark:bg-accent/15 blur-[100px] animate-glow-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/10 dark:bg-primary/10 blur-[150px]" />
+        {/* Animated Gradient Orbs */}
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.05, 1],
+            opacity: [0.5, 0.8, 0.5]
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-primary/20 dark:bg-primary/15 blur-[120px]" 
+        />
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.05, 1],
+            opacity: [0.5, 0.8, 0.5]
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-accent/15 dark:bg-accent/10 blur-[100px]" 
+        />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-gradient-radial from-primary/10 via-transparent to-transparent" 
+        />
         
-        {/* Grid Pattern */}
+        {/* Animated Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
         
         {/* Floating Particles */}
-        <div className="absolute top-20 left-20 w-2 h-2 rounded-full bg-primary animate-float" style={{ animationDelay: '0s' }} />
-        <div className="absolute top-40 right-40 w-3 h-3 rounded-full bg-accent animate-float" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-40 left-1/3 w-2 h-2 rounded-full bg-primary/60 animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/3 right-1/4 w-4 h-4 rounded-full bg-accent/40 animate-float" style={{ animationDelay: '0.5s' }} />
+        <motion.div
+          animate={{ y: [-10, 10, -10] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-20 left-20 w-2 h-2 rounded-full bg-primary/60"
+        />
+        <motion.div
+          animate={{ y: [-10, 10, -10] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          className="absolute top-40 right-40 w-3 h-3 rounded-full bg-accent/50"
+        />
+        <motion.div
+          animate={{ y: [-10, 10, -10] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-40 left-1/3 w-2 h-2 rounded-full bg-primary/60"
+        />
+        <motion.div
+          animate={{ y: [-10, 10, -10] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          className="absolute top-1/3 right-1/4 w-4 h-4 rounded-full bg-accent/40"
+        />
       </div>
 
       <div className="container relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[90vh] py-16 lg:py-24">
           {/* Content */}
-          <div className="text-center lg:text-left">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, staggerChildren: 0.1 }}
+            className="text-center lg:text-left"
+          >
             {/* Badge */}
-            <div 
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-primary text-primary text-sm font-semibold mb-8 animate-slide-up"
-              style={{ animationDelay: '0.1s' }}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-primary text-primary text-sm font-semibold mb-8"
             >
-              <Sparkles className="h-4 w-4 animate-pulse" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="h-4 w-4" />
+              </motion.div>
               <span>Up to 70% Off on Premium Products</span>
-              <Zap className="h-4 w-4 animate-bounce" />
-            </div>
+              <motion.div
+                animate={{ y: [-2, 2, -2] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              >
+                <Zap className="h-4 w-4" />
+              </motion.div>
+            </motion.div>
             
             {/* Heading */}
-            <h1 
-              className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8 animate-slide-up"
-              style={{ animationDelay: '0.2s', fontFamily: "'Space Grotesk', sans-serif" }}
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              <span className="text-foreground">Shop</span>
+              <motion.span 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="text-foreground inline-block"
+              >
+                Shop
+              </motion.span>
               <br />
-              <span className="text-gradient">Premium</span>
+              <motion.span 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="text-gradient inline-block"
+              >
+                Premium
+              </motion.span>
               <br />
-              <span className="text-foreground">Quality</span>
-            </h1>
+              <motion.span 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="text-foreground inline-block"
+              >
+                Quality
+              </motion.span>
+            </motion.h1>
             
             {/* Description */}
-            <p 
-              className="text-xl text-muted-foreground mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed animate-slide-up"
-              style={{ animationDelay: '0.3s' }}
+            <motion.p 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-xl text-muted-foreground mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed"
             >
               Discover an exclusive collection of premium products from verified sellers. Experience luxury at unbeatable prices.
-            </p>
+            </motion.p>
 
             {/* CTA Buttons */}
-            <div 
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-slide-up"
-              style={{ animationDelay: '0.4s' }}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
               <Link to="/products">
-                <Button className="btn-hero w-full sm:w-auto group">
-                  <ShoppingBag className="h-5 w-5 group-hover:rotate-12 transition-transform" />
-                  <span>Explore Now</span>
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button className="btn-hero w-full sm:w-auto group">
+                    <ShoppingBag className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+                    <span>Explore Now</span>
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </motion.div>
               </Link>
               <Link to="/flash-sale">
-                <Button className="btn-hero-outline w-full sm:w-auto group">
-                  <Zap className="h-5 w-5 text-primary animate-pulse" />
-                  <span>Flash Deals</span>
-                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button className="btn-hero-outline w-full sm:w-auto group">
+                    <Zap className="h-5 w-5 text-primary animate-pulse" />
+                    <span>Flash Deals</span>
+                  </Button>
+                </motion.div>
               </Link>
-            </div>
+            </motion.div>
 
             {/* Stats */}
-            <div 
-              className="flex items-center gap-8 justify-center lg:justify-start mt-14 animate-slide-up"
-              style={{ animationDelay: '0.5s' }}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="flex items-center gap-8 justify-center lg:justify-start mt-14"
             >
               {[
-                { value: '50K+', label: 'Products' },
-                { value: '10K+', label: 'Sellers' },
-                { value: '500K+', label: 'Customers' },
+                { value: '50K+', label: 'Products', icon: ShoppingBag },
+                { value: '10K+', label: 'Sellers', icon: Award },
+                { value: '500K+', label: 'Customers', icon: Users },
               ].map((stat, index) => (
-                <div key={stat.label} className="text-center relative">
+                <motion.div 
+                  key={stat.label} 
+                  className="text-center relative group"
+                  whileHover={{ y: -5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   {index > 0 && (
                     <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-px h-12 bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
                   )}
-                  <p className="text-3xl md:text-4xl font-bold text-gradient">{stat.value}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-                </div>
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <stat.icon className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <p className="text-3xl md:text-4xl font-bold text-gradient">{stat.value}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Hero Visual - Real Images */}
-          <div className="relative hidden lg:flex items-center justify-center">
+          {/* Hero Visual */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="relative hidden lg:flex items-center justify-center"
+          >
             {/* Main Product Image */}
-            <div 
-              className="relative z-10 w-[420px] h-[420px] glass-card rounded-[3rem] overflow-hidden animate-float"
-              style={{ animationDelay: '0.3s' }}
+            <motion.div 
+              animate={{ y: [-10, 10, -10] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="relative z-10 w-[420px] h-[420px] glass-card rounded-[3rem] overflow-hidden"
             >
               <img 
                 src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80"
@@ -113,13 +220,23 @@ export function HeroSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               
               {/* Badge */}
-              <div className="absolute top-4 left-4 px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center gap-2">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8, type: "spring" }}
+                className="absolute top-4 left-4 px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center gap-2"
+              >
                 <Star className="h-4 w-4 rating-star fill-current" />
                 Bestseller
-              </div>
+              </motion.div>
               
               {/* Product Info */}
-              <div className="absolute bottom-0 left-0 right-0 p-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 }}
+                className="absolute bottom-0 left-0 right-0 p-6"
+              >
                 <p className="text-white font-bold text-xl">Premium Collection</p>
                 <div className="flex items-center gap-2 mt-2">
                   {[...Array(5)].map((_, i) => (
@@ -127,13 +244,15 @@ export function HeroSection() {
                   ))}
                   <span className="text-white/80 text-sm ml-1">(4.9)</span>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
             
             {/* Floating Product Cards */}
-            <div 
-              className="absolute -top-4 -left-4 w-32 h-32 glass-card rounded-3xl overflow-hidden animate-float shadow-glow"
-              style={{ animationDelay: '0s' }}
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, type: "spring" }}
+              className="absolute -top-4 -left-4 w-32 h-32 glass-card rounded-3xl overflow-hidden shadow-glow animate-float"
             >
               <img 
                 src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80"
@@ -141,11 +260,19 @@ export function HeroSection() {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                <Truck className="h-8 w-8 text-white animate-bounce" />
+                <motion.div
+                  animate={{ y: [-3, 3, -3] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  <Truck className="h-8 w-8 text-white" />
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
             
-            <div 
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7, type: "spring" }}
               className="absolute -bottom-8 -right-8 w-28 h-28 glass-primary rounded-2xl overflow-hidden animate-float"
               style={{ animationDelay: '1s' }}
             >
@@ -154,10 +281,13 @@ export function HeroSection() {
                 alt="Sneakers"
                 className="w-full h-full object-cover"
               />
-            </div>
+            </motion.div>
             
-            <div 
-              className="absolute top-1/2 -right-16 w-24 h-24 rounded-2xl overflow-hidden animate-float glass-card"
+            <motion.div 
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, type: "spring" }}
+              className="absolute top-1/2 -right-16 w-24 h-24 rounded-2xl overflow-hidden glass-card animate-float"
               style={{ animationDelay: '2s' }}
             >
               <img 
@@ -166,11 +296,19 @@ export function HeroSection() {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                <Gift className="h-6 w-6 text-white animate-pulse" />
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <Gift className="h-6 w-6 text-white" />
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
 
-            <div 
+            <motion.div 
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, type: "spring" }}
               className="absolute -top-10 right-20 w-20 h-20 glass-card rounded-xl overflow-hidden animate-float"
               style={{ animationDelay: '1.5s' }}
             >
@@ -182,12 +320,38 @@ export function HeroSection() {
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                 <Shield className="h-5 w-5 text-white" />
               </div>
-            </div>
+            </motion.div>
 
-            {/* Orbiting Ring */}
-            <div className="absolute inset-0 rounded-full border border-primary/10 dark:border-primary/10 animate-rotate-slow" style={{ margin: '-40px' }} />
-            <div className="absolute inset-0 rounded-full border border-accent/10 dark:border-accent/10 animate-rotate-slow" style={{ margin: '-80px', animationDirection: 'reverse', animationDuration: '25s' }} />
-          </div>
+            {/* Trending Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.2, type: "spring" }}
+              className="absolute bottom-20 -left-12 glass-card px-4 py-3 rounded-2xl flex items-center gap-3"
+            >
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-foreground">Trending Now</p>
+                <p className="text-xs text-muted-foreground">+24% this week</p>
+              </div>
+            </motion.div>
+
+            {/* Orbiting Rings */}
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 rounded-full border border-primary/10 dark:border-primary/10" 
+              style={{ margin: '-40px' }} 
+            />
+            <motion.div 
+              animate={{ rotate: -360 }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 rounded-full border border-accent/10 dark:border-accent/10" 
+              style={{ margin: '-80px' }} 
+            />
+          </motion.div>
         </div>
       </div>
 
