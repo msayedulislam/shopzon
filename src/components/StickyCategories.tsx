@@ -39,7 +39,6 @@ export function StickyCategories({ isVisible }: StickyCategoriesProps) {
                     to={`/category/${category.slug}`}
                     className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 whitespace-nowrap"
                   >
-                    <span className="text-lg">{category.icon}</span>
                     <span>{category.name}</span>
                   </Link>
                 </motion.div>
