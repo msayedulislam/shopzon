@@ -13,8 +13,18 @@ import { BestSellingSection } from '@/components/home/BestSellingSection';
 import { TopSellersSection } from '@/components/home/TopSellersSection';
 import { TrendingDealsSection } from '@/components/home/TrendingDealsSection';
 import { PromoBannerCarousel } from '@/components/home/PromoBannerCarousel';
+import { MobileHomePage } from '@/components/mobile/MobileHomePage';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
+  const isMobile = useIsMobile();
+
+  // Show mobile-specific homepage on mobile devices
+  if (isMobile) {
+    return <MobileHomePage />;
+  }
+
+  // Desktop version
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
