@@ -9,6 +9,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileAuthPage } from '@/components/mobile/MobileAuthPage';
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name must be less than 100 characters'),
@@ -29,6 +31,7 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const isMobile = useIsMobile();
   
   const [formData, setFormData] = useState({
     fullName: '',
@@ -50,6 +53,11 @@ export default function AuthPage() {
   useEffect(() => {
     setIsLogin(mode === 'login');
   }, [mode]);
+
+  // Mobile view - after all hooks
+  if (isMobile) {
+    return <MobileAuthPage />;
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

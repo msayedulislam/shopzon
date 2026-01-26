@@ -14,11 +14,14 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileProductDetail } from '@/components/mobile/MobileProductDetail';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const { addItem } = useCart();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const product = products.find((p) => p.slug === slug) || products[0];
   
   const [selectedImage, setSelectedImage] = useState(0);
@@ -87,6 +90,11 @@ export default function ProductDetailPage() {
   const handleAddToCart = () => {
     addItem(product, quantity);
   };
+
+  // Mobile view
+  if (isMobile) {
+    return <MobileProductDetail />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
