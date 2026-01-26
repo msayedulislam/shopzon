@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import { MobileProductCard } from './MobileProductCard';
 import { useFlashSaleProducts, toDisplayProduct } from '@/hooks/useProducts';
 import { getFlashSaleProducts } from '@/data/mockData';
-import { Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function MobileFlashSale() {
   const { data: dbProducts, isLoading } = useFlashSaleProducts(3);
@@ -49,35 +50,43 @@ export function MobileFlashSale() {
   }
 
   return (
-    <div className="px-4 py-4 bg-white dark:bg-card">
+    <section className="px-4 py-4 bg-white dark:bg-card">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-foreground">Flash Sell</h2>
-          <span className="text-xs text-primary font-medium">
+          <h2 className="text-base font-bold text-foreground">Flash Sell</h2>
+          <motion.span 
+            key={timeLeft.seconds}
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            className="text-xs text-primary font-semibold tabular-nums"
+          >
             {formatTime(timeLeft.hours, timeLeft.minutes, timeLeft.seconds)}
-          </span>
+          </motion.span>
         </div>
         <Link 
           to="/flash-sale" 
-          className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-primary transition-colors"
         >
-          All &gt;
+          All
+          <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
       {/* Products Grid */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <div className="grid grid-cols-3 gap-2.5">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="aspect-[3/4] bg-secondary/40 rounded-xl animate-pulse" />
+          ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2.5">
           {flashSaleProducts.map((product, index) => (
             <MobileProductCard key={product.id} product={product} index={index} />
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

@@ -1,17 +1,17 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { MobileProductCard } from './MobileProductCard';
-import { useNewArrivals, toDisplayProduct } from '@/hooks/useProducts';
-import { getNewArrivals } from '@/data/mockData';
+import { useBestSelling, toDisplayProduct } from '@/hooks/useProducts';
+import { getBestSellingProducts } from '@/data/mockData';
 
-export function MobileNewProducts() {
-  const { data: dbProducts, isLoading } = useNewArrivals(6);
+export function MobileBestSellers() {
+  const { data: dbProducts, isLoading } = useBestSelling(6);
   
-  const newProducts = dbProducts && dbProducts.length > 0
+  const bestProducts = dbProducts && dbProducts.length > 0
     ? dbProducts.map(toDisplayProduct)
-    : getNewArrivals().slice(0, 6);
+    : getBestSellingProducts().slice(0, 6);
 
-  if (newProducts.length === 0 && !isLoading) {
+  if (bestProducts.length === 0 && !isLoading) {
     return null;
   }
 
@@ -19,9 +19,9 @@ export function MobileNewProducts() {
     <section className="px-4 py-4 bg-white dark:bg-card">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-bold text-foreground">New Product</h2>
+        <h2 className="text-base font-bold text-foreground">Best Sellers</h2>
         <Link 
-          to="/products" 
+          to="/products?sort=bestselling" 
           className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-primary transition-colors"
         >
           All
@@ -38,7 +38,7 @@ export function MobileNewProducts() {
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-2.5">
-          {newProducts.slice(0, 3).map((product, index) => (
+          {bestProducts.slice(0, 3).map((product, index) => (
             <MobileProductCard key={product.id} product={product} index={index} />
           ))}
         </div>

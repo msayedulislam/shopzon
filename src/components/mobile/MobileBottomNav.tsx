@@ -14,9 +14,10 @@ export function MobileBottomNav() {
   const location = useLocation();
   const { items } = useCart();
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-card border-t border-border shadow-lg md:hidden">
-      <div className="flex items-center justify-around py-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-card border-t border-border/50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] safe-area-bottom md:hidden">
+      <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
@@ -25,31 +26,44 @@ export function MobileBottomNav() {
             <Link
               key={item.path}
               to={item.path}
-              className="flex flex-col items-center gap-1 py-2 px-4 relative"
+              className="flex flex-col items-center gap-0.5 py-1.5 px-5 relative"
             >
-              <div className="relative">
+              <motion.div 
+                className="relative"
+                whileTap={{ scale: 0.9 }}
+              >
                 <Icon 
-                  className={`h-6 w-6 transition-colors ${
+                  className={`h-5 w-5 transition-colors duration-200 ${
                     isActive ? 'text-primary' : 'text-muted-foreground'
                   }`} 
+                  strokeWidth={isActive ? 2.5 : 2}
                 />
                 {item.hasBadge && itemCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary text-white text-xs flex items-center justify-center font-medium"
+                    className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center"
                   >
-                    {itemCount > 9 ? '9+' : itemCount}
+                    {itemCount > 99 ? '99+' : itemCount}
                   </motion.span>
                 )}
-              </div>
+              </motion.div>
               <span 
-                className={`text-xs font-medium transition-colors ${
+                className={`text-[10px] font-medium transition-colors duration-200 ${
                   isActive ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
                 {item.label}
               </span>
+              
+              {/* Active Indicator */}
+              {isActive && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full"
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                />
+              )}
             </Link>
           );
         })}
