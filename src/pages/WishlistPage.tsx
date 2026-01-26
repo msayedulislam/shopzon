@@ -12,6 +12,8 @@ import { formatPrice } from '@/data/mockData';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileWishlistPage } from '@/components/mobile/MobileWishlistPage';
 
 interface WishlistItem {
   id: string;
@@ -31,6 +33,7 @@ interface WishlistItem {
 }
 
 export default function WishlistPage() {
+  const isMobile = useIsMobile();
   const { user } = useAuth();
   const { addItem } = useCart();
   const queryClient = useQueryClient();
@@ -145,6 +148,10 @@ export default function WishlistPage() {
       toast.success(`Added ${addedCount} items to cart`);
     }
   };
+
+  if (isMobile) {
+    return <MobileWishlistPage />;
+  }
 
   if (!user) {
     return (

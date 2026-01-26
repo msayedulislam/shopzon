@@ -22,6 +22,8 @@ import {
 } from '@/components/ui/collapsible';
 import { products as mockProducts, categories as mockCategories, formatPrice } from '@/data/mockData';
 import { useProducts, useCategories, toDisplayProduct } from '@/hooks/useProducts';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileSearchPage } from '@/components/mobile/MobileSearchPage';
 
 const brands = [
   { id: 'samsung', name: 'Samsung', count: 45 },
@@ -34,6 +36,7 @@ const brands = [
 const ratings = [5, 4, 3, 2, 1];
 
 export default function ProductsPage() {
+  const isMobile = useIsMobile();
   const { slug } = useParams();
   const [searchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -186,6 +189,10 @@ export default function ProductsPage() {
       </Button>
     </div>
   );
+
+  if (isMobile) {
+    return <MobileSearchPage />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -13,6 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileStaticPage } from '@/components/mobile/MobileStaticPage';
 
 // Hero images
 import heroAbout from '@/assets/hero-about.jpg';
@@ -85,6 +87,7 @@ const contactSchema = z.object({
 });
 
 export default function StaticPage() {
+  const isMobile = useIsMobile();
   const location = useLocation();
   const slug = location.pathname.substring(1); // Remove leading slash
   const [page, setPage] = useState<StaticPageData | null>(null);
@@ -319,6 +322,10 @@ export default function StaticPage() {
   const gradientColor = slug ? pageColors[slug] || 'from-primary/90 to-primary/80' : 'from-primary/90 to-primary/80';
   const icon = slug ? pageIcons[slug] : <FileText className="h-8 w-8" />;
   const heroImage = slug ? pageHeroImages[slug] : null;
+
+  if (isMobile) {
+    return <MobileStaticPage />;
+  }
 
   if (loading) {
     return (
