@@ -13,6 +13,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileCheckoutPage } from '@/components/mobile/MobileCheckoutPage';
 
 const steps = [
   { id: 1, name: 'Shipping', icon: MapPin },
@@ -24,6 +26,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { items, getSubtotal, clearCart } = useCart();
+  const isMobile = useIsMobile();
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [walletBalance, setWalletBalance] = useState(0);
@@ -58,6 +61,11 @@ export default function CheckoutPage() {
       setWalletAmountToUse(0);
     }
   }, [useWallet, walletBalance, subtotal, deliveryCharge]);
+
+  // Mobile view - after all hooks
+  if (isMobile) {
+    return <MobileCheckoutPage />;
+  }
 
   const fetchWalletBalance = async () => {
     try {

@@ -5,6 +5,8 @@ import { Footer } from '@/components/layout/Footer';
 import { useCategories } from '@/hooks/useProducts';
 import { categories as mockCategories } from '@/data/mockData';
 import { Grid3X3, ArrowRight } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileCategoriesPage } from '@/components/mobile/MobileCategoriesPage';
 
 // Color gradients for categories
 const colorGradients = [
@@ -32,6 +34,7 @@ const getInitials = (name: string) => {
 
 export default function CategoriesPage() {
   const { data: dbCategories, isLoading } = useCategories();
+  const isMobile = useIsMobile();
   
   const categories = dbCategories && dbCategories.length > 0 
     ? dbCategories.map(c => ({ 
@@ -43,6 +46,11 @@ export default function CategoriesPage() {
         image_url: c.image_url 
       }))
     : mockCategories.map(c => ({ ...c, image_url: null }));
+
+  // Mobile view
+  if (isMobile) {
+    return <MobileCategoriesPage />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

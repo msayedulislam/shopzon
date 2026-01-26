@@ -8,16 +8,24 @@ import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { formatPrice } from '@/data/mockData';
 import { useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileCartPage } from '@/components/mobile/MobileCartPage';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getSubtotal } = useCart();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [couponCode, setCouponCode] = useState('');
   
   const subtotal = getSubtotal();
   const deliveryCharge = subtotal > 5000 ? 0 : 60;
   const total = subtotal + deliveryCharge;
   const isLoggedIn = !!user;
+
+  // Mobile view
+  if (isMobile) {
+    return <MobileCartPage />;
+  }
 
   if (items.length === 0) {
     return (
