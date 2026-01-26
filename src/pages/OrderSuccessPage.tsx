@@ -1,9 +1,16 @@
 import { Link } from 'react-router-dom';
 import { CheckCircle, Package, ArrowRight, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileOrderSuccessPage } from '@/components/mobile/MobileOrderSuccessPage';
 
 export default function OrderSuccessPage() {
-  const orderNumber = 'BDM' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const isMobile = useIsMobile();
+  const orderNumber = 'JHU' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  if (isMobile) {
+    return <MobileOrderSuccessPage />;
+  }
 
   return (
     <div className="min-h-screen bg-secondary/30 flex items-center justify-center p-4">

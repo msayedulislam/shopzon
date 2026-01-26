@@ -18,6 +18,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileBlogPage } from '@/components/mobile/MobileBlogPage';
 
 interface BlogPost {
   id: string;
@@ -31,6 +33,7 @@ interface BlogPost {
 }
 
 export default function BlogPage() {
+  const isMobile = useIsMobile();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,6 +70,10 @@ export default function BlogPage() {
     const minutes = Math.ceil(words / wordsPerMinute);
     return `${minutes} min read`;
   };
+
+  if (isMobile) {
+    return <MobileBlogPage />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
