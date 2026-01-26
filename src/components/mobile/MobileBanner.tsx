@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,7 +8,7 @@ const banners = [
     title: 'SUMMER',
     discount: '40%',
     subtitle: 'SALES',
-    bgColor: 'bg-gradient-to-r from-rose-400 via-rose-500 to-rose-600',
+    bgGradient: 'from-rose-400 via-rose-500 to-orange-400',
     image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=200&fit=crop',
     link: '/products?sale=summer',
   },
@@ -17,7 +17,7 @@ const banners = [
     title: 'NEW',
     discount: '30%',
     subtitle: 'ARRIVALS',
-    bgColor: 'bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600',
+    bgGradient: 'from-blue-400 via-blue-500 to-indigo-500',
     image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=200&fit=crop',
     link: '/products?new=true',
   },
@@ -26,7 +26,7 @@ const banners = [
     title: 'FLASH',
     discount: '50%',
     subtitle: 'DEALS',
-    bgColor: 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600',
+    bgGradient: 'from-amber-400 via-orange-500 to-red-500',
     image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop',
     link: '/flash-sale',
   },
@@ -34,75 +34,92 @@ const banners = [
 
 export function MobileBanner() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % banners.length);
-    }, 4000);
-
-    return () => clearInterval(timer);
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % banners.length);
   }, []);
 
+  useEffect(() => {
+    if (isPaused) return;
+    
+    const timer = setInterval(nextSlide, 4000);
+    return () => clearInterval(timer);
+  }, [isPaused, nextSlide]);
+
   return (
-    <div className="px-4 py-3">
-      <div className="relative h-36 rounded-2xl overflow-hidden">
+    <div 
+      className="px-4 py-2"
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
+    >
+      <div className="relative h-32 rounded-2xl overflow-hidden shadow-lg">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 100 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
             className="absolute inset-0"
           >
             <Link 
               to={banners[currentIndex].link}
-              className={`block w-full h-full ${banners[currentIndex].bgColor} relative`}
+              className={`flex w-full h-full bg-gradient-to-r ${banners[currentIndex].bgGradient} relative overflow-hidden`}
             >
-              {/* Background Image */}
-              <div 
-                className="absolute inset-0 opacity-30"
-                style={{
-                  backgroundImage: `url(${banners[currentIndex].image})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
+              {/* Decorative Elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
               
               {/* Content */}
-              <div className="absolute inset-0 flex items-center justify-between p-6">
+              <div className="relative z-10 flex items-center justify-between w-full px-5 py-4">
                 <div className="text-white">
-                  <p className="text-2xl font-bold tracking-wider">
+                  <motion.p 
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-xl font-bold tracking-wide"
+                  >
                     {banners[currentIndex].title}
-                  </p>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-4xl font-black">
+                  </motion.p>
+                  <motion.div 
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-baseline gap-1.5 mt-0.5"
+                  >
+                    <span className="text-3xl font-black">
                       {banners[currentIndex].discount}
                     </span>
-                    <span className="text-lg font-semibold">OFF</span>
-                  </div>
+                    <span className="text-sm font-bold opacity-90">OFF</span>
+                  </motion.div>
                 </div>
-                <div className="text-white text-right">
-                  <p className="text-2xl font-bold tracking-wider">
-                    {banners[currentIndex].subtitle}
-                  </p>
-                </div>
+                
+                <motion.p 
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.15 }}
+                  className="text-white text-xl font-bold tracking-wide"
+                >
+                  {banners[currentIndex].subtitle}
+                </motion.p>
               </div>
             </Link>
           </motion.div>
         </AnimatePresence>
 
-        {/* Dots Indicator */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+        {/* Progress Dots */}
+        <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
           {banners.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
+              className={`h-1.5 rounded-full transition-all duration-300 ${
                 index === currentIndex 
                   ? 'w-5 bg-white' 
-                  : 'bg-white/50'
+                  : 'w-1.5 bg-white/50 hover:bg-white/70'
               }`}
+              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
