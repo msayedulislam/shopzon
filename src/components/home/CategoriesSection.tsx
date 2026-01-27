@@ -1,159 +1,78 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Grid3X3 } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { useCategories } from '@/hooks/useProducts';
 
-const categoryData = [
-  {
-    id: '1',
-    name: 'Electronics',
-    slug: 'electronics',
-    productCount: 1250,
-    color: 'from-blue-500 to-cyan-500',
-  },
-  {
-    id: '2',
-    name: 'Fashion',
-    slug: 'fashion',
-    productCount: 2340,
-    color: 'from-pink-500 to-rose-500',
-  },
-  {
-    id: '3',
-    name: 'Home & Living',
-    slug: 'home-living',
-    productCount: 890,
-    color: 'from-amber-500 to-orange-500',
-  },
-  {
-    id: '4',
-    name: 'Sports',
-    slug: 'sports',
-    productCount: 567,
-    color: 'from-green-500 to-emerald-500',
-  },
-  {
-    id: '5',
-    name: 'Beauty',
-    slug: 'beauty',
-    productCount: 1120,
-    color: 'from-purple-500 to-pink-500',
-  },
-  {
-    id: '6',
-    name: 'Automotive',
-    slug: 'automotive',
-    productCount: 345,
-    color: 'from-slate-500 to-gray-600',
-  },
-  {
-    id: '7',
-    name: 'Baby & Kids',
-    slug: 'baby-kids',
-    productCount: 678,
-    color: 'from-sky-400 to-blue-500',
-  },
-  {
-    id: '8',
-    name: 'Books',
-    slug: 'books',
-    productCount: 2100,
-    color: 'from-indigo-500 to-violet-500',
-  },
+const fallbackCategories = [
+  { id: '1', name: 'Women Fashion', slug: 'fashion', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200&h=200&fit=crop' },
+  { id: '2', name: 'Men Topwear', slug: 'men-topwear', image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=200&h=200&fit=crop' },
+  { id: '3', name: 'Electronics', slug: 'electronics', image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=200&h=200&fit=crop' },
+  { id: '4', name: 'Kids Wear', slug: 'kids', image: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=200&h=200&fit=crop' },
+  { id: '5', name: 'Beauty', slug: 'beauty', image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=200&h=200&fit=crop' },
+  { id: '6', name: 'Home & Living', slug: 'home-living', image: 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=200&h=200&fit=crop' },
+  { id: '7', name: 'Footwear', slug: 'footwear', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop' },
+  { id: '8', name: 'Accessories', slug: 'accessories', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop' },
+  { id: '9', name: 'Health & Beauty', slug: 'health-beauty', image: 'https://images.unsplash.com/photo-1576426863848-c21f53c60b19?w=200&h=200&fit=crop' },
+  { id: '10', name: 'Baby & Kids', slug: 'baby-kids', image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=200&h=200&fit=crop' },
 ];
 
-const getInitials = (name: string) => {
-  return name.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
-};
-
 export function CategoriesSection() {
+  const { data: dbCategories, isLoading } = useCategories();
+  
+  const categories = dbCategories && dbCategories.length > 0
+    ? dbCategories.slice(0, 10).map((cat, idx) => ({
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        image: cat.image_url || fallbackCategories[idx % fallbackCategories.length].image,
+      }))
+    : fallbackCategories;
+
   return (
-    <section className="py-16 lg:py-24 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px]" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-accent/5 blur-[100px]" />
-      
-      <div className="container relative z-10">
+    <section className="py-6 bg-white dark:bg-card">
+      <div className="container">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-foreground">Categories</h2>
+          <Link
+            to="/categories"
+            className="flex items-center gap-1 text-sm text-primary font-medium hover:underline"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium text-muted-foreground mb-4">
-              <Grid3X3 className="h-4 w-4 text-primary animate-pulse" />
-              <span>Browse Categories</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              Shop by <span className="text-gradient">Category</span>
-            </h2>
-            <p className="text-muted-foreground mt-3 text-lg">
-              Discover products across all categories
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Link
-              to="/categories"
-              className="group inline-flex items-center gap-2 px-6 py-3 rounded-full glass-primary text-primary font-semibold transition-all duration-300 hover:gap-4"
-            >
-              View All Categories
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </motion.div>
+            All
+            <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4 lg:gap-6">
-          {categoryData.map((category, index) => (
+        {/* Categories Grid - Govaly Style with Images */}
+        <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+          {categories.map((category, index) => (
             <motion.div
               key={category.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.05 }}
+              transition={{ duration: 0.2, delay: index * 0.02 }}
             >
               <Link
                 to={`/category/${category.slug}`}
-                className="group relative flex flex-col items-center justify-center aspect-square rounded-3xl overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl"
+                className="group flex flex-col items-center gap-1.5"
               >
-                {/* Background Gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-90 group-hover:opacity-100 transition-opacity duration-300`} />
-                
-                {/* Overlay Pattern */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
-                
-                {/* Shine Effect */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                </div>
-                
-                {/* Content */}
-                <div className="relative z-10 flex flex-col items-center p-4 text-center">
-                  {/* Initials Badge */}
-                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
-                    <span className="text-xl font-bold text-white">{getInitials(category.name)}</span>
-                  </div>
-                  
-                  {/* Category Name */}
-                  <span className="font-bold text-sm text-white drop-shadow-lg">
-                    {category.name}
-                  </span>
-                  
-                  {/* Product Count */}
-                  <span className="text-xs text-white/80 mt-1">
-                    {category.productCount} items
-                  </span>
-                </div>
-                
-                {/* Bottom Glow */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+                {/* Square Image Container */}
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full aspect-square rounded-lg overflow-hidden bg-secondary/30 border border-border/20 group-hover:border-primary/30 transition-colors"
+                >
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </motion.div>
+                <span className="text-[10px] font-medium text-foreground text-center line-clamp-1 leading-tight">
+                  {category.name}
+                </span>
               </Link>
             </motion.div>
           ))}
