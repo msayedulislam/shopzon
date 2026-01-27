@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { MobileHeader } from './MobileHeader';
@@ -25,25 +23,27 @@ export function MobileHomePage() {
       <MobileBanner />
       
       {/* Categories */}
-      <MobileCategories />
+      <div className="mt-1.5">
+        <MobileCategories />
+      </div>
       
       {/* Flash Sale Section */}
-      <div className="mt-2">
+      <div className="mt-1.5">
         <MobileFlashSale />
       </div>
       
       {/* New Products Section */}
-      <div className="mt-2">
+      <div className="mt-1.5">
         <MobileNewProducts />
       </div>
       
       {/* Best Sellers Section */}
-      <div className="mt-2">
+      <div className="mt-1.5">
         <MobileBestSellers />
       </div>
       
       {/* All Products Section */}
-      <div className="mt-2 pb-24">
+      <div className="mt-1.5 pb-20">
         <MobileAllProducts />
       </div>
       
@@ -53,10 +53,10 @@ export function MobileHomePage() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
         whileTap={{ scale: 0.9 }}
-        className="fixed right-4 bottom-20 z-40 w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white flex items-center justify-center shadow-lg shadow-primary/30"
+        className="fixed right-3 bottom-16 z-40 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg"
         aria-label="Chat support"
       >
-        <MessageCircle className="h-5 w-5" />
+        <MessageCircle className="h-4 w-4" />
       </motion.button>
       
       {/* Bottom Navigation */}

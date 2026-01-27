@@ -1,32 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-const banners = [
+const fallbackBanners = [
   {
-    id: 1,
+    id: '1',
     title: 'Summer Sale',
-    discount: '40% OFF',
-    description: 'On selected items',
-    bgGradient: 'from-rose-500 via-pink-500 to-orange-400',
-    link: '/products?sale=summer',
+    subtitle: 'Up to 50% Off',
+    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&h=400&fit=crop',
+    link: '/products?sale=true',
   },
   {
-    id: 2,
+    id: '2',
     title: 'New Arrivals',
-    discount: '30% OFF',
-    description: 'Fresh collections',
-    bgGradient: 'from-blue-500 via-indigo-500 to-purple-500',
-    link: '/products?new=true',
+    subtitle: 'Shop Latest Trends',
+    image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&h=400&fit=crop',
+    link: '/products?sort=newest',
   },
   {
-    id: 3,
-    title: 'Flash Deals',
-    discount: '50% OFF',
-    description: 'Limited time only',
-    bgGradient: 'from-amber-500 via-orange-500 to-red-500',
-    link: '/flash-sale',
+    id: '3',
+    title: 'Electronics',
+    subtitle: 'Best Deals',
+    image: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=800&h=400&fit=crop',
+    link: '/categories?category=electronics',
   },
 ];
 
@@ -34,97 +33,104 @@ export function MobileBanner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  const { data: dbBanners } = useQuery({
+    queryKey: ['mobile-banners'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('banners')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .limit(5);
+      return data || [];
+    },
+  });
+
+  const banners = dbBanners && dbBanners.length > 0
+    ? dbBanners.map((b) => ({
+        id: b.id,
+        title: b.title,
+        subtitle: b.subtitle || '',
+        image: b.image_url,
+        link: b.link_url || '/products',
+      }))
+    : fallbackBanners;
+
   const nextSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % banners.length);
-  }, []);
+  }, [banners.length]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
+  }, [banners.length]);
 
   useEffect(() => {
     if (isPaused) return;
-    
     const timer = setInterval(nextSlide, 4000);
     return () => clearInterval(timer);
   }, [isPaused, nextSlide]);
 
   return (
     <div 
-      className="px-4 py-3"
+      className="mx-2 mt-1"
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
     >
-      <div className="relative h-36 rounded-3xl overflow-hidden shadow-xl">
+      {/* Banner Container */}
+      <div className="relative aspect-[2/1] rounded-lg overflow-hidden bg-secondary/30">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             className="absolute inset-0"
           >
-            <Link 
-              to={banners[currentIndex].link}
-              className={`flex w-full h-full bg-gradient-to-br ${banners[currentIndex].bgGradient} relative overflow-hidden`}
-            >
-              {/* Decorative Elements */}
-              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-xl" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/4 blur-xl" />
-              <div className="absolute top-1/2 right-8 w-24 h-24 bg-white/5 rounded-full" />
-              
-              {/* Content */}
-              <div className="relative z-10 flex flex-col justify-center w-full px-6 py-5">
-                <motion.p 
-                  initial={{ y: 15, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-white/80 text-xs font-medium tracking-wider uppercase"
-                >
-                  {banners[currentIndex].description}
-                </motion.p>
-                <motion.h3 
-                  initial={{ y: 15, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.15 }}
-                  className="text-white text-xl font-bold mt-1"
-                >
+            <Link to={banners[currentIndex].link}>
+              <img
+                src={banners[currentIndex].image}
+                alt={banners[currentIndex].title}
+                className="w-full h-full object-cover"
+              />
+              {/* Overlay with text */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex flex-col justify-center px-4">
+                <h2 className="text-white text-lg font-bold mb-0.5">
                   {banners[currentIndex].title}
-                </motion.h3>
-                <motion.div 
-                  initial={{ y: 15, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex items-center gap-2 mt-2"
-                >
-                  <span className="text-white text-2xl font-black">
-                    {banners[currentIndex].discount}
-                  </span>
-                </motion.div>
-                <motion.div
-                  initial={{ y: 15, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.25 }}
-                  className="mt-3"
-                >
-                  <span className="inline-flex items-center gap-1 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold">
-                    Shop Now <ChevronRight className="h-3.5 w-3.5" />
-                  </span>
-                </motion.div>
+                </h2>
+                <p className="text-white/90 text-xs">
+                  {banners[currentIndex].subtitle}
+                </p>
               </div>
             </Link>
           </motion.div>
         </AnimatePresence>
 
-        {/* Progress Indicator */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+        {/* Navigation Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/80 flex items-center justify-center shadow"
+        >
+          <ChevronLeft className="h-4 w-4 text-foreground" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/80 flex items-center justify-center shadow"
+        >
+          <ChevronRight className="h-4 w-4 text-foreground" />
+        </button>
+
+        {/* Dots Indicator */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1">
           {banners.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                index === currentIndex 
-                  ? 'w-6 bg-white' 
-                  : 'w-1.5 bg-white/40 hover:bg-white/60'
+              className={`w-1.5 h-1.5 rounded-full transition-all ${
+                index === currentIndex
+                  ? 'bg-white w-3'
+                  : 'bg-white/50'
               }`}
-              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
