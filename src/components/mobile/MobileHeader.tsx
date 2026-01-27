@@ -7,6 +7,7 @@ import { useCart } from '@/hooks/useCart';
 interface MobileHeaderProps {
   title?: string;
   showBack?: boolean;
+  backPath?: string;
   showSearch?: boolean;
   showNotification?: boolean;
   transparent?: boolean;
@@ -14,7 +15,8 @@ interface MobileHeaderProps {
 
 export function MobileHeader({ 
   title = 'Jhuri', 
-  showBack = false, 
+  showBack = false,
+  backPath,
   showSearch = true,
   showNotification = true,
   transparent = false
@@ -34,7 +36,9 @@ export function MobileHeader({
   }, []);
 
   const handleBack = () => {
-    if (window.history.length > 1) {
+    if (backPath) {
+      navigate(backPath);
+    } else if (window.history.length > 2) {
       navigate(-1);
     } else {
       navigate('/');
