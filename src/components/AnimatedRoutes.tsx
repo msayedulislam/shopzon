@@ -85,6 +85,9 @@ import BlogPostPage from '@/pages/BlogPostPage';
 // Wishlist
 import WishlistPage from '@/pages/WishlistPage';
 
+// Notifications
+import NotificationsPage from '@/pages/NotificationsPage';
+
 // Seller Store
 import SellerStorePage from '@/pages/SellerStorePage';
 
@@ -107,6 +110,7 @@ export function AnimatedRoutes() {
         <Route path="/login" element={<PageTransition><AuthPage /></PageTransition>} />
         <Route path="/forgot-password" element={<PageTransition><ForgotPasswordPage /></PageTransition>} />
         <Route path="/wishlist" element={<PageTransition><WishlistPage /></PageTransition>} />
+        <Route path="/notifications" element={<PageTransition><NotificationsPage /></PageTransition>} />
         <Route path="/store/:slug" element={<PageTransition><SellerStorePage /></PageTransition>} />
 
         {/* Protected Routes */}
