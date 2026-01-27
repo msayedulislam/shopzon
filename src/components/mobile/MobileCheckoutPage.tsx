@@ -45,12 +45,27 @@ export function MobileCheckoutPage() {
   const deliveryCharge = subtotal > 5000 ? 0 : 60;
   const total = subtotal + deliveryCharge;
 
-  // Auto-fill user profile data
+  // Auto-fill user profile data and detect location on mount
   useEffect(() => {
     if (user) {
       fetchUserProfile();
     }
+    // Auto-detect location on page load
+    autoDetectLocationOnMount();
   }, [user]);
+
+  const autoDetectLocationOnMount = async () => {
+    const location = await detectLocation();
+    if (location) {
+      setShippingInfo((prev) => ({
+        ...prev,
+        address: location.address || prev.address,
+        city: location.city || prev.city,
+        area: location.area || prev.area,
+        postalCode: location.postalCode || prev.postalCode,
+      }));
+    }
+  };
 
   const fetchUserProfile = async () => {
     try {
