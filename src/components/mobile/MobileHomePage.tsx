@@ -10,6 +10,7 @@ import { MobileNewProducts } from './MobileNewProducts';
 import { MobileBestSellers } from './MobileBestSellers';
 import { MobileAllProducts } from './MobileAllProducts';
 import { MobileBottomNav } from './MobileBottomNav';
+import { NotificationPermissionPrompt } from './NotificationPermissionPrompt';
 
 export function MobileHomePage() {
   const navigate = useNavigate();
@@ -65,6 +66,9 @@ export function MobileHomePage() {
       
       {/* Bottom Navigation */}
       <MobileBottomNav />
+      
+      {/* Notification Permission Prompt */}
+      <NotificationPermissionPrompt />
     </div>
   );
 }
