@@ -48,28 +48,28 @@ export function MobileSearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-background pb-20">
+    <div className="min-h-screen bg-secondary/30 dark:bg-background pb-16">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-card border-b border-border/50 safe-area-top">
-        <div className="flex items-center gap-3 h-14 px-4">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2">
+      <header className="sticky top-0 z-50 bg-white dark:bg-card border-b border-border/30 safe-area-top">
+        <div className="flex items-center gap-2 h-12 px-3">
+          <button onClick={() => navigate(-1)} className="p-1.5 -ml-1">
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
           
           {/* Search Input */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-secondary/60 rounded-full pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full bg-secondary/50 rounded-lg pl-8 pr-8 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/30"
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2"
               >
                 <X className="h-4 w-4 text-muted-foreground" />
               </button>
@@ -79,27 +79,27 @@ export function MobileSearchPage() {
           {/* Filter Button */}
           <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
             <SheetTrigger asChild>
-              <button className="p-2 relative">
+              <button className="p-1.5 relative">
                 <SlidersHorizontal className="h-5 w-5 text-foreground" />
                 {(selectedBrands.length > 0 || priceRange[0] > 0 || priceRange[1] < 200000) && (
-                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary" />
+                  <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-primary" />
                 )}
               </button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
-              <SheetHeader className="mb-6">
+            <SheetContent side="bottom" className="h-[65vh] rounded-t-2xl">
+              <SheetHeader className="mb-4">
                 <SheetTitle className="flex items-center justify-between">
-                  <span>Filters</span>
-                  <button onClick={clearFilters} className="text-sm text-primary font-normal">
+                  <span className="text-base">Filters</span>
+                  <button onClick={clearFilters} className="text-xs text-primary font-normal">
                     Clear All
                   </button>
                 </SheetTitle>
               </SheetHeader>
               
-              <div className="space-y-6 overflow-y-auto max-h-[calc(70vh-120px)]">
+              <div className="space-y-5 overflow-y-auto max-h-[calc(65vh-100px)]">
                 {/* Price Range */}
                 <div>
-                  <h3 className="font-semibold mb-4">Price Range</h3>
+                  <h3 className="font-semibold text-sm mb-3">Price Range</h3>
                   <Slider
                     value={priceRange}
                     onValueChange={setPriceRange}
@@ -107,7 +107,7 @@ export function MobileSearchPage() {
                     max={200000}
                     step={1000}
                   />
-                  <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
                     <span>{formatPrice(priceRange[0])}</span>
                     <span>{formatPrice(priceRange[1])}</span>
                   </div>
@@ -115,10 +115,10 @@ export function MobileSearchPage() {
 
                 {/* Brands */}
                 <div>
-                  <h3 className="font-semibold mb-4">Brands</h3>
-                  <div className="space-y-3">
+                  <h3 className="font-semibold text-sm mb-3">Brands</h3>
+                  <div className="space-y-2.5">
                     {brands.map((brand) => (
-                      <label key={brand.id} className="flex items-center gap-3 cursor-pointer">
+                      <label key={brand.id} className="flex items-center gap-2.5 cursor-pointer">
                         <Checkbox
                           checked={selectedBrands.includes(brand.id)}
                           onCheckedChange={(checked) => {
@@ -136,10 +136,10 @@ export function MobileSearchPage() {
                 </div>
               </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-card border-t">
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-white dark:bg-card border-t">
                 <Button 
                   onClick={() => setFilterOpen(false)} 
-                  className="w-full rounded-full"
+                  className="w-full rounded-lg h-10"
                 >
                   Show {products.length} Results
                 </Button>
@@ -150,35 +150,35 @@ export function MobileSearchPage() {
       </header>
 
       {/* Results Count */}
-      <div className="px-4 py-3 flex items-center justify-between bg-secondary/30">
-        <span className="text-sm text-muted-foreground">
-          {products.length} products found
+      <div className="px-3 py-2 flex items-center justify-between bg-white dark:bg-card border-b border-border/20">
+        <span className="text-xs text-muted-foreground">
+          {products.length} products
         </span>
-        <button className="flex items-center gap-1 text-sm font-medium">
-          Sort by
-          <ChevronDown className="h-4 w-4" />
+        <button className="flex items-center gap-1 text-xs font-medium">
+          Sort
+          <ChevronDown className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      {/* Products Grid */}
-      <div className="px-4 py-4">
+      {/* Products Grid - 3 columns */}
+      <div className="p-2">
         {isLoading ? (
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-1.5">
             {[...Array(9)].map((_, i) => (
-              <div key={i} className="aspect-[3/4] bg-secondary/40 rounded-xl animate-pulse" />
+              <div key={i} className="aspect-[3/4] bg-white dark:bg-card rounded-lg animate-pulse" />
             ))}
           </div>
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-1.5">
             {products.map((product, index) => (
-              <MobileProductCard key={product.id} product={product} index={index} />
+              <MobileProductCard key={product.id} product={product} index={index} variant="square" />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-            <h3 className="font-semibold mb-2">No products found</h3>
-            <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
+          <div className="text-center py-12 bg-white dark:bg-card rounded-lg">
+            <Search className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+            <h3 className="font-semibold text-sm mb-1">No products found</h3>
+            <p className="text-xs text-muted-foreground">Try adjusting your search or filters</p>
           </div>
         )}
       </div>

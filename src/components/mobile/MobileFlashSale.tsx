@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Zap, Clock } from 'lucide-react';
+import { ChevronRight, Zap } from 'lucide-react';
 import { MobileProductCard } from './MobileProductCard';
 import { useFlashSaleProducts, toDisplayProduct } from '@/hooks/useProducts';
 import { getFlashSaleProducts } from '@/data/mockData';
 import { motion } from 'framer-motion';
 
 export function MobileFlashSale() {
-  const { data: dbProducts, isLoading } = useFlashSaleProducts(3);
+  const { data: dbProducts, isLoading } = useFlashSaleProducts(6);
   
   const flashSaleProducts = dbProducts && dbProducts.length > 0
     ? dbProducts.map(toDisplayProduct)
-    : getFlashSaleProducts().slice(0, 3);
+    : getFlashSaleProducts().slice(0, 6);
 
   const [timeLeft, setTimeLeft] = useState({
     hours: 3,
@@ -49,66 +49,46 @@ export function MobileFlashSale() {
   }
 
   return (
-    <section className="py-4 bg-white dark:bg-card">
+    <section className="py-3 bg-white dark:bg-card">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 mb-4">
+      <div className="flex items-center justify-between px-3 mb-2.5">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary to-rose-500 flex items-center justify-center">
-              <Zap className="h-3.5 w-3.5 text-white" fill="white" />
-            </div>
-            <h2 className="text-base font-bold text-foreground">Flash Sale</h2>
+            <Zap className="h-4 w-4 text-primary" fill="currentColor" />
+            <h2 className="text-sm font-bold text-foreground">Flash Sale</h2>
+          </div>
+          
+          {/* Timer - Compact */}
+          <div className="flex items-center gap-0.5 bg-foreground/5 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-foreground">{pad(timeLeft.hours)}</span>
+            <span className="text-[10px] text-foreground">:</span>
+            <span className="text-[10px] font-bold text-foreground">{pad(timeLeft.minutes)}</span>
+            <span className="text-[10px] text-foreground">:</span>
+            <span className="text-[10px] font-bold text-foreground">{pad(timeLeft.seconds)}</span>
           </div>
         </div>
         
-        {/* Timer */}
-        <div className="flex items-center gap-1.5">
-          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-          <div className="flex items-center gap-0.5">
-            <span className="w-6 h-6 rounded-md bg-foreground text-background text-xs font-bold flex items-center justify-center">
-              {pad(timeLeft.hours)}
-            </span>
-            <span className="text-foreground font-bold">:</span>
-            <span className="w-6 h-6 rounded-md bg-foreground text-background text-xs font-bold flex items-center justify-center">
-              {pad(timeLeft.minutes)}
-            </span>
-            <span className="text-foreground font-bold">:</span>
-            <span className="w-6 h-6 rounded-md bg-foreground text-background text-xs font-bold flex items-center justify-center">
-              {pad(timeLeft.seconds)}
-            </span>
-          </div>
-        </div>
+        <Link 
+          to="/flash-sale" 
+          className="flex items-center gap-0.5 text-xs text-primary font-medium"
+        >
+          All
+          <ChevronRight className="h-3 w-3" />
+        </Link>
       </div>
 
-      {/* Products Horizontal Scroll */}
+      {/* Products Grid - 3 columns */}
       {isLoading ? (
-        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
+        <div className="grid grid-cols-3 gap-1.5 px-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="w-36 shrink-0">
-              <div className="aspect-[3/4] bg-secondary/40 rounded-2xl animate-pulse" />
-            </div>
+            <div key={i} className="aspect-[3/4] bg-secondary/30 rounded-lg animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="relative">
-          <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-1">
-            {flashSaleProducts.map((product, index) => (
-              <div key={product.id} className="w-36 shrink-0">
-                <MobileProductCard product={product} index={index} variant="compact" />
-              </div>
-            ))}
-            
-            {/* View All Card */}
-            <Link 
-              to="/flash-sale"
-              className="w-28 shrink-0 aspect-[3/4] rounded-2xl bg-gradient-to-br from-primary/10 to-rose-500/10 border border-primary/20 flex flex-col items-center justify-center gap-2"
-            >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <ChevronRight className="h-5 w-5 text-primary" />
-              </div>
-              <span className="text-xs font-semibold text-primary">View All</span>
-            </Link>
-          </div>
+        <div className="grid grid-cols-3 gap-1.5 px-2">
+          {flashSaleProducts.slice(0, 6).map((product, index) => (
+            <MobileProductCard key={product.id} product={product} index={index} variant="square" />
+          ))}
         </div>
       )}
     </section>
