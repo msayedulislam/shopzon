@@ -86,7 +86,7 @@ export default function UserDashboard() {
   if (isMobile) {
     return (
       <div className="min-h-screen bg-secondary/30 dark:bg-background pb-20">
-        <MobileHeader showBack title={getPageTitle()} />
+        <MobileHeader showBack backPath="/dashboard" title={getPageTitle()} />
         <div className="p-4">
           <Outlet context={{ profile, fetchProfile }} />
         </div>
