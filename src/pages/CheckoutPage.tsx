@@ -63,15 +63,42 @@ export default function CheckoutPage() {
   const walletDiscount = useWallet ? Math.min(walletAmountToUse, subtotal + deliveryCharge) : 0;
   const total = subtotal + deliveryCharge - walletDiscount;
 
-  // Auto-fill user profile data and detect location on mount
-  useEffect(() => {
-    if (user) {
-      fetchWalletBalance();
-      fetchUserProfile();
+  // Function definitions (must be before useEffect that calls them)
+  const fetchWalletBalance = async () => {
+    try {
+      const { data } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+      
+      if (data) {
+        setWalletBalance(data.balance);
+      }
+    } catch (error) {
+      console.log('No wallet found');
     }
-    // Auto-detect location on page load
-    autoDetectLocationOnMount();
-  }, [user]);
+  };
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, phone')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      if (profile) {
+        setShippingInfo((prev) => ({
+          ...prev,
+          name: profile.full_name || prev.name,
+          phone: profile.phone || prev.phone,
+        }));
+      }
+    } catch (error) {
+      console.log('No profile found, user can fill manually');
+    }
+  };
 
   const autoDetectLocationOnMount = async () => {
     const location = await detectLocation();
@@ -86,25 +113,15 @@ export default function CheckoutPage() {
     }
   };
 
-  const fetchUserProfile = async () => {
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name, phone')
-        .eq('user_id', user?.id)
-        .single();
-
-      if (profile) {
-        setShippingInfo((prev) => ({
-          ...prev,
-          name: profile.full_name || prev.name,
-          phone: profile.phone || prev.phone,
-        }));
-      }
-    } catch (error) {
-      console.log('No profile found, user can fill manually');
+  // Auto-fill user profile data and detect location on mount
+  useEffect(() => {
+    if (user) {
+      fetchWalletBalance();
+      fetchUserProfile();
     }
-  };
+    // Auto-detect location on page load
+    autoDetectLocationOnMount();
+  }, [user]);
 
   useEffect(() => {
     if (useWallet && walletBalance > 0) {
@@ -118,23 +135,6 @@ export default function CheckoutPage() {
   if (isMobile) {
     return <MobileCheckoutPage />;
   }
-
-  const fetchWalletBalance = async () => {
-    try {
-      const { data } = await supabase
-        .from('wallets')
-        .select('balance')
-        .eq('user_id', user?.id)
-        .single();
-      
-      if (data) {
-        setWalletBalance(data.balance);
-      }
-    } catch (error) {
-      // Wallet doesn't exist yet, that's fine
-      console.log('No wallet found');
-    }
-  };
 
   const handlePlaceOrder = async () => {
     if (!user) {
