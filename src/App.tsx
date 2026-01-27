@@ -7,7 +7,17 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import { AnimatedRoutes } from "@/components/AnimatedRoutes";
 
-const queryClient = new QueryClient();
+// Optimized QueryClient with better caching
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes - reduce refetches
+      gcTime: 1000 * 60 * 30, // 30 minutes cache
+      refetchOnWindowFocus: false, // Don't refetch on tab focus
+      retry: 1, // Reduce retry attempts
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
