@@ -181,9 +181,9 @@ export function SearchAutocomplete({ className, inputClassName, isCompact = fals
   const showDropdown = isOpen;
 
   return (
-    <div ref={wrapperRef} className={cn("relative", className)} style={{ zIndex: 9999 }}>
+    <div ref={wrapperRef} className={cn("relative", className)} style={{ position: 'relative', zIndex: 100 }}>
       <div className="relative group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors z-10" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
         <Input
           ref={inputRef}
           type="search"
@@ -210,8 +210,8 @@ export function SearchAutocomplete({ className, inputClassName, isCompact = fals
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl overflow-hidden max-h-[500px] overflow-y-auto"
-            style={{ zIndex: 99999 }}
+            className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl max-h-[500px] overflow-y-auto"
+            style={{ zIndex: 100 }}
           >
             {/* Search Results */}
             {query.length >= 2 && (
