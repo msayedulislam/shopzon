@@ -5,6 +5,7 @@ import { MobileCategories } from './MobileCategories';
 import { MobileFlashSale } from './MobileFlashSale';
 import { MobileNewProducts } from './MobileNewProducts';
 import { MobileBestSellers } from './MobileBestSellers';
+import { MobileAllProducts } from './MobileAllProducts';
 import { MobileBottomNav } from './MobileBottomNav';
 
 export function MobileHomePage() {
@@ -33,8 +34,13 @@ export function MobileHomePage() {
       </div>
       
       {/* Best Sellers Section */}
-      <div className="mt-2 pb-20">
+      <div className="mt-2">
         <MobileBestSellers />
+      </div>
+      
+      {/* All Products Section */}
+      <div className="mt-2 pb-20">
+        <MobileAllProducts />
       </div>
       
       {/* Bottom Navigation */}
