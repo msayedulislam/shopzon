@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   User, 
   Package, 
@@ -36,6 +36,7 @@ const menuItems = [
 
 export default function UserDashboard() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -111,16 +112,19 @@ export default function UserDashboard() {
         {menuItems.map((item) => {
           const active = isActive(item);
           return (
-            <Link
+            <button
               key={item.path}
-              to={item.path}
-              onClick={onNavigate}
+              type="button"
+              onClick={() => {
+                onNavigate?.();
+                navigate(item.path);
+              }}
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
                 active
                   ? 'bg-primary text-primary-foreground shadow-md'
                   : 'hover:bg-secondary text-foreground'
-              )}
+              ) + ' w-full text-left'}
             >
               <item.icon className={cn(
                 'h-5 w-5 transition-transform',
@@ -130,7 +134,7 @@ export default function UserDashboard() {
               {!active && (
                 <ChevronRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
               )}
-            </Link>
+            </button>
           );
         })}
       </nav>
