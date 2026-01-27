@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Plus, Edit2, Trash2, Check, Loader2, Home, Building } from 'lucide-react';
+import { MapPin, Plus, Edit2, Trash2, Check, Loader2, Home, Building, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useLocationDetect } from '@/hooks/useLocationDetect';
 
 interface Address {
   id: string;
@@ -27,10 +28,17 @@ interface Address {
   is_default: boolean;
 }
 
+interface Profile {
+  full_name: string | null;
+  phone: string | null;
+}
+
 export default function AddressesPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { detecting, detectLocation } = useLocationDetect();
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -49,8 +57,19 @@ export default function AddressesPage() {
   useEffect(() => {
     if (user) {
       fetchAddresses();
+      fetchProfile();
     }
   }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('full_name, phone')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    setProfile(data);
+  };
 
   const fetchAddresses = async () => {
     if (!user) return;
@@ -85,9 +104,10 @@ export default function AddressesPage() {
       });
     } else {
       setEditingAddress(null);
+      // Auto-fill name and phone from profile when adding new address
       setFormData({
-        name: '',
-        phone: '',
+        name: profile?.full_name || '',
+        phone: profile?.phone || '',
         address: '',
         city: 'Dhaka',
         area: '',
@@ -96,6 +116,19 @@ export default function AddressesPage() {
       });
     }
     setDialogOpen(true);
+  };
+
+  const handleDetectLocation = async () => {
+    const location = await detectLocation();
+    if (location) {
+      setFormData(prev => ({
+        ...prev,
+        address: location.address,
+        city: location.city,
+        area: location.area,
+        postal_code: location.postalCode,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -246,7 +279,24 @@ export default function AddressesPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="address">Street Address</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="address">Street Address</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDetectLocation}
+                      disabled={detecting}
+                      className="gap-1.5 h-7 text-xs"
+                    >
+                      {detecting ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Navigation className="h-3 w-3" />
+                      )}
+                      {detecting ? 'Detecting...' : 'Detect Location'}
+                    </Button>
+                  </div>
                   <Input
                     id="address"
                     value={formData.address}
