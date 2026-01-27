@@ -1,5 +1,6 @@
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { MobileHeader } from './MobileHeader';
 import { MobileSearchBar } from './MobileSearchBar';
 import { MobileBanner } from './MobileBanner';
@@ -11,6 +12,8 @@ import { MobileAllProducts } from './MobileAllProducts';
 import { MobileBottomNav } from './MobileBottomNav';
 
 export function MobileHomePage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-secondary/30 dark:bg-background">
       {/* Header */}
@@ -53,6 +56,7 @@ export function MobileHomePage() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
         whileTap={{ scale: 0.9 }}
+        onClick={() => navigate('/help')}
         className="fixed right-3 bottom-16 z-40 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg"
         aria-label="Chat support"
       >
