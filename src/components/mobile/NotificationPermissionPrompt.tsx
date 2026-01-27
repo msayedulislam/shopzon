@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Bell, X } from 'lucide-react';
+import { Bell, X, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { notificationService } from '@/lib/notificationService';
 
 export function NotificationPermissionPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -10,15 +11,15 @@ export function NotificationPermissionPrompt() {
 
   useEffect(() => {
     // Check if notifications are supported
-    if (!('Notification' in window)) {
+    if (!notificationService.isSupported()) {
       setPermissionStatus('unsupported');
       return;
     }
 
-    setPermissionStatus(Notification.permission);
+    setPermissionStatus(notificationService.getPermission());
 
-    // Only show prompt on mobile if permission is not granted and not denied
-    if (isMobile && Notification.permission === 'default') {
+    // Only show prompt if permission is not granted and not denied
+    if (notificationService.getPermission() === 'default') {
       // Check if user has dismissed the prompt before
       const dismissed = localStorage.getItem('notification-prompt-dismissed');
       const dismissedTime = dismissed ? parseInt(dismissed, 10) : 0;
@@ -29,7 +30,7 @@ export function NotificationPermissionPrompt() {
         // Delay showing prompt for better UX
         const timer = setTimeout(() => {
           setShowPrompt(true);
-        }, 3000);
+        }, 2000);
 
         return () => clearTimeout(timer);
       }
@@ -37,16 +38,19 @@ export function NotificationPermissionPrompt() {
   }, [isMobile]);
 
   const requestPermission = async () => {
+    // Unlock audio on user interaction
+    notificationService.unlockAudio();
+    
     try {
-      const permission = await Notification.requestPermission();
+      const permission = await notificationService.requestPermission();
       setPermissionStatus(permission);
       
       if (permission === 'granted') {
-        // Show a test notification
-        new Notification('Notifications Enabled! 🔔', {
-          body: 'You will now receive important updates.',
-          icon: '/favicon.png',
-        });
+        // Play sound and show notification
+        notificationService.notify(
+          'Notifications Enabled! 🔔',
+          'You will now receive important updates with sound alerts.'
+        );
       }
       
       setShowPrompt(false);
@@ -54,6 +58,11 @@ export function NotificationPermissionPrompt() {
       console.error('Error requesting notification permission:', error);
       setShowPrompt(false);
     }
+  };
+
+  const testSound = () => {
+    notificationService.unlockAudio();
+    notificationService.playSound();
   };
 
   const dismissPrompt = () => {
@@ -103,10 +112,21 @@ export function NotificationPermissionPrompt() {
               <span>Flash sales & exclusive deals</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-lg">💰</span>
-              <span>Price drops on wishlist items</span>
+              <span className="text-lg">🔊</span>
+              <span>Sound alerts for new notifications</span>
             </div>
           </div>
+
+          {/* Test Sound Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={testSound}
+          >
+            <Volume2 className="h-4 w-4 mr-2" />
+            Test Sound
+          </Button>
 
           <div className="flex gap-3">
             <Button

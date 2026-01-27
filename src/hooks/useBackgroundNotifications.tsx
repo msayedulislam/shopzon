@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
+import { notificationService } from '@/lib/notificationService';
 
 // Register service worker for background notifications
 const registerServiceWorker = async () => {
@@ -37,58 +38,6 @@ const requestPersistentStorage = async () => {
   }
 };
 
-// Play notification sound (works in background with user interaction)
-const playNotificationSound = () => {
-  try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    
-    // Resume context if suspended (required for background)
-    if (audioContext.state === 'suspended') {
-      audioContext.resume();
-    }
-    
-    // Three-tone chime
-    const frequencies = [880, 1318.5, 1760];
-    const delays = [0, 0.1, 0.2];
-    const durations = [0.15, 0.25, 0.3];
-    const gains = [0.4, 0.4, 0.3];
-    
-    frequencies.forEach((freq, i) => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      gain.gain.setValueAtTime(0, audioContext.currentTime);
-      gain.gain.setValueAtTime(gains[i], audioContext.currentTime + delays[i]);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + delays[i] + durations[i]);
-      osc.start(audioContext.currentTime + delays[i]);
-      osc.stop(audioContext.currentTime + delays[i] + durations[i]);
-    });
-  } catch (error) {
-    console.log('Audio not supported');
-  }
-};
-
-// Show browser notification
-const showNotification = (title: string, body: string, tag: string) => {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    const notification = new Notification(title, {
-      body,
-      icon: '/favicon.png',
-      badge: '/favicon.png',
-      tag,
-      requireInteraction: true, // Keep notification visible until user interacts
-    });
-    
-    notification.onclick = () => {
-      window.focus();
-      notification.close();
-    };
-  }
-};
-
 export function useBackgroundNotifications(enabled: boolean = true) {
   const channelsRef = useRef<any[]>([]);
   const cleanupRef = useRef<(() => void) | null>(null);
@@ -119,8 +68,7 @@ export function useBackgroundNotifications(enabled: boolean = true) {
         },
         (payload) => {
           const order = payload.new as any;
-          playNotificationSound();
-          showNotification(
+          notificationService.notify(
             '🛒 New Order Received!',
             `Order #${order.order_number} - ${formatPrice(order.total)}`,
             `order-${order.id}`
@@ -140,8 +88,7 @@ export function useBackgroundNotifications(enabled: boolean = true) {
         },
         (payload) => {
           const seller = payload.new as any;
-          playNotificationSound();
-          showNotification(
+          notificationService.notify(
             '🏪 New Seller Registration',
             `${seller.shop_name} has registered as a seller`,
             `seller-${seller.id}`
@@ -169,8 +116,7 @@ export function useBackgroundNotifications(enabled: boolean = true) {
             product.stock <= threshold && 
             (oldProduct.stock === null || oldProduct.stock > threshold)
           ) {
-            playNotificationSound();
-            showNotification(
+            notificationService.notify(
               '⚠️ Low Stock Alert',
               `${product.name} has only ${product.stock} items left`,
               `stock-${product.id}`
