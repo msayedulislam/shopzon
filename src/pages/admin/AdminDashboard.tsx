@@ -28,6 +28,7 @@ import {
   Sparkles,
   Database,
   Key,
+  PenTool,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -65,6 +66,7 @@ const menuItems = [
   { icon: Database, label: 'Master Data', path: '/admin/master-data' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/logs' },
   { icon: Activity, label: 'System Health', path: '/admin/system-health' },
+  { icon: PenTool, label: 'CMS', path: '/admin/cms' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 

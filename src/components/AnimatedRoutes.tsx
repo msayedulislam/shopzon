@@ -80,6 +80,7 @@ import AdminActivityDashboard from '@/pages/admin/AdminActivityDashboard';
 import AdminProfiles from '@/pages/admin/AdminProfiles';
 import AdminReports from '@/pages/admin/AdminReports';
 import AdminNotifications from '@/pages/admin/AdminNotifications';
+import AdminCMS from '@/pages/admin/AdminCMS';
 
 import StaticPage from '@/pages/StaticPage';
 
@@ -191,6 +192,7 @@ export function AnimatedRoutes() {
           <Route path="role-presets" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminRolePresets /></Suspense>} />
           <Route path="master-data" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminMasterData /></Suspense>} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="cms" element={<AdminCMS />} />
         </Route>
 
         {/* Static Pages */}
