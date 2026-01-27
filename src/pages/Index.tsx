@@ -28,7 +28,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 relative" style={{ zIndex: 1 }}>
         <HeroSection />
         <PromoBannerCarousel />
         <MarketingFeatures />

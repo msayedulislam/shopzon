@@ -58,7 +58,7 @@ export function HeroSection() {
         />
       </div>
 
-      <div className="container relative z-10">
+      <div className="container relative" style={{ zIndex: 1 }}>
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[90vh] py-16 lg:py-24">
           {/* Content */}
           <motion.div 
