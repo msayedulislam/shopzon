@@ -63,11 +63,33 @@ export default function CheckoutPage() {
   const walletDiscount = useWallet ? Math.min(walletAmountToUse, subtotal + deliveryCharge) : 0;
   const total = subtotal + deliveryCharge - walletDiscount;
 
+  // Auto-fill user profile data
   useEffect(() => {
     if (user) {
       fetchWalletBalance();
+      fetchUserProfile();
     }
   }, [user]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, phone')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (profile) {
+        setShippingInfo((prev) => ({
+          ...prev,
+          name: profile.full_name || prev.name,
+          phone: profile.phone || prev.phone,
+        }));
+      }
+    } catch (error) {
+      console.log('No profile found, user can fill manually');
+    }
+  };
 
   useEffect(() => {
     if (useWallet && walletBalance > 0) {
