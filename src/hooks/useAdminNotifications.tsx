@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatPrice } from '@/data/mockData';
@@ -15,9 +15,74 @@ export interface AdminNotification {
   data?: any;
 }
 
+// Notification sound (short beep)
+const playNotificationSound = () => {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+  } catch (error) {
+    console.log('Audio not supported');
+  }
+};
+
+// Request browser notification permission
+const requestNotificationPermission = async () => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+};
+
+// Show browser push notification
+const showBrowserNotification = (title: string, message: string, icon?: string) => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const notification = new Notification(title, {
+      body: message,
+      icon: icon || '/favicon.png',
+      badge: '/favicon.png',
+      tag: 'admin-notification',
+      requireInteraction: false,
+    });
+    
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+    
+    // Auto close after 5 seconds
+    setTimeout(() => notification.close(), 5000);
+  }
+};
+
 export function useAdminNotifications() {
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  const hasRequestedPermission = useRef(false);
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if (!hasRequestedPermission.current) {
+      hasRequestedPermission.current = true;
+      requestNotificationPermission().then(() => {
+        if ('Notification' in window) {
+          setNotificationPermission(Notification.permission);
+        }
+      });
+    }
+  }, []);
 
   const addNotification = useCallback((notification: Omit<AdminNotification, 'id' | 'timestamp' | 'read'>) => {
     const newNotification: AdminNotification = {
@@ -30,7 +95,13 @@ export function useAdminNotifications() {
     setNotifications(prev => [newNotification, ...prev].slice(0, 50)); // Keep last 50 notifications
     setUnreadCount(prev => prev + 1);
     
-    // Show toast notification
+    // Play notification sound
+    playNotificationSound();
+    
+    // Show browser push notification
+    showBrowserNotification(notification.title, notification.message);
+    
+    // Show in-app toast notification
     toast(notification.title, {
       description: notification.message,
       duration: 5000,
@@ -166,11 +237,20 @@ export function useAdminNotifications() {
     };
   }, [addNotification, checkLowStock]);
 
+  const requestPermission = useCallback(async () => {
+    await requestNotificationPermission();
+    if ('Notification' in window) {
+      setNotificationPermission(Notification.permission);
+    }
+  }, []);
+
   return {
     notifications,
     unreadCount,
     markAsRead,
     markAllAsRead,
     clearAll,
+    notificationPermission,
+    requestPermission,
   };
 }
