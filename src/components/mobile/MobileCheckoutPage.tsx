@@ -45,6 +45,33 @@ export function MobileCheckoutPage() {
   const deliveryCharge = subtotal > 5000 ? 0 : 60;
   const total = subtotal + deliveryCharge;
 
+  // Auto-fill user profile data
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, phone')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (profile) {
+        setShippingInfo((prev) => ({
+          ...prev,
+          name: profile.full_name || prev.name,
+          phone: profile.phone || prev.phone,
+        }));
+      }
+    } catch (error) {
+      console.log('No profile found, user can fill manually');
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!user) {
       toast.error('Please login to place order');
