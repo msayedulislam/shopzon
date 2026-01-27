@@ -96,6 +96,9 @@ import NotificationsPage from '@/pages/NotificationsPage';
 // Seller Store
 import SellerStorePage from '@/pages/SellerStorePage';
 
+// Search
+import SearchPage from '@/pages/SearchPage';
+
 export function AnimatedRoutes() {
   const location = useLocation();
 
@@ -118,6 +121,8 @@ export function AnimatedRoutes() {
         <Route path="/notifications" element={<PageTransition><NotificationsPage /></PageTransition>} />
         <Route path="/store/:slug" element={<PageTransition><SellerStorePage /></PageTransition>} />
         <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
+        <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
+
         {/* Protected Routes */}
         <Route path="/checkout" element={<ProtectedRoute><PageTransition><CheckoutPage /></PageTransition></ProtectedRoute>} />
         <Route path="/order-success" element={<ProtectedRoute><PageTransition><OrderSuccessPage /></PageTransition></ProtectedRoute>} />
