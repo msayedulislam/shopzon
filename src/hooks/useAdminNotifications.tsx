@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatPrice } from '@/data/mockData';
+import { notificationService } from '@/lib/notificationService';
 
 export type NotificationType = 'order' | 'seller' | 'low_stock';
 
@@ -15,79 +16,9 @@ export interface AdminNotification {
   data?: any;
 }
 
-// Notification sound - pleasant two-tone chime
-const playNotificationSound = () => {
-  try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    
-    // First tone (higher pitch)
-    const osc1 = audioContext.createOscillator();
-    const gain1 = audioContext.createGain();
-    osc1.connect(gain1);
-    gain1.connect(audioContext.destination);
-    osc1.frequency.value = 880; // A5
-    osc1.type = 'sine';
-    gain1.gain.setValueAtTime(0.4, audioContext.currentTime);
-    gain1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-    osc1.start(audioContext.currentTime);
-    osc1.stop(audioContext.currentTime + 0.15);
-    
-    // Second tone (even higher pitch) - delayed slightly
-    const osc2 = audioContext.createOscillator();
-    const gain2 = audioContext.createGain();
-    osc2.connect(gain2);
-    gain2.connect(audioContext.destination);
-    osc2.frequency.value = 1318.5; // E6
-    osc2.type = 'sine';
-    gain2.gain.setValueAtTime(0, audioContext.currentTime);
-    gain2.gain.setValueAtTime(0.4, audioContext.currentTime + 0.1);
-    gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.35);
-    osc2.start(audioContext.currentTime + 0.1);
-    osc2.stop(audioContext.currentTime + 0.35);
-    
-    // Third tone (highest) - for emphasis
-    const osc3 = audioContext.createOscillator();
-    const gain3 = audioContext.createGain();
-    osc3.connect(gain3);
-    gain3.connect(audioContext.destination);
-    osc3.frequency.value = 1760; // A6
-    osc3.type = 'sine';
-    gain3.gain.setValueAtTime(0, audioContext.currentTime);
-    gain3.gain.setValueAtTime(0.3, audioContext.currentTime + 0.2);
-    gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-    osc3.start(audioContext.currentTime + 0.2);
-    osc3.stop(audioContext.currentTime + 0.5);
-  } catch (error) {
-    console.log('Audio not supported');
-  }
-};
-
 // Request browser notification permission
 const requestNotificationPermission = async () => {
-  if ('Notification' in window && Notification.permission === 'default') {
-    await Notification.requestPermission();
-  }
-};
-
-// Show browser push notification
-const showBrowserNotification = (title: string, message: string, icon?: string) => {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    const notification = new Notification(title, {
-      body: message,
-      icon: icon || '/favicon.png',
-      badge: '/favicon.png',
-      tag: 'admin-notification',
-      requireInteraction: false,
-    });
-    
-    notification.onclick = () => {
-      window.focus();
-      notification.close();
-    };
-    
-    // Auto close after 5 seconds
-    setTimeout(() => notification.close(), 5000);
-  }
+  return notificationService.requestPermission();
 };
 
 export function useAdminNotifications() {
@@ -119,11 +50,8 @@ export function useAdminNotifications() {
     setNotifications(prev => [newNotification, ...prev].slice(0, 50)); // Keep last 50 notifications
     setUnreadCount(prev => prev + 1);
     
-    // Play notification sound
-    playNotificationSound();
-    
-    // Show browser push notification
-    showBrowserNotification(notification.title, notification.message);
+    // Use centralized notification service for sound + browser notification
+    notificationService.notify(notification.title, notification.message, `admin-${notification.type}`);
     
     // Show in-app toast notification
     toast(notification.title, {
