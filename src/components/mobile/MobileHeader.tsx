@@ -74,6 +74,7 @@ export function MobileHeader({
           {showNotification && (
             <motion.button
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/notifications')}
               className="p-2 rounded-full hover:bg-secondary/80 transition-colors relative"
               aria-label="Notifications"
             >
