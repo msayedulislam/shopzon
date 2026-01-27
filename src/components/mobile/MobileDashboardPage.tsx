@@ -104,11 +104,8 @@ export function MobileDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-secondary/30 dark:bg-background pb-20">
-      {/* Header */}
-      <MobileHeader showBack={false} />
-
-      <div className="px-3 pt-3 pb-4 space-y-3">
+    <div className="min-h-screen bg-secondary/30 dark:bg-background pb-20 pt-3">
+      <div className="px-3 pb-4 space-y-3">
         {/* User Info Card */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
