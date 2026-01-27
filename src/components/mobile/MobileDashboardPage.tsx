@@ -2,57 +2,46 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   User, Package, Heart, MapPin, LogOut, Wallet, Settings, 
-  ChevronRight, ArrowLeft, Camera, Bell, ShoppingBag, 
-  CreditCard, Gift, HelpCircle, Shield
+  ChevronRight, Menu, ShoppingBag, Bell, HelpCircle, 
+  CreditCard, Gift, Shield, Truck, RotateCcw
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { MobileHeader } from './MobileHeader';
 import { MobileBottomNav } from './MobileBottomNav';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
 const quickActions = [
-  { icon: Package, label: 'Orders', path: '/dashboard/orders', color: 'from-orange-500 to-amber-400' },
-  { icon: Heart, label: 'Wishlist', path: '/wishlist', color: 'from-rose-500 to-pink-400' },
-  { icon: Wallet, label: 'Wallet', path: '/dashboard/wallet', color: 'from-emerald-500 to-teal-400' },
-  { icon: Gift, label: 'Coupons', path: '/dashboard/coupons', color: 'from-purple-500 to-violet-400' },
+  { icon: Package, label: 'My Orders', path: '/dashboard/orders', bgColor: 'bg-primary/10', iconColor: 'text-primary' },
+  { icon: Truck, label: 'Track Order', path: '/dashboard/orders', bgColor: 'bg-blue-500/10', iconColor: 'text-blue-500' },
+  { icon: RotateCcw, label: 'Returns', path: '/dashboard/orders', bgColor: 'bg-orange-500/10', iconColor: 'text-orange-500' },
+  { icon: HelpCircle, label: 'Help', path: '/help', bgColor: 'bg-emerald-500/10', iconColor: 'text-emerald-500' },
 ];
 
-const menuSections = [
-  {
-    title: 'Account',
-    items: [
-      { icon: User, label: 'Edit Profile', description: 'Update your personal info', path: '/dashboard/profile' },
-      { icon: MapPin, label: 'Saved Addresses', description: 'Manage delivery locations', path: '/dashboard/addresses' },
-      { icon: CreditCard, label: 'Payment Methods', description: 'Cards & saved payments', path: '/dashboard/payments' },
-    ]
-  },
-  {
-    title: 'Preferences',
-    items: [
-      { icon: Bell, label: 'Notifications', description: 'Alerts & updates', path: '/notifications' },
-      { icon: Settings, label: 'Settings', description: 'App preferences', path: '/dashboard/settings' },
-      { icon: Shield, label: 'Privacy & Security', description: 'Password & data', path: '/dashboard/security' },
-    ]
-  },
-  {
-    title: 'Support',
-    items: [
-      { icon: HelpCircle, label: 'Help Center', description: 'FAQs & support', path: '/help' },
-    ]
-  },
+const menuItems = [
+  { icon: User, label: 'Edit Profile', path: '/dashboard/profile' },
+  { icon: MapPin, label: 'Saved Addresses', path: '/dashboard/addresses' },
+  { icon: Heart, label: 'My Wishlist', path: '/wishlist' },
+  { icon: Wallet, label: 'Wallet', path: '/dashboard/wallet' },
+  { icon: Gift, label: 'Coupons', path: '/dashboard/coupons' },
+  { icon: CreditCard, label: 'Payment Methods', path: '/dashboard/payments' },
+  { icon: Bell, label: 'Notifications', path: '/notifications' },
+  { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
+  { icon: Shield, label: 'Privacy & Security', path: '/dashboard/security' },
+  { icon: HelpCircle, label: 'Help Center', path: '/help' },
 ];
 
 export function MobileDashboardPage() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<any>(null);
-  const [stats, setStats] = useState({ orders: 0, wishlist: 0, wallet: 0 });
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
-      fetchStats();
     }
   }, [user]);
 
@@ -64,35 +53,6 @@ export function MobileDashboardPage() {
       .eq('user_id', user.id)
       .maybeSingle();
     setProfile(data);
-  };
-
-  const fetchStats = async () => {
-    if (!user) return;
-    
-    // Fetch order count
-    const { count: orderCount } = await supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id);
-    
-    // Fetch wishlist count
-    const { count: wishlistCount } = await supabase
-      .from('wishlists')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id);
-    
-    // Fetch wallet balance
-    const { data: wallet } = await supabase
-      .from('wallets')
-      .select('balance')
-      .eq('user_id', user.id)
-      .maybeSingle();
-    
-    setStats({
-      orders: orderCount || 0,
-      wishlist: wishlistCount || 0,
-      wallet: wallet?.balance || 0,
-    });
   };
 
   const handleSignOut = async () => {
@@ -109,32 +69,32 @@ export function MobileDashboardPage() {
       .slice(0, 2) || 'U';
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-secondary/50 to-background dark:from-background dark:to-background pb-20">
-        <header className="sticky top-0 z-50 bg-white/80 dark:bg-card/80 backdrop-blur-xl border-b border-border/50 safe-area-top">
-          <div className="flex items-center gap-3 h-14 px-4">
-            <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-secondary/80 transition-colors">
-              <ArrowLeft className="h-5 w-5 text-foreground" />
-            </button>
-            <h1 className="text-base font-semibold">My Account</h1>
-          </div>
-        </header>
+      <div className="min-h-screen bg-secondary/30 dark:bg-background pb-20">
+        <MobileHeader showBack title="My Account" />
         <div className="flex flex-col items-center justify-center py-20 px-4">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6">
-            <User className="h-12 w-12 text-primary/60" />
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <User className="h-10 w-10 text-primary/60" />
           </div>
-          <h2 className="font-semibold text-xl mb-2">Welcome!</h2>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-[280px]">
-            Sign in to access your orders, wishlist, and personalized recommendations
+          <h2 className="font-semibold text-lg mb-2">Welcome!</h2>
+          <p className="text-sm text-muted-foreground text-center mb-6 max-w-[260px]">
+            Sign in to access your orders and personalized experience
           </p>
           <Link 
             to="/login" 
-            className="px-10 py-3 bg-gradient-to-r from-primary to-primary/80 text-white rounded-full font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
+            className="px-8 py-2.5 bg-primary text-white rounded-full font-medium text-sm"
           >
             Sign In
           </Link>
-          <Link to="/register" className="mt-4 text-sm text-primary font-medium">
+          <Link to="/register" className="mt-3 text-sm text-primary font-medium">
             Create an account
           </Link>
         </div>
@@ -144,149 +104,203 @@ export function MobileDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary/50 to-background dark:from-background dark:to-background pb-20">
+    <div className="min-h-screen bg-secondary/30 dark:bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-card/80 backdrop-blur-xl border-b border-border/50 safe-area-top">
-        <div className="flex items-center justify-between h-14 px-4">
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-secondary/80 transition-colors">
-              <ArrowLeft className="h-5 w-5 text-foreground" />
-            </button>
-            <h1 className="text-base font-semibold">My Account</h1>
-          </div>
-          <Link to="/notifications" className="p-2 relative rounded-full hover:bg-secondary/80 transition-colors">
-            <Bell className="h-5 w-5 text-muted-foreground" />
-            <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-white dark:ring-card" />
-          </Link>
-        </div>
-      </header>
+      <MobileHeader showBack={false} />
 
-      <div className="px-4 pt-4 pb-6 space-y-5">
-        {/* Profile Card */}
+      <div className="px-3 pt-3 pb-4 space-y-3">
+        {/* User Info Card */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 rounded-3xl p-5 text-white shadow-xl shadow-primary/20"
+          className="bg-card dark:bg-card/80 rounded-xl p-3 border border-border/50"
         >
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-white" />
-            <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-white" />
-          </div>
-          
-          <div className="relative flex items-center gap-4">
-            <div className="relative">
-              <Avatar className="h-18 w-18 border-3 border-white/30 shadow-lg">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="bg-white/20 text-white font-bold text-xl backdrop-blur-sm">
-                  {getInitials(profile?.full_name || user?.email || 'User')}
-                </AvatarFallback>
-              </Avatar>
-              <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white text-primary flex items-center justify-center shadow-lg">
-                <Camera className="h-4 w-4" />
-              </button>
-            </div>
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12 border-2 border-primary/20">
+              <AvatarImage src={profile?.avatar_url} />
+              <AvatarFallback className="bg-primary text-white font-semibold text-sm">
+                {getInitials(profile?.full_name || user?.email || 'User')}
+              </AvatarFallback>
+            </Avatar>
             <div className="flex-1 min-w-0">
-              <h2 className="font-bold text-xl truncate">
+              <h2 className="font-semibold text-sm truncate">
                 {profile?.full_name || 'Welcome!'}
               </h2>
-              <p className="text-sm text-white/80 truncate mt-0.5">
-                {user?.email || profile?.phone}
+              <p className="text-xs text-muted-foreground truncate">
+                My Account
               </p>
-              <Link 
-                to="/dashboard/profile" 
-                className="inline-flex items-center gap-1 text-xs font-medium text-white/90 mt-2 hover:text-white transition-colors"
-              >
-                View Profile <ChevronRight className="h-3.5 w-3.5" />
-              </Link>
             </div>
-          </div>
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger asChild>
+                <button className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center">
+                  <Menu className="h-4 w-4 text-foreground" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] p-0">
+                <div className="flex flex-col h-full">
+                  {/* Menu Header */}
+                  <div className="p-4 border-b border-border">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={profile?.avatar_url} />
+                        <AvatarFallback className="bg-primary text-white text-sm">
+                          {getInitials(profile?.full_name || user?.email || 'User')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{profile?.full_name || 'User'}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                      </div>
+                    </div>
+                  </div>
 
-          {/* Stats Row */}
-          <div className="relative grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-white/20">
-            <div className="text-center">
-              <p className="text-2xl font-bold">{stats.orders}</p>
-              <p className="text-xs text-white/70 mt-0.5">Orders</p>
-            </div>
-            <div className="text-center border-x border-white/20">
-              <p className="text-2xl font-bold">{stats.wishlist}</p>
-              <p className="text-xs text-white/70 mt-0.5">Wishlist</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">৳{stats.wallet}</p>
-              <p className="text-xs text-white/70 mt-0.5">Wallet</p>
-            </div>
+                  {/* Menu Items */}
+                  <nav className="flex-1 py-2 overflow-y-auto">
+                    {menuItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-secondary transition-colors"
+                      >
+                        <item.icon className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">{item.label}</span>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto" />
+                      </Link>
+                    ))}
+                  </nav>
+
+                  {/* Sign Out */}
+                  <div className="p-4 border-t border-border">
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span className="text-sm font-medium">Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* Greeting Card with CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="bg-gradient-to-br from-primary via-primary/95 to-primary/90 rounded-xl p-4 text-white"
+        >
+          <p className="text-xs text-white/70 mb-0.5">{getGreeting()},</p>
+          <h3 className="text-lg font-bold mb-1.5">
+            {profile?.full_name || 'Welcome!'}
+          </h3>
+          <p className="text-xs text-white/80 mb-4">
+            Here's what's happening with your orders today.
+          </p>
+          <Link 
+            to="/products"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-xs font-medium transition-colors"
+          >
+            <ShoppingBag className="h-3.5 w-3.5" />
+            Continue Shopping
+          </Link>
+        </motion.div>
+
+        {/* Quick Actions Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-4 gap-3"
+          className="grid grid-cols-4 gap-2"
         >
           {quickActions.map((action, index) => (
             <Link
-              key={action.path}
+              key={index}
               to={action.path}
-              className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-md transition-all"
+              className="flex flex-col items-center gap-1.5 p-3 bg-card dark:bg-card/80 rounded-xl border border-border/50"
             >
-              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center shadow-lg`}>
-                <action.icon className="h-5 w-5 text-white" />
+              <div className={`w-10 h-10 rounded-xl ${action.bgColor} flex items-center justify-center`}>
+                <action.icon className={`h-5 w-5 ${action.iconColor}`} />
               </div>
-              <span className="text-xs font-medium text-center">{action.label}</span>
+              <span className="text-[10px] font-medium text-center leading-tight">{action.label}</span>
             </Link>
           ))}
         </motion.div>
 
-        {/* Menu Sections */}
-        {menuSections.map((section, sectionIndex) => (
-          <motion.div
-            key={section.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 + sectionIndex * 0.05 }}
-            className="bg-white dark:bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden"
-          >
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-2">
-              {section.title}
-            </h3>
-            <div className="divide-y divide-border/50">
-              {section.items.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="flex items-center gap-4 px-4 py-3.5 hover:bg-secondary/50 active:bg-secondary transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center shrink-0">
-                    <item.icon className="h-5 w-5 text-foreground/70" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">{item.label}</p>
-                    <p className="text-xs text-muted-foreground truncate">{item.description}</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        ))}
-
-        {/* Sign Out */}
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
+        {/* Recent Activity Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          onClick={handleSignOut}
-          className="w-full bg-white dark:bg-card rounded-2xl border border-destructive/20 p-4 flex items-center justify-center gap-3 text-destructive hover:bg-destructive/5 active:bg-destructive/10 transition-colors shadow-sm"
+          transition={{ delay: 0.15 }}
+          className="bg-card dark:bg-card/80 rounded-xl border border-border/50 overflow-hidden"
         >
-          <LogOut className="h-5 w-5" />
-          <span className="font-semibold">Sign Out</span>
+          <div className="flex items-center justify-between px-3 py-2.5 border-b border-border/50">
+            <h3 className="text-xs font-semibold">Quick Links</h3>
+            <Link to="/dashboard/orders" className="text-xs text-primary font-medium">
+              View All
+            </Link>
+          </div>
+          <div className="divide-y divide-border/50">
+            <Link to="/dashboard/orders" className="flex items-center gap-3 px-3 py-3 hover:bg-secondary/50 transition-colors">
+              <div className="w-9 h-9 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                <Package className="h-4 w-4 text-orange-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">My Orders</p>
+                <p className="text-[10px] text-muted-foreground">Track and manage orders</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link to="/wishlist" className="flex items-center gap-3 px-3 py-3 hover:bg-secondary/50 transition-colors">
+              <div className="w-9 h-9 rounded-lg bg-rose-500/10 flex items-center justify-center">
+                <Heart className="h-4 w-4 text-rose-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Wishlist</p>
+                <p className="text-[10px] text-muted-foreground">Your saved items</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link to="/dashboard/wallet" className="flex items-center gap-3 px-3 py-3 hover:bg-secondary/50 transition-colors">
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Wallet className="h-4 w-4 text-emerald-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Wallet</p>
+                <p className="text-[10px] text-muted-foreground">Balance & transactions</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link to="/dashboard/addresses" className="flex items-center gap-3 px-3 py-3 hover:bg-secondary/50 transition-colors">
+              <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <MapPin className="h-4 w-4 text-blue-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Addresses</p>
+                <p className="text-[10px] text-muted-foreground">Manage delivery addresses</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* Sign Out Button */}
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          onClick={handleSignOut}
+          className="w-full bg-card dark:bg-card/80 rounded-xl border border-destructive/20 p-3 flex items-center justify-center gap-2 text-destructive hover:bg-destructive/5 transition-colors"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="text-sm font-medium">Sign Out</span>
         </motion.button>
 
-        {/* App Version */}
-        <p className="text-center text-xs text-muted-foreground pt-2">
+        {/* Version */}
+        <p className="text-center text-[10px] text-muted-foreground pt-1">
           Jhuri v1.0.0
         </p>
       </div>
