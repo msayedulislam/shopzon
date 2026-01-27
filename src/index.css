@@ -566,4 +566,28 @@
   .safe-area-right {
     padding-right: env(safe-area-inset-right, 0);
   }
+
+  /* Hide scrollbar but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Touch-friendly scroll snap */
+  .scroll-snap-x {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-snap-item {
+    scroll-snap-align: start;
+  }
+
+  /* Mobile-optimized tap targets */
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
