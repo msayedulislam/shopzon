@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, CreditCard, Check, ChevronRight } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Check, ChevronRight, LocateFixed, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
 import { toast } from 'sonner';
 import { MobileBottomNav } from './MobileBottomNav';
+import { useLocationDetect } from '@/hooks/useLocationDetect';
 
 export function MobileCheckoutPage() {
   const navigate = useNavigate();
@@ -16,6 +17,20 @@ export function MobileCheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [placingOrder, setPlacingOrder] = useState(false);
+  const { detecting, detectLocation } = useLocationDetect();
+
+  const handleDetectLocation = async () => {
+    const location = await detectLocation();
+    if (location) {
+      setShippingInfo((prev) => ({
+        ...prev,
+        address: location.address || prev.address,
+        city: location.city || prev.city,
+        area: location.area || prev.area,
+        postalCode: location.postalCode || prev.postalCode,
+      }));
+    }
+  };
   
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
@@ -136,10 +151,24 @@ export function MobileCheckoutPage() {
             animate={{ opacity: 1, x: 0 }}
             className="bg-white dark:bg-card rounded-xl p-4"
           >
-            <h2 className="text-base font-semibold mb-4 flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary" />
-              Shipping Address
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-primary" />
+                Shipping Address
+              </h2>
+              <button
+                onClick={handleDetectLocation}
+                disabled={detecting}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium disabled:opacity-50"
+              >
+                {detecting ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <LocateFixed className="h-3.5 w-3.5" />
+                )}
+                {detecting ? 'Detecting...' : 'Auto Detect'}
+              </button>
+            </div>
             <div className="space-y-3">
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Full Name</label>
