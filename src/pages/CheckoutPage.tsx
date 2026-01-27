@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, CreditCard, Truck, ChevronRight, Check, ArrowLeft, Wallet, Info, LocateFixed, Loader2 } from 'lucide-react';
+import { MapPin, CreditCard, Truck, ChevronRight, Check, ArrowLeft, Wallet, Info, LocateFixed, Loader2, Clock } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
+import { DeliverySlotSelector } from '@/components/DeliverySlotSelector';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +36,8 @@ export default function CheckoutPage() {
   const [useWallet, setUseWallet] = useState(false);
   const [walletAmountToUse, setWalletAmountToUse] = useState(0);
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<any>(null);
 
   const handleDetectLocation = async () => {
     const location = await detectLocation();
@@ -59,7 +62,8 @@ export default function CheckoutPage() {
   });
 
   const subtotal = getSubtotal();
-  const deliveryCharge = subtotal > 5000 ? 0 : 60;
+  const slotExtraCharge = selectedSlot?.extra_charge || 0;
+  const deliveryCharge = (subtotal > 5000 ? 0 : 60) + slotExtraCharge;
   const walletDiscount = useWallet ? Math.min(walletAmountToUse, subtotal + deliveryCharge) : 0;
   const total = subtotal + deliveryCharge - walletDiscount;
 
@@ -372,6 +376,18 @@ export default function CheckoutPage() {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  {/* Delivery Slot Selection */}
+                  <div className="mt-6">
+                    <DeliverySlotSelector
+                      onSelect={(date, slot) => {
+                        setSelectedDeliveryDate(date);
+                        setSelectedSlot(slot);
+                      }}
+                      selectedDate={selectedDeliveryDate || undefined}
+                      selectedSlotId={selectedSlot?.id}
+                    />
                   </div>
 
                   <div className="flex justify-between mt-8">

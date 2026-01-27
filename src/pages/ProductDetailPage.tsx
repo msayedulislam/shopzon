@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Minus, Plus, Check, Share2, ChevronRight, Award, Package, Scale } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Minus, Plus, Check, Share2, ChevronRight, Award, Package, Scale, Bell } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,8 @@ import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import { useProductComparison } from '@/hooks/useProductComparison';
 import { ProductComparisonBar } from '@/components/ProductComparison';
 import { LiveChatWidget } from '@/components/LiveChatWidget';
+import { ProductQA } from '@/components/ProductQA';
+import { PriceAlertButton } from '@/components/PriceAlertButton';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -402,6 +404,14 @@ export default function ProductDetailPage() {
                       <Share2 className="h-5 w-5" />
                     </Button>
                   </motion.div>
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                    <PriceAlertButton
+                      productId={product.id}
+                      currentPrice={product.price}
+                      productName={product.name}
+                      variant="icon"
+                    />
+                  </motion.div>
                 </div>
 
                 {/* Features */}
@@ -475,7 +485,8 @@ export default function ProductDetailPage() {
               {[
                 { value: 'description', label: 'Description' },
                 { value: 'specifications', label: 'Specifications' },
-                { value: 'reviews', label: `Reviews (${product.reviewCount})` }
+                { value: 'reviews', label: `Reviews (${product.reviewCount})` },
+                { value: 'qa', label: 'Q&A' }
               ].map((tab) => (
                 <TabsTrigger
                   key={tab.value}
@@ -540,6 +551,9 @@ export default function ProductDetailPage() {
                 productRating={product.rating} 
                 reviewCount={product.reviewCount} 
               />
+            </TabsContent>
+            <TabsContent value="qa" className="mt-0">
+              <ProductQA productId={product.id} sellerId={product.seller?.id} />
             </TabsContent>
           </Tabs>
         </div>

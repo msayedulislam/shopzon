@@ -10,6 +10,7 @@ import { formatPrice } from '@/data/mockData';
 import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileCartPage } from '@/components/mobile/MobileCartPage';
+import { QuickReorderWidget } from '@/components/QuickReorderWidget';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getSubtotal } = useCart();
@@ -65,9 +66,12 @@ export default function CartPage() {
             <span className="text-foreground">Shopping Cart</span>
           </nav>
 
-          <h1 className="text-2xl md:text-3xl font-display font-bold mb-8">
-            Shopping Cart ({items.length} {items.length === 1 ? 'item' : 'items'})
-          </h1>
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-2xl md:text-3xl font-display font-bold">
+              Shopping Cart ({items.length} {items.length === 1 ? 'item' : 'items'})
+            </h1>
+            {isLoggedIn && <QuickReorderWidget />}
+          </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items */}
