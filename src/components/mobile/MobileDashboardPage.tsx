@@ -154,16 +154,18 @@ export function MobileDashboardPage() {
                   {/* Menu Items */}
                   <nav className="flex-1 py-2 overflow-y-auto">
                     {menuItems.map((item) => (
-                      <Link
+                      <button
                         key={item.path}
-                        to={item.path}
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-secondary transition-colors"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          navigate(item.path);
+                        }}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-secondary transition-colors w-full text-left"
                       >
                         <item.icon className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">{item.label}</span>
                         <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto" />
-                      </Link>
+                      </button>
                     ))}
                   </nav>
 
