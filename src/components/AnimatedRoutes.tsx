@@ -29,6 +29,7 @@ import DashboardWishlistPage from '@/pages/dashboard/WishlistPage';
 import AddressesPage from '@/pages/dashboard/AddressesPage';
 import DashboardWalletPage from '@/pages/dashboard/WalletPage';
 import CouponsPage from '@/pages/dashboard/CouponsPage';
+import PaymentsPage from '@/pages/dashboard/PaymentsPage';
 
 // Seller
 import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
@@ -127,6 +128,7 @@ export function AnimatedRoutes() {
           <Route path="wishlist" element={<DashboardWishlistPage />} />
           <Route path="addresses" element={<AddressesPage />} />
           <Route path="coupons" element={<CouponsPage />} />
+          <Route path="payments" element={<PaymentsPage />} />
         </Route>
 
         {/* Seller Routes */}
