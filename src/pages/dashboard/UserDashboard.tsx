@@ -23,6 +23,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileDashboardPage } from '@/components/mobile/MobileDashboardPage';
+import { MobileHeader } from '@/components/mobile/MobileHeader';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
+
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Overview', path: '/dashboard', exact: true },
@@ -58,9 +61,38 @@ export default function UserDashboard() {
     setProfile(data);
   };
 
-  // Show dedicated mobile dashboard on mobile devices
-  if (isMobile) {
+  // Get page title from current path
+  const getPageTitle = () => {
+    const pathMap: { [key: string]: string } = {
+      '/dashboard/profile': 'Edit Profile',
+      '/dashboard/orders': 'My Orders',
+      '/dashboard/wallet': 'Wallet',
+      '/dashboard/wishlist': 'Wishlist',
+      '/dashboard/addresses': 'Saved Addresses',
+      '/dashboard/settings': 'Settings',
+      '/dashboard/coupons': 'Coupons',
+      '/dashboard/payments': 'Payment Methods',
+      '/dashboard/security': 'Privacy & Security',
+    };
+    return pathMap[location.pathname] || 'Dashboard';
+  };
+
+  // Show dedicated mobile dashboard only on exact /dashboard route
+  if (isMobile && location.pathname === '/dashboard') {
     return <MobileDashboardPage />;
+  }
+
+  // Show mobile-friendly layout for sub-pages on mobile
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-secondary/30 dark:bg-background pb-20">
+        <MobileHeader showBack title={getPageTitle()} />
+        <div className="p-4">
+          <Outlet context={{ profile, fetchProfile }} />
+        </div>
+        <MobileBottomNav />
+      </div>
+    );
   }
 
   const handleSignOut = async () => {
