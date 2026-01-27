@@ -52,17 +52,35 @@ export function useLocationDetect(): UseLocationDetectReturn {
       const data = await response.json();
       const addressDetails = data.address || {};
 
-      // Extract address components
+      // Extract address components with better fallbacks
       const houseNumber = addressDetails.house_number || '';
       const road = addressDetails.road || addressDetails.street || '';
-      const suburb = addressDetails.suburb || addressDetails.neighbourhood || addressDetails.hamlet || '';
-      const city = addressDetails.city || addressDetails.town || addressDetails.village || addressDetails.state_district || 'Dhaka';
-      const area = suburb || addressDetails.county || addressDetails.district || '';
+      const neighbourhood = addressDetails.neighbourhood || addressDetails.suburb || addressDetails.hamlet || '';
+      const quarter = addressDetails.quarter || addressDetails.residential || '';
+      const village = addressDetails.village || '';
+      
+      // City extraction with multiple fallbacks
+      const city = addressDetails.city || addressDetails.town || addressDetails.village || 
+                   addressDetails.municipality || addressDetails.state_district?.replace(' District', '') || 'Dhaka';
+      
+      // Area extraction - use neighbourhood, county, or district
+      const area = neighbourhood || addressDetails.county || addressDetails.district || 
+                   addressDetails.state_district?.replace(' District', '') || '';
+      
       const postalCode = addressDetails.postcode || '';
 
-      // Build full address
-      const addressParts = [houseNumber, road, suburb].filter(Boolean);
-      const address = addressParts.length > 0 ? addressParts.join(', ') : data.display_name?.split(',').slice(0, 3).join(',') || '';
+      // Build full address from available parts
+      const addressParts = [houseNumber, road, quarter, neighbourhood, village].filter(Boolean);
+      
+      // If we have specific address parts, use them; otherwise use display_name
+      let address = '';
+      if (addressParts.length > 0) {
+        address = addressParts.join(', ');
+      } else if (data.display_name) {
+        // Use first 3 parts of display_name for a reasonable address
+        const displayParts = data.display_name.split(',').slice(0, 3);
+        address = displayParts.map((p: string) => p.trim()).join(', ');
+      }
 
       toast.success('Location detected successfully!');
       
