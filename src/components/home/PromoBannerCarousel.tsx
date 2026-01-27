@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface Banner {
@@ -14,6 +13,25 @@ interface Banner {
   link_url: string | null;
   position: string;
 }
+
+const fallbackBanners: Banner[] = [
+  {
+    id: '1',
+    title: 'Summer Sale',
+    subtitle: 'Up to 50% Off on Selected Items',
+    image_url: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=400&fit=crop',
+    link_url: '/products?sale=true',
+    position: 'hero',
+  },
+  {
+    id: '2',
+    title: 'New Collection',
+    subtitle: 'Discover Latest Trends',
+    image_url: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&h=400&fit=crop',
+    link_url: '/products?sort=newest',
+    position: 'hero',
+  },
+];
 
 export function PromoBannerCarousel() {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -37,9 +55,10 @@ export function PromoBannerCarousel() {
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
-      setBanners(data || []);
+      setBanners(data && data.length > 0 ? data : fallbackBanners);
     } catch (error) {
       console.error('Error fetching banners:', error);
+      setBanners(fallbackBanners);
     } finally {
       setIsLoading(false);
     }
@@ -57,19 +76,17 @@ export function PromoBannerCarousel() {
     }
   }, [banners.length]);
 
-  // Auto-rotation
   useEffect(() => {
     if (banners.length <= 1 || isPaused) return;
-
-    const interval = setInterval(nextSlide, 5000);
+    const interval = setInterval(nextSlide, 4000);
     return () => clearInterval(interval);
   }, [banners.length, isPaused, nextSlide]);
 
   if (isLoading) {
     return (
-      <section className="py-6 lg:py-8">
+      <section className="py-3">
         <div className="container">
-          <Skeleton className="w-full h-[300px] md:h-[400px] lg:h-[500px] rounded-3xl" />
+          <Skeleton className="w-full h-[180px] md:h-[220px] lg:h-[280px] rounded-lg" />
         </div>
       </section>
     );
@@ -82,10 +99,10 @@ export function PromoBannerCarousel() {
   const currentBanner = banners[currentIndex];
 
   return (
-    <section className="py-6 lg:py-8">
+    <section className="py-3">
       <div className="container">
         <div 
-          className="relative overflow-hidden rounded-3xl"
+          className="relative overflow-hidden rounded-lg"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
@@ -93,15 +110,14 @@ export function PromoBannerCarousel() {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentBanner.id}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.5, ease: 'easeInOut' }}
-              className="relative"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
               <Link 
                 to={currentBanner.link_url || '/products'}
-                className="block relative aspect-[21/9] md:aspect-[3/1] lg:aspect-[4/1] overflow-hidden"
+                className="block relative aspect-[3/1] md:aspect-[4/1] overflow-hidden"
               >
                 {/* Background Image */}
                 <img
@@ -111,44 +127,22 @@ export function PromoBannerCarousel() {
                 />
                 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
                 
                 {/* Content */}
-                <div className="absolute inset-0 flex items-center">
-                  <div className="container">
-                    <div className="max-w-xl space-y-4">
-                      <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-2xl md:text-4xl lg:text-5xl font-bold text-white"
-                        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                      >
-                        {currentBanner.title}
-                      </motion.h2>
-                      {currentBanner.subtitle && (
-                        <motion.p
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 }}
-                          className="text-sm md:text-lg text-white/90"
-                        >
-                          {currentBanner.subtitle}
-                        </motion.p>
-                      )}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                      >
-                        <Button 
-                          size="lg" 
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8"
-                        >
-                          Shop Now
-                        </Button>
-                      </motion.div>
-                    </div>
+                <div className="absolute inset-0 flex items-center px-6 md:px-10">
+                  <div className="max-w-md space-y-2">
+                    <h2 className="text-xl md:text-3xl font-bold text-white">
+                      {currentBanner.title}
+                    </h2>
+                    {currentBanner.subtitle && (
+                      <p className="text-sm md:text-base text-white/90">
+                        {currentBanner.subtitle}
+                      </p>
+                    )}
+                    <button className="mt-2 px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium rounded-lg transition-colors">
+                      Shop Now
+                    </button>
                   </div>
                 </div>
               </Link>
@@ -158,44 +152,39 @@ export function PromoBannerCarousel() {
           {/* Navigation Arrows */}
           {banners.length > 1 && (
             <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white rounded-full h-10 w-10 md:h-12 md:w-12"
+              <button
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
                   prevSlide();
                 }}
               >
-                <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white rounded-full h-10 w-10 md:h-12 md:w-12"
+                <ChevronLeft className="h-5 w-5 text-foreground" />
+              </button>
+              <button
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
                   nextSlide();
                 }}
               >
-                <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
-              </Button>
+                <ChevronRight className="h-5 w-5 text-foreground" />
+              </button>
             </>
           )}
 
           {/* Dots Indicator */}
           {banners.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
               {banners.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
                     index === currentIndex 
-                      ? 'w-8 bg-white' 
-                      : 'w-2 bg-white/50 hover:bg-white/70'
+                      ? 'w-5 bg-white' 
+                      : 'w-1.5 bg-white/50 hover:bg-white/70'
                   }`}
-                  aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
             </div>
