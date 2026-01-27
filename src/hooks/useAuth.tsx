@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rolesLoading, setRolesLoading] = useState(false);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [sellerStatus, setSellerStatus] = useState<'pending' | 'active' | 'suspended' | null>(null);
 
@@ -60,43 +61,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [user]);
 
-  useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+  const fetchUserRolesAndStatus = async (userId: string): Promise<void> => {
+    setRolesLoading(true);
+    try {
+      // Fetch roles and seller status in parallel
+      const [rolesResult, sellerResult] = await Promise.all([
+        fetchUserRolesInternal(userId),
+        fetchSellerStatusInternal(userId),
+      ]);
+      
+      setRoles(rolesResult);
+      setSellerStatus(sellerResult);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setRoles(['customer']);
+      setSellerStatus(null);
+    } finally {
+      setRolesLoading(false);
+    }
+  };
 
-        if (session?.user) {
-          // Fetch roles + seller status async (avoid potential auth listener deadlocks)
-          setTimeout(() => {
-            fetchUserRoles(session.user.id);
-            fetchSellerStatus(session.user.id);
-          }, 0);
-        } else {
-          setRoles([]);
-          setSellerStatus(null);
-        }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRoles(session.user.id);
-        fetchSellerStatus(session.user.id);
-      } else {
-        setSellerStatus(null);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const fetchUserRoles = async (userId: string, retryCount = 0): Promise<void> => {
+  const fetchUserRolesInternal = async (userId: string, retryCount = 0): Promise<AppRole[]> => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -110,17 +95,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // If no roles found, retry briefly (handles eventual consistency)
       if (fetchedRoles.length === 0 && retryCount < 2) {
         await new Promise(resolve => setTimeout(resolve, 300));
-        return fetchUserRoles(userId, retryCount + 1);
+        return fetchUserRolesInternal(userId, retryCount + 1);
       }
 
-      setRoles(fetchedRoles.length > 0 ? fetchedRoles : ['customer']);
+      return fetchedRoles.length > 0 ? fetchedRoles : ['customer'];
     } catch (error) {
       console.error('Error fetching user roles:', error);
-      setRoles(['customer']);
+      return ['customer'];
     }
   };
 
-  const fetchSellerStatus = async (userId: string, retryCount = 0): Promise<void> => {
+  const fetchSellerStatusInternal = async (userId: string, retryCount = 0): Promise<'pending' | 'active' | 'suspended' | null> => {
     try {
       const { data, error } = await supabase
         .from('sellers')
@@ -131,33 +116,76 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
 
       const status = (data?.status as 'pending' | 'active' | 'suspended' | null) ?? null;
-      setSellerStatus(status);
-
-      // If seller is approved but missing seller role, ensure the role exists
-      if (status === 'active' && !roles.includes('seller')) {
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role: 'seller' });
-
-        // Ignore duplicate unique constraint errors
-        if (roleError) {
-          const msg = String((roleError as any).message || '').toLowerCase();
-          if (!msg.includes('duplicate') && !msg.includes('unique')) {
-            console.error('Error ensuring seller role:', roleError);
-          }
-        } else {
-          setRoles((prev) => (prev.includes('seller') ? prev : [...prev, 'seller']));
-        }
-      }
 
       // If row not visible yet, retry once
       if (!data && retryCount < 1) {
         await new Promise((resolve) => setTimeout(resolve, 300));
-        return fetchSellerStatus(userId, retryCount + 1);
+        return fetchSellerStatusInternal(userId, retryCount + 1);
       }
+
+      return status;
     } catch (error) {
       console.error('Error fetching seller status:', error);
-      setSellerStatus(null);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          // Fetch roles + seller status - wait for completion
+          await fetchUserRolesAndStatus(session.user.id);
+        } else {
+          setRoles([]);
+          setSellerStatus(null);
+        }
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        await fetchUserRolesAndStatus(session.user.id);
+      } else {
+        setSellerStatus(null);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Legacy functions kept for refreshRoles
+  const fetchUserRoles = async (userId: string): Promise<void> => {
+    const fetchedRoles = await fetchUserRolesInternal(userId);
+    setRoles(fetchedRoles);
+  };
+
+  const fetchSellerStatus = async (userId: string): Promise<void> => {
+    const status = await fetchSellerStatusInternal(userId);
+    setSellerStatus(status);
+    
+    // If seller is approved but missing seller role, ensure the role exists
+    if (status === 'active' && !roles.includes('seller')) {
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert({ user_id: userId, role: 'seller' });
+
+      if (roleError) {
+        const msg = String((roleError as any).message || '').toLowerCase();
+        if (!msg.includes('duplicate') && !msg.includes('unique')) {
+          console.error('Error ensuring seller role:', roleError);
+        }
+      } else {
+        setRoles((prev) => (prev.includes('seller') ? prev : [...prev, 'seller']));
+      }
     }
   };
 
@@ -242,11 +270,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshRoles = async () => {
     if (user) {
-      await fetchUserRoles(user.id, 0);
-      await fetchSellerStatus(user.id, 0);
+      await fetchUserRoles(user.id);
+      await fetchSellerStatus(user.id);
     }
   };
 
+  // Combined loading state: auth loading OR roles loading
+  const isLoading = loading || rolesLoading;
+  
   const isAdmin = roles.includes('admin');
   const isSeller = roles.includes('seller');
   const isApprovedSeller = sellerStatus === 'active';
@@ -256,7 +287,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         session,
-        loading,
+        loading: isLoading,
         roles,
         sellerStatus,
         isAdmin,

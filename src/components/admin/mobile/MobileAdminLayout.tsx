@@ -1,8 +1,5 @@
-import { useEffect } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAdminNotifications } from '@/hooks/useAdminNotifications';
-import { Loader2 } from 'lucide-react';
 import { MobileAdminHeader } from './MobileAdminHeader';
 import { MobileAdminNav } from './MobileAdminNav';
 
@@ -48,28 +45,8 @@ const pathTitles: Record<string, string> = {
 };
 
 export default function MobileAdminLayout() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { user, loading, isAdmin } = useAuth();
   const { unreadCount } = useAdminNotifications();
-
-  useEffect(() => {
-    if (!loading && !isAdmin) {
-      navigate('/');
-    }
-  }, [loading, isAdmin, navigate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return null;
-  }
 
   const currentPath = location.pathname;
   const title = pathTitles[currentPath] || 'Admin';
