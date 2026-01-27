@@ -120,14 +120,26 @@ export function MobileCheckoutPage() {
 
       if (orderError) throw orderError;
 
-      const orderItems = items.map((item) => ({
+      // Add order items - filter out invalid products (non-UUID IDs from mock data)
+      const isValidUUID = (id: string) => {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(id);
+      };
+
+      const validItems = items.filter(item => isValidUUID(item.product.id));
+      
+      if (validItems.length === 0) {
+        throw new Error('No valid products in cart. Please add products from the store.');
+      }
+
+      const orderItems = validItems.map((item) => ({
         order_id: order.id,
         product_id: item.product.id,
         product_name: item.product.name,
-        product_image: item.product.images[0],
+        product_image: item.product.images?.[0] || null,
         quantity: item.quantity,
         price: item.product.price,
-        seller_id: item.product.seller?.id || null,
+        seller_id: item.product.seller?.id && isValidUUID(item.product.seller.id) ? item.product.seller.id : null,
       }));
 
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
