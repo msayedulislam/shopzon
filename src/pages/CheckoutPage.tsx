@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, CreditCard, Truck, ChevronRight, Check, ArrowLeft, Wallet, Info } from 'lucide-react';
+import { MapPin, CreditCard, Truck, ChevronRight, Check, ArrowLeft, Wallet, Info, LocateFixed, Loader2 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { formatPrice } from '@/data/mockData';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileCheckoutPage } from '@/components/mobile/MobileCheckoutPage';
+import { useLocationDetect } from '@/hooks/useLocationDetect';
 
 const steps = [
   { id: 1, name: 'Shipping', icon: MapPin },
@@ -27,12 +28,26 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const { items, getSubtotal, clearCart } = useCart();
   const isMobile = useIsMobile();
+  const { detecting, detectLocation } = useLocationDetect();
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [walletBalance, setWalletBalance] = useState(0);
   const [useWallet, setUseWallet] = useState(false);
   const [walletAmountToUse, setWalletAmountToUse] = useState(0);
   const [placingOrder, setPlacingOrder] = useState(false);
+
+  const handleDetectLocation = async () => {
+    const location = await detectLocation();
+    if (location) {
+      setShippingInfo((prev) => ({
+        ...prev,
+        address: location.address || prev.address,
+        city: location.city || prev.city,
+        area: location.area || prev.area,
+        postalCode: location.postalCode || prev.postalCode,
+      }));
+    }
+  };
   
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
@@ -216,10 +231,26 @@ export default function CheckoutPage() {
               {/* Step 1: Shipping */}
               {currentStep === 1 && (
                 <div className="bg-card rounded-2xl p-6 shadow-sm animate-fade-in">
-                  <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-primary" />
-                    Shipping Address
-                  </h2>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold flex items-center gap-2">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      Shipping Address
+                    </h2>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDetectLocation}
+                      disabled={detecting}
+                      className="gap-2"
+                    >
+                      {detecting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <LocateFixed className="h-4 w-4" />
+                      )}
+                      {detecting ? 'Detecting...' : 'Auto Detect'}
+                    </Button>
+                  </div>
 
                   <div className="grid gap-4">
                     <div className="grid md:grid-cols-2 gap-4">
