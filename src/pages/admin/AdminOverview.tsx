@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format, subDays, startOfWeek, startOfMonth, startOfYear } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { Users, Store, Package, ShoppingBag, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, CalendarIcon, Sparkles, Check, X, RotateCcw } from 'lucide-react';
+import { Users, Store, Package, ShoppingBag, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, CalendarIcon, Sparkles, Check, X, RotateCcw, AlertTriangle, Zap, Clock, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -38,8 +38,10 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import { AdminQuickActions } from '@/components/admin/AdminQuickActions';
+import { AdminAdvancedSearch } from '@/components/admin/AdminAdvancedSearch';
 
-const COLORS = ['hsl(var(--primary))', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+const COLORS = ['hsl(var(--primary))', 'hsl(142.1 76.2% 36.3%)', 'hsl(47.9 95.8% 53.1%)', 'hsl(0 84.2% 60.2%)', 'hsl(262.1 83.3% 57.8%)', 'hsl(188.7 94.5% 42.7%)'];
 
 type DateRange = { from: Date; to: Date };
 
