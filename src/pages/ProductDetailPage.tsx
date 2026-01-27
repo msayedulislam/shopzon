@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Minus, Plus, Check, Share2, ChevronRight, Award, Package } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Minus, Plus, Check, Share2, ChevronRight, Award, Package, Scale } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileProductDetail } from '@/components/mobile/MobileProductDetail';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { useProductComparison } from '@/hooks/useProductComparison';
+import { ProductComparisonBar } from '@/components/ProductComparison';
+import { LiveChatWidget } from '@/components/LiveChatWidget';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -37,10 +41,25 @@ export default function ProductDetailPage() {
 
   const colorVariations = product.variations?.filter((v) => v.type === 'color') || [];
   const sizeVariations = product.variations?.filter((v) => v.type === 'size') || [];
+  const { addProduct: addToRecentlyViewed } = useRecentlyViewed();
+  const { addProduct: addToCompare, isInComparison } = useProductComparison();
 
   const relatedProducts = products.filter(
     (p) => p.category.id === product.category.id && p.id !== product.id
   ).slice(0, 4);
+
+  // Track recently viewed
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+        slug: product.slug,
+      });
+    }
+  }, [product.id]);
 
   // Check if product is in wishlist
   useEffect(() => {
@@ -352,6 +371,33 @@ export default function ProductDetailPage() {
                     </Button>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                    <Button 
+                      variant={isInComparison(product.id) ? "default" : "outline"} 
+                      size="lg" 
+                      className="h-14 w-14 p-0 border-2"
+                      onClick={() => {
+                        const success = addToCompare({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          originalPrice: product.originalPrice,
+                          images: product.images,
+                          rating: product.rating,
+                          category: product.category.name,
+                        });
+                        if (success) {
+                          toast.success('Added to comparison');
+                        } else if (isInComparison(product.id)) {
+                          toast.info('Already in comparison');
+                        } else {
+                          toast.error('Comparison is full (max 4)');
+                        }
+                      }}
+                    >
+                      <Scale className="h-5 w-5" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
                     <Button variant="outline" size="lg" className="h-14 w-14 p-0 border-2">
                       <Share2 className="h-5 w-5" />
                     </Button>
@@ -562,6 +608,12 @@ export default function ProductDetailPage() {
       </motion.div>
 
       <Footer />
+      
+      {/* Product Comparison Bar */}
+      <ProductComparisonBar />
+      
+      {/* Live Chat */}
+      <LiveChatWidget />
     </div>
   );
 }

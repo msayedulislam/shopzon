@@ -8,6 +8,10 @@ import { BestSellingSection } from '@/components/home/BestSellingSection';
 import { PromoBannerCarousel } from '@/components/home/PromoBannerCarousel';
 import { MobileHomePage } from '@/components/mobile/MobileHomePage';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { RecentlyViewedSection } from '@/components/RecentlyViewedSection';
+import { PersonalizedRecommendations } from '@/components/PersonalizedRecommendations';
+import { ProductComparisonBar } from '@/components/ProductComparison';
+import { LiveChatWidget } from '@/components/LiveChatWidget';
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -38,10 +42,16 @@ const Index = () => {
           <BestSellingSection />
         </div>
         
+        {/* Personalized Recommendations */}
+        <PersonalizedRecommendations />
+        
         {/* New Arrivals */}
         <div className="mt-2">
           <NewArrivalSection />
         </div>
+        
+        {/* Recently Viewed */}
+        <RecentlyViewedSection />
         
         {/* All Products */}
         <div className="mt-2 pb-6">
@@ -49,6 +59,12 @@ const Index = () => {
         </div>
       </main>
       <Footer />
+      
+      {/* Product Comparison Bar */}
+      <ProductComparisonBar />
+      
+      {/* Live Chat Widget */}
+      <LiveChatWidget />
     </div>
   );
 };

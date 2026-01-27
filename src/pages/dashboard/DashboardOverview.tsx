@@ -9,13 +9,16 @@ import {
   CheckCircle2, 
   Clock, 
   ArrowRight,
-  Star
+  Star,
+  Gift
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/mockData';
+import { LoyaltyPointsWidget } from '@/components/LoyaltyPointsWidget';
+import { OrderTrackingWidget } from '@/components/OrderTrackingWidget';
 
 interface DashboardStats {
   totalOrders: number;
@@ -273,6 +276,12 @@ export default function DashboardOverview() {
         )}
       </div>
 
+      {/* Loyalty & Tracking Row */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <LoyaltyPointsWidget />
+        <OrderTrackingWidget />
+      </div>
+
       {/* Quick Actions */}
       <div className="grid md:grid-cols-3 gap-4">
         <Link
@@ -316,19 +325,19 @@ export default function DashboardOverview() {
         </Link>
 
         <Link
-          to="/dashboard/profile"
+          to="/dashboard/wallet"
           className="group bg-card rounded-xl p-5 border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center">
-              <Star className="h-6 w-6" />
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+              <Gift className="h-6 w-6" />
             </div>
             <div className="flex-1">
               <p className="font-semibold group-hover:text-primary transition-colors">
-                Edit Profile
+                Wallet & Rewards
               </p>
               <p className="text-sm text-muted-foreground">
-                Update your info
+                View your credits
               </p>
             </div>
             <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
