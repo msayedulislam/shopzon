@@ -21,6 +21,8 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileDashboardPage } from '@/components/mobile/MobileDashboardPage';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Overview', path: '/dashboard', exact: true },
@@ -37,6 +39,7 @@ export default function UserDashboard() {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (user) {
@@ -53,6 +56,11 @@ export default function UserDashboard() {
       .maybeSingle();
     setProfile(data);
   };
+
+  // Show dedicated mobile dashboard on mobile devices
+  if (isMobile) {
+    return <MobileDashboardPage />;
+  }
 
   const handleSignOut = async () => {
     await signOut();
