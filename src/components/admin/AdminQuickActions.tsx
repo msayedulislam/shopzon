@@ -35,18 +35,18 @@ const quickActions = [
   { icon: Tag, label: 'Create Coupon', path: '/admin/coupons', color: 'bg-purple-500', action: 'add-coupon' },
   { icon: Megaphone, label: 'New Campaign', path: '/admin/campaigns', color: 'bg-orange-500', action: 'add-campaign' },
   { icon: ShoppingBag, label: 'View Orders', path: '/admin/orders', color: 'bg-primary' },
-  { icon: FileText, label: 'Generate Report', path: '/admin/reports', color: 'bg-cyan-500' },
-  { icon: Bell, label: 'Send Notification', path: '/admin/notifications', color: 'bg-yellow-500' },
+  { icon: RefreshCw, label: 'Returns', path: '/admin/return-requests', color: 'bg-red-500' },
+  { icon: Bell, label: 'Inventory', path: '/admin/inventory-alerts', color: 'bg-yellow-500' },
   { icon: Settings, label: 'Settings', path: '/admin/settings', color: 'bg-gray-500' },
 ];
 
 const bulkActions = [
-  { icon: Package, label: 'Export Products', action: 'export-products' },
-  { icon: Users, label: 'Export Users', action: 'export-users' },
-  { icon: ShoppingBag, label: 'Export Orders', action: 'export-orders' },
-  { icon: Download, label: 'Download Backup', action: 'download-backup' },
-  { icon: Upload, label: 'Import Data', action: 'import-data' },
-  { icon: RefreshCw, label: 'Sync Inventory', action: 'sync-inventory' },
+  { icon: Package, label: 'Export Products', action: 'export-products', path: '/admin/export-tools' },
+  { icon: Users, label: 'Export Users', action: 'export-users', path: '/admin/export-tools' },
+  { icon: ShoppingBag, label: 'Export Orders', action: 'export-orders', path: '/admin/export-tools' },
+  { icon: Download, label: 'Download Backup', action: 'download-backup', path: '/admin/backup' },
+  { icon: BarChart3, label: 'Customer Insights', action: 'insights', path: '/admin/customer-insights' },
+  { icon: RefreshCw, label: 'Scheduled Actions', action: 'scheduled', path: '/admin/scheduled-actions' },
 ];
 
 export function AdminQuickActions() {
@@ -96,15 +96,15 @@ export function AdminQuickActions() {
               </DialogHeader>
               <div className="grid grid-cols-2 gap-3 mt-4">
                 {bulkActions.map((action) => (
-                  <Button
-                    key={action.action}
-                    variant="outline"
-                    className="h-auto flex flex-col items-center gap-2 p-4"
-                    onClick={() => handleBulkAction(action.action)}
-                  >
-                    <action.icon className="h-5 w-5" />
-                    <span className="text-sm">{action.label}</span>
-                  </Button>
+                  <Link key={action.action} to={action.path}>
+                    <Button
+                      variant="outline"
+                      className="w-full h-auto flex flex-col items-center gap-2 p-4"
+                    >
+                      <action.icon className="h-5 w-5" />
+                      <span className="text-sm">{action.label}</span>
+                    </Button>
+                  </Link>
                 ))}
               </div>
             </DialogContent>

@@ -4,6 +4,11 @@ import { lazy, Suspense } from 'react';
 const AdminBackup = lazy(() => import('@/pages/admin/AdminBackup'));
 const AdminRolePresets = lazy(() => import('@/pages/admin/AdminRolePresets'));
 const AdminMasterData = lazy(() => import('@/pages/admin/AdminMasterData'));
+const AdminInventoryAlerts = lazy(() => import('@/pages/admin/AdminInventoryAlerts'));
+const AdminCustomerInsights = lazy(() => import('@/pages/admin/AdminCustomerInsights'));
+const AdminScheduledActions = lazy(() => import('@/pages/admin/AdminScheduledActions'));
+const AdminExportTools = lazy(() => import('@/pages/admin/AdminExportTools'));
+const AdminReturnRequests = lazy(() => import('@/pages/admin/AdminReturnRequests'));
 import { AnimatePresence } from 'framer-motion';
 import { PageTransition } from './PageTransition';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -191,6 +196,11 @@ export function AnimatedRoutes() {
           <Route path="backup" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminBackup /></Suspense>} />
           <Route path="role-presets" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminRolePresets /></Suspense>} />
           <Route path="master-data" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminMasterData /></Suspense>} />
+          <Route path="inventory-alerts" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminInventoryAlerts /></Suspense>} />
+          <Route path="customer-insights" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminCustomerInsights /></Suspense>} />
+          <Route path="scheduled-actions" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminScheduledActions /></Suspense>} />
+          <Route path="export-tools" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminExportTools /></Suspense>} />
+          <Route path="return-requests" element={<Suspense fallback={<div className="flex items-center justify-center py-16"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}><AdminReturnRequests /></Suspense>} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="cms" element={<AdminCMS />} />
         </Route>
