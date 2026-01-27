@@ -30,6 +30,7 @@ import AddressesPage from '@/pages/dashboard/AddressesPage';
 import DashboardWalletPage from '@/pages/dashboard/WalletPage';
 import CouponsPage from '@/pages/dashboard/CouponsPage';
 import PaymentsPage from '@/pages/dashboard/PaymentsPage';
+import SettingsPage from '@/pages/dashboard/SettingsPage';
 
 // Seller
 import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
@@ -129,6 +130,7 @@ export function AnimatedRoutes() {
           <Route path="addresses" element={<AddressesPage />} />
           <Route path="coupons" element={<CouponsPage />} />
           <Route path="payments" element={<PaymentsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         {/* Seller Routes */}
