@@ -31,6 +31,8 @@ import DashboardWalletPage from '@/pages/dashboard/WalletPage';
 import CouponsPage from '@/pages/dashboard/CouponsPage';
 import PaymentsPage from '@/pages/dashboard/PaymentsPage';
 import SettingsPage from '@/pages/dashboard/SettingsPage';
+import SecurityPage from '@/pages/dashboard/SecurityPage';
+import HelpPage from '@/pages/HelpPage';
 
 // Seller
 import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
@@ -115,7 +117,7 @@ export function AnimatedRoutes() {
         <Route path="/wishlist" element={<PageTransition><WishlistPage /></PageTransition>} />
         <Route path="/notifications" element={<PageTransition><NotificationsPage /></PageTransition>} />
         <Route path="/store/:slug" element={<PageTransition><SellerStorePage /></PageTransition>} />
-
+        <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
         {/* Protected Routes */}
         <Route path="/checkout" element={<ProtectedRoute><PageTransition><CheckoutPage /></PageTransition></ProtectedRoute>} />
         <Route path="/order-success" element={<ProtectedRoute><PageTransition><OrderSuccessPage /></PageTransition></ProtectedRoute>} />
@@ -131,6 +133,7 @@ export function AnimatedRoutes() {
           <Route path="coupons" element={<CouponsPage />} />
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="security" element={<SecurityPage />} />
         </Route>
 
         {/* Seller Routes */}
