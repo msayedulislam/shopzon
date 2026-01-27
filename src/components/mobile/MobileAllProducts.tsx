@@ -31,7 +31,7 @@ export function MobileAllProducts() {
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5">
           {allProducts.map((product, index) => (
             <MobileProductCard key={product.id} product={product} index={index} />
           ))}
