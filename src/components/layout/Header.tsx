@@ -52,9 +52,10 @@ export function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ease-out ${
+        className={`fixed top-0 left-0 right-0 w-full transition-all duration-300 ease-out ${
           !isAtTop ? 'shadow-xl' : ''
         }`}
+        style={{ zIndex: 9999 }}
       >
         {/* Top Bar - Collapses when scrolled */}
         <div 
