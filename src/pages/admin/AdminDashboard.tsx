@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -34,7 +34,57 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminNotifications } from '@/hooks/useAdminNotifications';
+import { useBackgroundNotifications } from '@/hooks/useBackgroundNotifications';
 import { NotificationPanel } from '@/components/admin/NotificationPanel';
+import { useIsMobile } from '@/hooks/use-mobile';
+import MobileAdminOverview from '@/components/admin/mobile/MobileAdminOverview';
+import MobileAdminMenu from '@/components/admin/mobile/MobileAdminMenu';
+import { MobileAdminHeader } from '@/components/admin/mobile/MobileAdminHeader';
+import { MobileAdminNav } from '@/components/admin/mobile/MobileAdminNav';
+
+// Helper function to get page title from path
+const getPageTitle = (pathname: string): string => {
+  const pathTitles: Record<string, string> = {
+    '/admin': 'Dashboard',
+    '/admin/activity': 'Activity',
+    '/admin/profiles': 'Admin Profiles',
+    '/admin/orders': 'Orders',
+    '/admin/refunds': 'Refunds',
+    '/admin/return-requests': 'Return Requests',
+    '/admin/products': 'Products',
+    '/admin/inventory-alerts': 'Inventory Alerts',
+    '/admin/sellers': 'Sellers',
+    '/admin/seller-governance': 'Seller Governance',
+    '/admin/finance': 'Finance',
+    '/admin/couriers': 'Couriers',
+    '/admin/campaigns': 'Campaigns',
+    '/admin/banners': 'Banners',
+    '/admin/fraud': 'Fraud Detection',
+    '/admin/users': 'Users',
+    '/admin/customer-insights': 'Customer Insights',
+    '/admin/wallets': 'Wallets',
+    '/admin/categories': 'Categories',
+    '/admin/brands': 'Brands',
+    '/admin/coupons': 'Coupons',
+    '/admin/pages': 'Pages',
+    '/admin/blog': 'Blog',
+    '/admin/inquiries': 'Inquiries',
+    '/admin/notifications': 'Notifications',
+    '/admin/ai-suggestions': 'AI Suggestions',
+    '/admin/reports': 'Reports',
+    '/admin/export-tools': 'Export Tools',
+    '/admin/scheduled-actions': 'Scheduled Actions',
+    '/admin/role-presets': 'Role Presets',
+    '/admin/backup': 'Backup & Restore',
+    '/admin/master-data': 'Master Data',
+    '/admin/logs': 'Audit Logs',
+    '/admin/system-health': 'System Health',
+    '/admin/cms': 'CMS',
+    '/admin/settings': 'Settings',
+    '/admin/menu': 'Menu',
+  };
+  return pathTitles[pathname] || 'Admin';
+};
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
@@ -80,6 +130,10 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const { user, signOut, isAdmin } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useAdminNotifications();
+  const isMobile = useIsMobile();
+  
+  // Enable background notifications for admins
+  useBackgroundNotifications(isAdmin);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -91,6 +145,33 @@ export default function AdminDashboard() {
     await signOut();
     navigate('/');
   };
+
+  // Render mobile admin layout
+  if (isMobile) {
+    // Check if we're on the main admin page
+    if (location.pathname === '/admin') {
+      return <MobileAdminOverview />;
+    }
+    // Check if we're on the menu page
+    if (location.pathname === '/admin/menu') {
+      return <MobileAdminMenu />;
+    }
+    // For all other admin sub-pages, render with mobile wrapper
+    return (
+      <div className="min-h-screen bg-background pb-20">
+        <MobileAdminHeader 
+          title={getPageTitle(location.pathname)} 
+          showBack={true}
+          backPath="/admin/menu"
+          unreadCount={unreadCount}
+        />
+        <main className="p-4">
+          <Outlet />
+        </main>
+        <MobileAdminNav unreadCount={unreadCount} />
+      </div>
+    );
+  }
 
   const Sidebar = () => (
     <div className="h-full flex flex-col">
