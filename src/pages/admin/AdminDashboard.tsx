@@ -128,7 +128,7 @@ const menuItems = [
 export default function AdminDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, loading } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useAdminNotifications();
   const isMobile = useIsMobile();
   
@@ -136,15 +136,30 @@ export default function AdminDashboard() {
   useBackgroundNotifications(isAdmin);
 
   useEffect(() => {
-    if (!isAdmin) {
+    // Only redirect after loading is complete and user is confirmed not admin
+    if (!loading && !isAdmin) {
       navigate('/');
     }
-  }, [isAdmin, navigate]);
+  }, [loading, isAdmin, navigate]);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
   };
+
+  // Show loading while auth is being verified
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+
+  // If not admin after loading, don't render (redirect will happen)
+  if (!isAdmin) {
+    return null;
+  }
 
   // Render mobile admin layout
   if (isMobile) {
@@ -233,10 +248,6 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-
-  if (!isAdmin) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen flex">
