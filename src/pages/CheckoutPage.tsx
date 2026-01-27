@@ -63,13 +63,28 @@ export default function CheckoutPage() {
   const walletDiscount = useWallet ? Math.min(walletAmountToUse, subtotal + deliveryCharge) : 0;
   const total = subtotal + deliveryCharge - walletDiscount;
 
-  // Auto-fill user profile data
+  // Auto-fill user profile data and detect location on mount
   useEffect(() => {
     if (user) {
       fetchWalletBalance();
       fetchUserProfile();
     }
+    // Auto-detect location on page load
+    autoDetectLocationOnMount();
   }, [user]);
+
+  const autoDetectLocationOnMount = async () => {
+    const location = await detectLocation();
+    if (location) {
+      setShippingInfo((prev) => ({
+        ...prev,
+        address: location.address || prev.address,
+        city: location.city || prev.city,
+        area: location.area || prev.area,
+        postalCode: location.postalCode || prev.postalCode,
+      }));
+    }
+  };
 
   const fetchUserProfile = async () => {
     try {
