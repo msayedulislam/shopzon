@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Zap, Clock } from 'lucide-react';
 import { MobileProductCard } from './MobileProductCard';
 import { useFlashSaleProducts, toDisplayProduct } from '@/hooks/useProducts';
 import { getFlashSaleProducts } from '@/data/mockData';
@@ -42,49 +42,73 @@ export function MobileFlashSale() {
     return () => clearInterval(timer);
   }, []);
 
-  const formatTime = (h: number, m: number, s: number) => 
-    `${h.toString().padStart(2, '0')}. ${m.toString().padStart(2, '0')}. ${s.toString().padStart(2, '0')}`;
+  const pad = (n: number) => n.toString().padStart(2, '0');
 
   if (flashSaleProducts.length === 0 && !isLoading) {
     return null;
   }
 
   return (
-    <section className="px-4 py-4 bg-white dark:bg-card">
+    <section className="py-4 bg-white dark:bg-card">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between px-4 mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-base font-bold text-foreground">Flash Sell</h2>
-          <motion.span 
-            key={timeLeft.seconds}
-            initial={{ opacity: 0.5 }}
-            animate={{ opacity: 1 }}
-            className="text-xs text-primary font-semibold tabular-nums"
-          >
-            {formatTime(timeLeft.hours, timeLeft.minutes, timeLeft.seconds)}
-          </motion.span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary to-rose-500 flex items-center justify-center">
+              <Zap className="h-3.5 w-3.5 text-white" fill="white" />
+            </div>
+            <h2 className="text-base font-bold text-foreground">Flash Sale</h2>
+          </div>
         </div>
-        <Link 
-          to="/flash-sale" 
-          className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-primary transition-colors"
-        >
-          All
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
+        
+        {/* Timer */}
+        <div className="flex items-center gap-1.5">
+          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+          <div className="flex items-center gap-0.5">
+            <span className="w-6 h-6 rounded-md bg-foreground text-background text-xs font-bold flex items-center justify-center">
+              {pad(timeLeft.hours)}
+            </span>
+            <span className="text-foreground font-bold">:</span>
+            <span className="w-6 h-6 rounded-md bg-foreground text-background text-xs font-bold flex items-center justify-center">
+              {pad(timeLeft.minutes)}
+            </span>
+            <span className="text-foreground font-bold">:</span>
+            <span className="w-6 h-6 rounded-md bg-foreground text-background text-xs font-bold flex items-center justify-center">
+              {pad(timeLeft.seconds)}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Products Grid */}
+      {/* Products Horizontal Scroll */}
       {isLoading ? (
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="aspect-[3/4] bg-secondary/40 rounded-xl animate-pulse" />
+            <div key={i} className="w-36 shrink-0">
+              <div className="aspect-[3/4] bg-secondary/40 rounded-2xl animate-pulse" />
+            </div>
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-2.5">
-          {flashSaleProducts.map((product, index) => (
-            <MobileProductCard key={product.id} product={product} index={index} />
-          ))}
+        <div className="relative">
+          <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-1">
+            {flashSaleProducts.map((product, index) => (
+              <div key={product.id} className="w-36 shrink-0">
+                <MobileProductCard product={product} index={index} variant="compact" />
+              </div>
+            ))}
+            
+            {/* View All Card */}
+            <Link 
+              to="/flash-sale"
+              className="w-28 shrink-0 aspect-[3/4] rounded-2xl bg-gradient-to-br from-primary/10 to-rose-500/10 border border-primary/20 flex flex-col items-center justify-center gap-2"
+            >
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <ChevronRight className="h-5 w-5 text-primary" />
+              </div>
+              <span className="text-xs font-semibold text-primary">View All</span>
+            </Link>
+          </div>
         </div>
       )}
     </section>

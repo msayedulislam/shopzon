@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Camera, Clock, X, TrendingUp, Package, Loader2, Sparkles } from 'lucide-react';
+import { Search, Camera, Clock, X, TrendingUp, Package, Loader2, Sparkles, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,6 +39,7 @@ export function MobileSearchBar() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Fetch search history and recommended products on focus
   useEffect(() => {
@@ -168,31 +169,44 @@ export function MobileSearchBar() {
   const showDropdown = isFocused;
 
   return (
-    <div ref={wrapperRef} className="px-4 py-3 bg-white dark:bg-card relative z-50">
+    <div ref={wrapperRef} className="px-4 py-3 bg-white/80 dark:bg-card/80 backdrop-blur-lg relative z-40">
       <form onSubmit={(e) => { e.preventDefault(); handleSearch(searchQuery); }}>
         <motion.div 
-          className={`relative flex items-center rounded-xl transition-all duration-200 ${
+          className={`relative flex items-center rounded-2xl transition-all duration-300 ${
             isFocused 
-              ? 'bg-secondary ring-2 ring-primary/20' 
-              : 'bg-secondary/60'
+              ? 'bg-white dark:bg-card ring-2 ring-primary/20 shadow-lg' 
+              : 'bg-secondary/70 dark:bg-secondary/50'
           }`}
-          animate={{ scale: isFocused ? 1.01 : 1 }}
+          animate={{ scale: isFocused ? 1.02 : 1 }}
         >
-          <Search className="absolute left-3.5 h-4.5 w-4.5 text-muted-foreground" />
+          <div className={`absolute left-4 transition-colors duration-200 ${isFocused ? 'text-primary' : 'text-muted-foreground'}`}>
+            <Search className="h-4.5 w-4.5" />
+          </div>
           <input
+            ref={inputRef}
             type="text"
-            placeholder="Search Product"
+            placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
-            className="w-full bg-transparent pl-10 pr-12 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+            className="w-full bg-transparent pl-11 pr-20 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none rounded-2xl"
           />
-          <button 
-            type="button" 
-            className="absolute right-3 p-1.5 rounded-lg hover:bg-secondary-foreground/10 transition-colors"
-          >
-            <Camera className="h-4.5 w-4.5 text-muted-foreground" />
-          </button>
+          <div className="absolute right-2 flex items-center gap-1">
+            <motion.button 
+              type="button" 
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-xl hover:bg-secondary/80 transition-colors"
+            >
+              <Mic className="h-4 w-4 text-muted-foreground" />
+            </motion.button>
+            <motion.button 
+              type="button" 
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-xl hover:bg-secondary/80 transition-colors"
+            >
+              <Camera className="h-4 w-4 text-muted-foreground" />
+            </motion.button>
+          </div>
         </motion.div>
       </form>
 
@@ -204,7 +218,7 @@ export function MobileSearchBar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 right-0 top-full bg-white dark:bg-card border-t border-border shadow-xl z-50 max-h-[70vh] overflow-y-auto"
+            className="absolute left-0 right-0 top-full bg-white dark:bg-card border-t border-border/30 shadow-2xl z-50 max-h-[70vh] overflow-y-auto rounded-b-3xl"
           >
             {/* Search Results */}
             {searchQuery.length >= 2 && (
@@ -217,16 +231,17 @@ export function MobileSearchBar() {
                   <>
                     <div className="flex items-center gap-2 mb-3">
                       <TrendingUp className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-semibold text-muted-foreground uppercase">Products</span>
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Products</span>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {results.map((product) => (
-                        <button
+                        <motion.button
                           key={product.id}
                           onClick={() => handleProductClick(product.slug)}
-                          className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-secondary/50 transition-colors"
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-secondary/50 transition-colors"
                         >
-                          <div className="w-12 h-12 rounded-lg bg-secondary overflow-hidden flex-shrink-0">
+                          <div className="w-14 h-14 rounded-xl bg-secondary overflow-hidden flex-shrink-0">
                             {product.image_url ? (
                               <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                             ) : (
@@ -235,24 +250,27 @@ export function MobileSearchBar() {
                               </div>
                             )}
                           </div>
-                          <div className="flex-1 text-left">
+                          <div className="flex-1 text-left min-w-0">
                             <p className="text-sm font-medium line-clamp-1">{product.name}</p>
                             <p className="text-xs text-muted-foreground">{product.category_name}</p>
                           </div>
-                          <span className="text-sm font-bold text-primary">{formatPrice(product.price)}</span>
-                        </button>
+                          <span className="text-sm font-bold text-primary shrink-0">{formatPrice(product.price)}</span>
+                        </motion.button>
                       ))}
                     </div>
-                    <button
+                    <motion.button
                       onClick={() => handleSearch(searchQuery)}
-                      className="w-full mt-3 py-3 text-sm text-primary bg-primary/10 rounded-xl font-medium"
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full mt-4 py-3.5 text-sm text-white bg-gradient-to-r from-primary to-primary/80 rounded-2xl font-semibold shadow-lg shadow-primary/20"
                     >
                       View all results for "{searchQuery}"
-                    </button>
+                    </motion.button>
                   </>
                 ) : (
                   <div className="py-8 text-center">
-                    <Package className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                    <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-secondary/50 flex items-center justify-center">
+                      <Package className="h-7 w-7 text-muted-foreground" />
+                    </div>
                     <p className="text-sm text-muted-foreground">No products found for "{searchQuery}"</p>
                   </div>
                 )}
@@ -268,7 +286,7 @@ export function MobileSearchBar() {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-xs font-semibold text-muted-foreground uppercase">Recent</span>
+                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Recent</span>
                       </div>
                       <button
                         onClick={handleClearHistory}
@@ -279,17 +297,18 @@ export function MobileSearchBar() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {history.map((item) => (
-                        <button
+                        <motion.button
                           key={item.id}
                           onClick={() => handleSearch(item.query)}
-                          className="group flex items-center gap-1.5 px-3 py-1.5 bg-secondary rounded-full text-sm"
+                          whileTap={{ scale: 0.95 }}
+                          className="group flex items-center gap-1.5 px-4 py-2 bg-secondary/70 rounded-full text-sm font-medium"
                         >
                           <span>{item.query}</span>
                           <X
-                            className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => handleDeleteHistoryItem(item.id, e)}
                           />
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
                   </div>
@@ -299,17 +318,18 @@ export function MobileSearchBar() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingUp className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-semibold text-muted-foreground uppercase">Popular Searches</span>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Trending</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {popularSearches.map((term) => (
-                      <button
+                      <motion.button
                         key={term}
                         onClick={() => handleSearch(term)}
-                        className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium"
+                        whileTap={{ scale: 0.95 }}
+                        className="px-4 py-2 bg-gradient-to-r from-primary/10 to-rose-500/10 text-primary rounded-full text-sm font-medium border border-primary/20"
                       >
                         {term}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -319,16 +339,17 @@ export function MobileSearchBar() {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Sparkles className="h-4 w-4 text-amber-500" />
-                      <span className="text-xs font-semibold text-muted-foreground uppercase">Recommended</span>
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">For You</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {recommendedProducts.map((product) => (
-                        <button
+                        <motion.button
                           key={product.id}
                           onClick={() => handleProductClick(product.slug)}
-                          className="flex flex-col items-center p-3 bg-secondary/50 rounded-xl hover:bg-secondary transition-colors"
+                          whileTap={{ scale: 0.97 }}
+                          className="flex flex-col items-center p-3 bg-secondary/40 rounded-2xl hover:bg-secondary/60 transition-colors"
                         >
-                          <div className="w-16 h-16 rounded-lg bg-background overflow-hidden mb-2">
+                          <div className="w-16 h-16 rounded-xl bg-white dark:bg-card overflow-hidden mb-2 shadow-sm">
                             {product.image_url ? (
                               <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                             ) : (
@@ -339,7 +360,7 @@ export function MobileSearchBar() {
                           </div>
                           <p className="text-xs font-medium text-center line-clamp-1">{product.name}</p>
                           <p className="text-xs font-bold text-primary mt-0.5">{formatPrice(product.price)}</p>
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
                   </div>

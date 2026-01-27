@@ -1,66 +1,59 @@
 import { Link } from 'react-router-dom';
-import { ChevronRight, Smartphone, Shirt, Baby, Home, Dumbbell, ShoppingBasket, BookOpen, Gift } from 'lucide-react';
+import { ChevronRight, Shirt, Gift, Baby, Home, Smartphone, Sparkles, ShoppingBag, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const categories = [
-  { id: '1', name: 'Man', slug: 'fashion', icon: Shirt, color: 'from-rose-400 to-rose-500' },
-  { id: '2', name: 'Woman', slug: 'beauty', icon: Gift, color: 'from-purple-400 to-purple-500' },
-  { id: '3', name: 'Kids', slug: 'toys', icon: Baby, color: 'from-blue-400 to-blue-500' },
-  { id: '4', name: 'Home', slug: 'home-living', icon: Home, color: 'from-teal-400 to-teal-500' },
+  { id: '1', name: 'Fashion', slug: 'fashion', icon: Shirt, gradient: 'from-rose-500 to-pink-400' },
+  { id: '2', name: 'Beauty', slug: 'beauty', icon: Sparkles, gradient: 'from-purple-500 to-violet-400' },
+  { id: '3', name: 'Kids', slug: 'toys', icon: Baby, gradient: 'from-blue-500 to-cyan-400' },
+  { id: '4', name: 'Home', slug: 'home-living', icon: Home, gradient: 'from-teal-500 to-emerald-400' },
+  { id: '5', name: 'Electronics', slug: 'electronics', icon: Smartphone, gradient: 'from-indigo-500 to-blue-400' },
+  { id: '6', name: 'Deals', slug: 'deals', icon: Zap, gradient: 'from-amber-500 to-orange-400' },
 ];
 
 export function MobileCategories() {
   return (
-    <div className="px-4 py-4 bg-white dark:bg-card">
-      <div className="flex items-center justify-between">
-        {/* Category Icons */}
-        <div className="flex items-center gap-4 flex-1">
-          {categories.map((category, index) => (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.05, type: 'spring', stiffness: 300 }}
-            >
-              <Link
-                to={`/categories?category=${category.slug}`}
-                className="flex flex-col items-center gap-1.5"
-              >
-                <motion.div 
-                  whileTap={{ scale: 0.95 }}
-                  className={`w-12 h-12 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-md`}
-                >
-                  <category.icon className="h-5 w-5 text-white" strokeWidth={2} />
-                </motion.div>
-                <span className="text-[11px] font-medium text-foreground text-center">
-                  {category.name}
-                </span>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-        
-        {/* More Button */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+    <div className="px-4 py-5 bg-white dark:bg-card">
+      {/* Section Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-bold text-foreground">Shop by Category</h2>
+        <Link 
+          to="/categories" 
+          className="flex items-center gap-0.5 text-xs text-primary font-medium"
         >
-          <Link
-            to="/categories"
-            className="flex flex-col items-center gap-1.5"
+          See All
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+
+      {/* Categories Grid */}
+      <div className="grid grid-cols-3 gap-3">
+        {categories.map((category, index) => (
+          <motion.div
+            key={category.id}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.05, type: 'spring', stiffness: 300 }}
           >
-            <motion.div 
-              whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 rounded-full bg-gradient-to-br from-muted-foreground to-foreground/80 flex items-center justify-center shadow-md"
+            <Link
+              to={`/categories?category=${category.slug}`}
+              className="flex flex-col items-center gap-2 group"
             >
-              <ChevronRight className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </motion.div>
-            <span className="text-[11px] font-medium text-foreground text-center">
-              More
-            </span>
-          </Link>
-        </motion.div>
+              <motion.div 
+                whileTap={{ scale: 0.92 }}
+                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${category.gradient} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow`}
+                style={{
+                  boxShadow: `0 8px 20px -4px rgba(0, 0, 0, 0.15)`
+                }}
+              >
+                <category.icon className="h-6 w-6 text-white" strokeWidth={1.8} />
+              </motion.div>
+              <span className="text-xs font-medium text-foreground text-center">
+                {category.name}
+              </span>
+            </Link>
+          </motion.div>
+        ))}
       </div>
     </div>
   );
