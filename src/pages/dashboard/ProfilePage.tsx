@@ -42,7 +42,7 @@ export default function ProfilePage() {
         .from('profiles')
         .update({
           full_name: formData.full_name,
-          phone: formData.phone,
+          email: formData.email,
         })
         .eq('user_id', user.id);
 
@@ -157,13 +157,13 @@ export default function ProfilePage() {
                 <Input
                   id="phone"
                   value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  className="pl-10 h-12"
-                  placeholder="01XXXXXXXXX"
+                  readOnly
+                  className="pl-10 h-12 bg-secondary/50 cursor-not-allowed"
                 />
               </div>
+              <p className="text-xs text-muted-foreground">
+                Phone number cannot be changed
+              </p>
             </div>
           </div>
 
@@ -176,13 +176,13 @@ export default function ProfilePage() {
               <Input
                 id="email"
                 value={formData.email}
-                readOnly
-                className="pl-10 h-12 bg-secondary/50 cursor-not-allowed"
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                className="pl-10 h-12"
+                placeholder="Enter your email address"
               />
             </div>
-            <p className="text-xs text-muted-foreground">
-              Email address cannot be changed
-            </p>
           </div>
 
           <Separator />
