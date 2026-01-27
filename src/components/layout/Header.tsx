@@ -92,8 +92,8 @@ export function Header() {
         <div className={`glass-strong border-b border-white/5 backdrop-blur-xl transition-all duration-300 ${
           !isAtTop ? 'bg-background/98 dark:bg-background/98' : ''
         }`}>
-          <div className="container">
-            <div className="flex items-center gap-4 py-2">
+          <div className="container" style={{ overflow: 'visible' }}>
+            <div className="flex items-center gap-4 py-2" style={{ overflow: 'visible' }}>
               {/* Mobile Menu */}
               <Sheet>
                 <SheetTrigger asChild className="lg:hidden">
