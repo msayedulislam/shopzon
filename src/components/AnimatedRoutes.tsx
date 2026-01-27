@@ -161,6 +161,7 @@ export function AnimatedRoutes() {
         <Route path="/admin/login" element={<PageTransition><AdminLoginPage /></PageTransition>} />
         <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>}>
           <Route index element={<AdminOverview />} />
+          <Route path="menu" element={<></>} />
           <Route path="users" element={<AdminUsersEnhanced />} />
           <Route path="sellers" element={<AdminSellers />} />
           <Route path="products" element={<AdminProductsEnhanced />} />
