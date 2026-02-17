@@ -16,41 +16,33 @@ export function MobileHomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-secondary/30 dark:bg-background">
-      {/* Header */}
-      <MobileHeader showBack={false} transparent />
-      
-      {/* Search Bar */}
-      <MobileSearchBar />
-      
-      {/* Banner Carousel */}
-      <MobileBanner />
-      
-      {/* Categories */}
-      <div className="mt-1.5">
+    <div className="flex flex-col min-h-screen bg-[#f7f7f7] pb-24">
+      <MobileHeader transparent />
+
+      <main className="flex-1">
+        {/* Main Banner / Story Row could go here */}
+        <section className="bg-white px-3 py-2">
+          <div className="w-full h-40 rounded-xl overflow-hidden bg-secondary/20">
+            <img
+              src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80"
+              className="w-full h-full object-cover"
+              alt="Main Banner"
+            />
+          </div>
+        </section>
+
         <MobileCategories />
-      </div>
-      
-      {/* Flash Sale Section */}
-      <div className="mt-1.5">
-        <MobileFlashSale />
-      </div>
-      
-      {/* New Products Section */}
-      <div className="mt-1.5">
-        <MobileNewProducts />
-      </div>
-      
-      {/* Best Sellers Section */}
-      <div className="mt-1.5">
-        <MobileBestSellers />
-      </div>
-      
-      {/* All Products Section */}
-      <div className="mt-1.5 pb-20">
-        <MobileAllProducts />
-      </div>
-      
+
+        <div className="space-y-3 mt-3">
+          <MobileFlashSale />
+          <MobileNewProducts />
+          <MobileBestSellers />
+          <div className="px-3 pb-6">
+            <MobileAllProducts />
+          </div>
+        </div>
+      </main>
+
       {/* Floating Action Button - Chat/Support */}
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
@@ -63,10 +55,10 @@ export function MobileHomePage() {
       >
         <MessageCircle className="h-4 w-4" />
       </motion.button>
-      
+
       {/* Bottom Navigation */}
       <MobileBottomNav />
-      
+
       {/* Notification Permission Prompt */}
       <NotificationPermissionPrompt />
     </div>

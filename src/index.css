@@ -16,8 +16,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 8%;
 
-    /* Primary - Premium Ruby Red */
-    --primary: 0 84% 55%;
+    /* Primary - Govaly Brand Red */
+    --primary: 0 84% 50%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Light Gray */
@@ -31,17 +31,17 @@
     --accent: 45 93% 47%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 55%;
+    --destructive: 0 84% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 84% 55%;
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
+    --ring: 0 84% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     /* RGB values for JS shadows */
-    --primary-rgb: 217, 38, 38;
+    --primary-rgb: 231, 26, 26;
     --success: 142 76% 40%;
     --success-foreground: 0 0% 100%;
 

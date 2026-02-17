@@ -1,51 +1,31 @@
+import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Flame } from 'lucide-react';
 import { MobileProductCard } from './MobileProductCard';
 import { useBestSelling, toDisplayProduct } from '@/hooks/useProducts';
 import { getBestSellingProducts } from '@/data/mockData';
 
 export function MobileBestSellers() {
-  const { data: dbProducts, isLoading } = useBestSelling(6);
-  
-  const bestProducts = dbProducts && dbProducts.length > 0
+  const { data: dbProducts } = useBestSelling(6);
+
+  const bestSellers = dbProducts && dbProducts.length > 0
     ? dbProducts.map(toDisplayProduct)
     : getBestSellingProducts().slice(0, 6);
 
-  if (bestProducts.length === 0 && !isLoading) {
-    return null;
-  }
-
   return (
-    <section className="py-3 bg-white dark:bg-card">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 mb-2.5">
-        <div className="flex items-center gap-1.5">
-          <Flame className="h-4 w-4 text-orange-500" />
-          <h2 className="text-sm font-bold text-foreground">Best Sellers</h2>
-        </div>
-        <Link 
-          to="/products?sort=bestselling" 
-          className="flex items-center gap-0.5 text-xs text-primary font-medium"
-        >
-          All
-          <ChevronRight className="h-3 w-3" />
+    <div className="bg-white py-3">
+      <div className="flex items-center justify-between px-3 mb-3">
+        <h2 className="text-[15px] font-black text-foreground uppercase tracking-tight">Best Sellers</h2>
+        <Link to="/products?popular=true" className="flex items-center text-xs text-primary font-bold">
+          View All
+          <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
-      {/* Products Grid - 3 columns */}
-      {isLoading ? (
-        <div className="grid grid-cols-3 gap-1.5 px-2">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="aspect-[3/4] bg-secondary/30 rounded-lg animate-pulse" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-1.5 px-2">
-          {bestProducts.slice(0, 6).map((product, index) => (
-            <MobileProductCard key={product.id} product={product} index={index} variant="square" />
-          ))}
-        </div>
-      )}
-    </section>
+      <div className="px-3 grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
+        {bestSellers.map((product) => (
+          <MobileProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    </div>
   );
 }

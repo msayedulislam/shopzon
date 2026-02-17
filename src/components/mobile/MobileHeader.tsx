@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, Search, Bell, Heart } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Search, Bell, ShoppingCart, User, Menu } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useCart } from '@/hooks/useCart';
 
 interface MobileHeaderProps {
@@ -9,21 +9,21 @@ interface MobileHeaderProps {
   showBack?: boolean;
   backPath?: string;
   showSearch?: boolean;
-  showNotification?: boolean;
   transparent?: boolean;
 }
 
 export function MobileHeader({
-  title = 'Jhuri',
+  title = 'Govaly',
   showBack = false,
   backPath,
   showSearch = true,
-  showNotification = true,
   transparent = false
 }: MobileHeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const { items } = useCart();
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const isHome = location.pathname === '/';
 
@@ -46,79 +46,72 @@ export function MobileHeader({
   };
 
   return (
-    <motion.header
-      initial={false}
-      animate={{
-        backgroundColor: scrolled || !transparent ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
-      }}
-      className={`sticky top-0 z-50 safe-area-top transition-all duration-300 ${scrolled ? 'glass-strong shadow-sm' : transparent ? '' : 'bg-white/85 dark:bg-card/85 backdrop-blur-xl'
-        } ${scrolled || !transparent ? 'border-b border-border/30' : ''}`}
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled || !transparent ? 'bg-white shadow-sm border-b border-border/40' : 'bg-transparent'
+        }`}
     >
-      <div className="flex items-center justify-between h-14 px-4">
-        {/* Left - Back Button or Brand */}
-        <div className="flex items-center gap-2 min-w-[80px]">
-          {showBack && !isHome ? (
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={handleBack}
-              className="w-9 h-9 rounded-full bg-secondary/80 dark:bg-secondary flex items-center justify-center hover:bg-secondary transition-colors"
-              aria-label="Go back"
-            >
-              <ArrowLeft className="h-4.5 w-4.5 text-foreground" />
-            </motion.button>
-          ) : null}
-        </div>
-
-        {/* Center - Title/Brand */}
-        <motion.div
-          className="flex-1 flex justify-center"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {isHome ? (
-            <Link to="/" className="flex items-center gap-1.5">
-              <span
-                className="text-xl font-bold tracking-tight text-primary"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
-                Jhuri
+      <div className="safe-area-top" />
+      <div className="flex flex-col">
+        {/* Top Row: Logo & Actions */}
+        <div className="flex items-center justify-between h-14 px-3">
+          <div className="flex items-center gap-3">
+            {showBack && !isHome ? (
+              <button onClick={handleBack} className="p-1.5 -ml-1">
+                <ArrowLeft className="h-6 w-6 text-foreground" />
+              </button>
+            ) : (
+              <button className="p-1.5 -ml-1">
+                <Menu className="h-6 w-6 text-foreground" />
+              </button>
+            )}
+            <Link to="/" className="flex items-center">
+              <span className="text-2xl font-black text-primary tracking-tighter">
+                GOVALY
               </span>
             </Link>
-          ) : (
-            <h1
-              className="text-base font-semibold text-foreground truncate max-w-[180px]"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              {title}
-            </h1>
-          )}
-        </motion.div>
+          </div>
 
-        {/* Right - Action Icons */}
-        <div className="flex items-center gap-1 min-w-[80px] justify-end">
-          {showSearch && (
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => navigate('/search')}
-              className="w-9 h-9 rounded-full bg-secondary/60 dark:bg-secondary/40 flex items-center justify-center hover:bg-secondary transition-colors"
-              aria-label="Search"
-            >
-              <Search className="h-4.5 w-4.5 text-muted-foreground" />
-            </motion.button>
-          )}
-          {showNotification && (
-            <motion.button
-              whileTap={{ scale: 0.9 }}
+          <div className="flex items-center gap-1">
+            <button
               onClick={() => navigate('/notifications')}
-              className="w-9 h-9 rounded-full bg-secondary/60 dark:bg-secondary/40 flex items-center justify-center hover:bg-secondary transition-colors relative"
-              aria-label="Notifications"
+              className="p-2 relative"
             >
-              <Bell className="h-5 w-5 text-foreground" />
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary ring-2 ring-white" />
-            </motion.button>
-          )}
+              <Bell className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+              <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary border-2 border-white" />
+            </button>
+            <button
+              onClick={() => navigate('/cart')}
+              className="p-2 relative"
+            >
+              <ShoppingCart className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+              {itemCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="p-2"
+            >
+              <User className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+            </button>
+          </div>
         </div>
+
+        {/* Search Row - Integrated with Header on Home */}
+        {showSearch && isHome && (
+          <div className="px-3 pb-3">
+            <div
+              onClick={() => navigate('/search')}
+              className="flex items-center gap-2 h-10 px-3 bg-secondary/50 rounded-lg border border-border/30 text-muted-foreground transition-colors active:bg-secondary"
+            >
+              <Search className="h-4.5 w-4.5" />
+              <span className="text-sm">Search for products, brands...</span>
+            </div>
+          </div>
+        )}
       </div>
-    </motion.header>
+    </header>
   );
 }
