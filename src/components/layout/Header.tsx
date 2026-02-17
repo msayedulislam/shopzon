@@ -94,12 +94,12 @@ export function Header() {
           !isAtTop ? 'bg-background/98 dark:bg-background/98' : ''
         }`}>
           <div className="container" style={{ overflow: 'visible' }}>
-            <div className="flex items-center gap-4 py-2" style={{ overflow: 'visible' }}>
+            <div className="flex items-center gap-3 py-2.5" style={{ overflow: 'visible' }}>
               {/* Mobile Menu */}
               <Sheet>
                 <SheetTrigger asChild className="lg:hidden">
-                  <Button variant="ghost" size="icon" className="hover:bg-white/10">
-                    <Menu className="h-6 w-6" />
+                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-white/10 rounded-lg">
+                    <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-[300px] p-0 glass-dark border-r border-white/10">
@@ -127,8 +127,8 @@ export function Header() {
 
                 {/* Logo - Compact size */}
                 <Link to="/" className="flex items-center gap-2 shrink-0 group">
-                  <img src={jhuriLogo} alt="Jhuri" className="h-9 w-9 object-contain rounded-xl group-hover:scale-110 transition-transform duration-300" />
-                  <span className="font-bold text-lg hidden sm:block" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <img src={jhuriLogo} alt="Jhuri" className="h-8 w-8 object-contain rounded-lg group-hover:scale-110 transition-transform duration-300" />
+                  <span className="font-bold text-base hidden sm:block" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                     <span className="text-gradient">Jhu</span>ri
                   </span>
                 </Link>
@@ -140,15 +140,15 @@ export function Header() {
               />
 
               {/* Action Buttons - Compact size */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <ThemeToggle />
                 <Link to="/wishlist">
-                  <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300">
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-lg hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300 flex-shrink-0">
                     <Heart className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link to="/cart">
-                  <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300">
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-lg hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300 flex-shrink-0">
                     <ShoppingCart className="h-4 w-4" />
                     {cartCount > 0 && (
                       <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-[10px] font-bold shadow-glow">
@@ -159,7 +159,7 @@ export function Header() {
                 </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10 transition-all duration-300">
+                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white/10 transition-all duration-300 flex-shrink-0">
                       <User className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>

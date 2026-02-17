@@ -95,15 +95,15 @@ export function ProductCard({ product, variant = 'default', compact = false }: P
             </span>
           )}
         </div>
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
-          <h3 className="font-medium text-foreground text-sm line-clamp-2 mb-1 group-hover:text-primary transition-colors">
+        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+          <h3 className="font-medium text-foreground text-sm line-clamp-2 group-hover:text-primary transition-colors break-words">
             {product.name}
           </h3>
-          <div className="flex items-center gap-1.5 mb-1">
-            <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+          <div className="flex items-center gap-1 flex-wrap">
+            <Star className="h-3 w-3 fill-amber-500 text-amber-500 flex-shrink-0" />
             <span className="text-xs text-muted-foreground">{product.rating}</span>
           </div>
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-baseline gap-2 flex-wrap">
             <span className="text-base font-bold text-primary">{formatPrice(product.price)}</span>
             {product.originalPrice && (
               <span className="text-xs text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
@@ -178,19 +178,19 @@ export function ProductCard({ product, variant = 'default', compact = false }: P
 
           {/* Product Info - Compact */}
           <div className="p-2.5">
-            <h3 className="font-medium text-foreground text-xs line-clamp-2 leading-tight min-h-[32px] group-hover:text-primary transition-colors">
+            <h3 className="font-medium text-foreground text-xs line-clamp-2 leading-snug min-h-[32px] group-hover:text-primary transition-colors break-words">
               {product.name}
             </h3>
             
             {/* Rating */}
-            <div className="flex items-center gap-1 mt-1">
-              <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+            <div className="flex items-center gap-1 mt-2 flex-wrap">
+              <Star className="h-3 w-3 fill-amber-500 text-amber-500 flex-shrink-0" />
               <span className="text-[10px] text-muted-foreground">{product.rating}</span>
               <span className="text-[10px] text-muted-foreground">• {product.sold || 0} sold</span>
             </div>
             
             {/* Price */}
-            <div className="flex items-baseline gap-1.5 mt-1.5">
+            <div className="flex items-baseline gap-1.5 mt-2 flex-wrap">
               <span className="text-sm font-bold text-primary">
                 {formatPrice(product.price)}
               </span>
@@ -279,7 +279,7 @@ export function ProductCard({ product, variant = 'default', compact = false }: P
             <Button
               onClick={handleAddToCart}
               size="sm"
-              className="w-full h-9 rounded-lg bg-white text-foreground hover:bg-gray-100 text-xs font-medium gap-1.5"
+              className="w-full h-9 rounded-lg bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:from-primary/90 hover:to-primary/80 text-xs font-bold gap-1.5 shadow-lg"
             >
               <ShoppingCart className="h-3.5 w-3.5" />
               Add to Cart
@@ -291,19 +291,19 @@ export function ProductCard({ product, variant = 'default', compact = false }: P
         <div className="p-3">
           {/* Brand */}
           {product.brand && (
-            <p className="text-[10px] text-primary uppercase tracking-wider font-medium mb-1">
+            <p className="text-[10px] text-primary uppercase tracking-wider font-medium mb-1 truncate">
               {product.brand.name}
             </p>
           )}
 
           {/* Name */}
-          <h3 className="font-medium text-foreground text-sm line-clamp-2 leading-tight min-h-[40px] group-hover:text-primary transition-colors">
+          <h3 className="font-medium text-foreground text-sm line-clamp-2 leading-snug min-h-[40px] group-hover:text-primary transition-colors break-words">
             {product.name}
           </h3>
 
           {/* Rating */}
-          <div className="flex items-center gap-1.5 mt-2">
-            <div className="flex items-center gap-1 bg-amber-500/10 px-1.5 py-0.5 rounded">
+          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+            <div className="flex items-center gap-1 bg-amber-500/10 px-1.5 py-0.5 rounded flex-shrink-0">
               <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
               <span className="text-xs font-medium text-amber-600 dark:text-amber-400">{product.rating}</span>
             </div>
@@ -312,7 +312,7 @@ export function ProductCard({ product, variant = 'default', compact = false }: P
           </div>
 
           {/* Price */}
-          <div className="flex items-baseline gap-2 mt-2 pt-2 border-t border-border/50">
+          <div className="flex items-baseline gap-2 mt-2 pt-2 border-t border-border/50 flex-wrap">
             <span className="text-base font-bold text-primary">
               {formatPrice(product.price)}
             </span>

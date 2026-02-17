@@ -30,31 +30,37 @@ const Index = () => {
         <PromoBannerCarousel />
         
         {/* Categories Grid */}
-        <CategoriesSection />
+        <div className="py-2">
+          <CategoriesSection />
+        </div>
         
         {/* Flash Sale */}
-        <div className="mt-2">
+        <div className="py-3">
           <FlashSaleSection />
         </div>
         
         {/* Best Sellers */}
-        <div className="mt-2">
+        <div className="py-3">
           <BestSellingSection />
         </div>
         
         {/* Personalized Recommendations */}
-        <PersonalizedRecommendations />
+        <div className="py-3">
+          <PersonalizedRecommendations />
+        </div>
         
         {/* New Arrivals */}
-        <div className="mt-2">
+        <div className="py-3">
           <NewArrivalSection />
         </div>
         
         {/* Recently Viewed */}
-        <RecentlyViewedSection />
+        <div className="py-3">
+          <RecentlyViewedSection />
+        </div>
         
         {/* All Products */}
-        <div className="mt-2 pb-6">
+        <div className="py-6 pb-8">
           <AllProductsSection />
         </div>
       </main>
