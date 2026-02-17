@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Zap, Loader2 } from 'lucide-react';
-import { ProductCard } from '@/components/product/ProductCard';
+import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { useFlashSaleProducts, toDisplayProduct } from '@/hooks/useProducts';
 import { getFlashSaleProducts } from '@/data/mockData';
 import { motion } from 'framer-motion';
 
 export function FlashSaleSection() {
   const { data: dbProducts, isLoading } = useFlashSaleProducts(10);
-  
+
   const flashSaleProducts = dbProducts && dbProducts.length > 0
     ? dbProducts.map(toDisplayProduct)
     : getFlashSaleProducts().slice(0, 10);
@@ -23,7 +23,7 @@ export function FlashSaleSection() {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         let { hours, minutes, seconds } = prev;
-        
+
         if (seconds > 0) {
           seconds--;
         } else if (minutes > 0) {
@@ -58,7 +58,7 @@ export function FlashSaleSection() {
               <Zap className="h-5 w-5 text-primary" fill="currentColor" />
               <h2 className="text-lg font-bold text-foreground">Flash Sale</h2>
             </div>
-            
+
             {/* Timer - Compact */}
             <div className="flex items-center gap-1 bg-foreground/5 dark:bg-foreground/10 px-2.5 py-1 rounded-lg">
               <span className="text-xs font-bold text-foreground">{pad(timeLeft.hours)}</span>
@@ -68,9 +68,9 @@ export function FlashSaleSection() {
               <span className="text-xs font-bold text-foreground">{pad(timeLeft.seconds)}</span>
             </div>
           </div>
-          
-          <Link 
-            to="/flash-sale" 
+
+          <Link
+            to="/flash-sale"
             className="flex items-center gap-1 text-sm text-primary font-medium hover:underline"
           >
             All
@@ -84,17 +84,9 @@ export function FlashSaleSection() {
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-            {flashSaleProducts.slice(0, 10).map((product, index) => (
-              <motion.div
-                key={`flash-${product.id}-${index}`}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.03, duration: 0.2 }}
-              >
-                <ProductCard product={product} variant="square" />
-              </motion.div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            {flashSaleProducts.slice(0, 12).map((product, index) => (
+              <GovalyProductCard key={`flash-${product.id}-${index}`} product={product} index={index} />
             ))}
           </div>
         )}

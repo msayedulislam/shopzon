@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { ChevronRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ProductCard } from '@/components/product/ProductCard';
+import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { products as mockProducts } from '@/data/mockData';
 import { useProducts, toDisplayProduct } from '@/hooks/useProducts';
 
 export function AllProductsSection() {
   const { data: dbProducts, isLoading } = useProducts({ limit: 20 });
-  
+
   const allProducts = dbProducts && dbProducts.length > 0
     ? dbProducts.map(toDisplayProduct)
     : mockProducts;
@@ -18,9 +18,9 @@ export function AllProductsSection() {
         {/* Section Header - Compact */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-foreground">Just For You</h2>
-          
-          <Link 
-            to="/products" 
+
+          <Link
+            to="/products"
             className="flex items-center gap-1 text-sm text-primary font-medium hover:underline"
           >
             All
@@ -34,17 +34,9 @@ export function AllProductsSection() {
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-            {allProducts.slice(0, 20).map((product, index) => (
-              <motion.div
-                key={`all-${product.id}-${index}`}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.2, delay: index * 0.02 }}
-              >
-                <ProductCard product={product} variant="square" />
-              </motion.div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            {allProducts.slice(0, 24).map((product, index) => (
+              <GovalyProductCard key={`all-${product.id}-${index}`} product={product} index={index} />
             ))}
           </div>
         )}
