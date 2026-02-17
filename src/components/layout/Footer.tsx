@@ -10,7 +10,7 @@ export function Footer() {
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-        
+
         <div className="container relative py-12">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="text-center lg:text-left">
@@ -66,12 +66,12 @@ export function Footer() {
                   </div>
                   support@jhuri.com
                 </a>
-                <p className="flex items-center gap-3 text-muted-foreground">
+                <div className="flex items-center gap-3 text-muted-foreground">
                   <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
                     <MapPin className="h-4 w-4" />
                   </div>
                   Dhaka, Bangladesh
-                </p>
+                </div>
               </div>
             </div>
 
@@ -81,8 +81,8 @@ export function Footer() {
               <ul className="space-y-3">
                 {['About Us', 'Contact Us', 'Careers', 'Blog', 'FAQs'].map((item) => (
                   <li key={item}>
-                    <Link 
-                      to={`/${item.toLowerCase().replace(' ', '-')}`} 
+                    <Link
+                      to={`/${item.toLowerCase().replace(' ', '-')}`}
                       className="text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-2 group"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
@@ -99,8 +99,8 @@ export function Footer() {
               <ul className="space-y-3">
                 {['Track Order', 'Returns & Exchanges', 'Shipping Info', 'Payment Methods', 'Help Center'].map((item) => (
                   <li key={item}>
-                    <Link 
-                      to={`/${item.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} 
+                    <Link
+                      to={`/${item.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}
                       className="text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-2 group"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
@@ -117,8 +117,8 @@ export function Footer() {
               <ul className="space-y-3">
                 {['Privacy Policy', 'Terms & Conditions', 'Refund Policy', 'Seller Policy'].map((item) => (
                   <li key={item}>
-                    <Link 
-                      to={`/${item.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} 
+                    <Link
+                      to={`/${item.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}
                       className="text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-2 group"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
@@ -152,9 +152,9 @@ export function Footer() {
                     { icon: Twitter, href: '#' },
                     { icon: Youtube, href: '#' },
                   ].map(({ icon: Icon, href }, index) => (
-                    <a 
+                    <a
                       key={index}
-                      href={href} 
+                      href={href}
                       className="h-11 w-11 rounded-xl glass flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all duration-300 group"
                     >
                       <Icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -168,8 +168,8 @@ export function Footer() {
           {/* Copyright */}
           <div className="mt-10 text-center text-sm text-muted-foreground">
             <p className="flex items-center justify-center gap-2">
-              © 2024 Jhuri. All rights reserved. Made with 
-              <Heart className="h-4 w-4 text-primary fill-primary animate-pulse" /> 
+              © 2024 Jhuri. All rights reserved. Made with
+              <Heart className="h-4 w-4 text-primary fill-primary animate-pulse" />
               in Bangladesh
             </p>
           </div>
