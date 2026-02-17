@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, ShoppingCart, Trash2, Loader2, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MobileBottomNav } from './MobileBottomNav';
+import { MobileHeader } from './MobileHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/integrations/supabase/client';
@@ -92,7 +93,7 @@ export function MobileWishlistPage() {
 
   const handleAddToCart = (item: WishlistItem) => {
     if (!item.product) return;
-    
+
     const product = {
       id: item.product.id,
       name: item.product.name,
@@ -120,15 +121,8 @@ export function MobileWishlistPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-secondary/30 dark:bg-background pb-20">
-        <header className="sticky top-0 z-50 bg-white dark:bg-card border-b border-border/50 safe-area-top">
-          <div className="flex items-center gap-3 h-14 px-4">
-            <button onClick={() => navigate(-1)} className="p-2 -ml-2">
-              <ArrowLeft className="h-5 w-5 text-foreground" />
-            </button>
-            <h1 className="text-base font-semibold">Wishlist</h1>
-          </div>
-        </header>
+      <div className="min-h-screen bg-[#f7f7f7] dark:bg-background pb-20">
+        <MobileHeader title="Wishlist" showBack showSearch={false} />
         <div className="flex flex-col items-center justify-center py-20 px-4">
           <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mb-4">
             <Heart className="h-10 w-10 text-muted-foreground" />
@@ -147,21 +141,8 @@ export function MobileWishlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-secondary/30 dark:bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-card border-b border-border/50 safe-area-top">
-        <div className="flex items-center justify-between h-14 px-4">
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="p-2 -ml-2">
-              <ArrowLeft className="h-5 w-5 text-foreground" />
-            </button>
-            <h1 className="text-base font-semibold">Wishlist</h1>
-          </div>
-          <span className="text-sm text-muted-foreground">
-            {wishlistItems.length} items
-          </span>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#f7f7f7] dark:bg-background pb-20">
+      <MobileHeader title="Wishlist" showBack showSearch={false} />
 
       <div className="p-4">
         {isLoading ? (
@@ -188,16 +169,16 @@ export function MobileWishlistPage() {
                 <motion.div
                   key={item.id}
                   layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -100 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, x: -50 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-white dark:bg-card rounded-2xl p-3 border border-border/50 flex gap-3"
+                  className="bg-white dark:bg-card rounded-2xl p-3 border border-border/5 shadow-sm flex gap-3"
                 >
                   {/* Product Image */}
-                  <Link 
+                  <Link
                     to={`/product/${item.product?.slug}`}
-                    className="w-24 h-24 rounded-xl bg-secondary overflow-hidden shrink-0"
+                    className="w-20 h-20 rounded-xl bg-secondary/20 border border-border/10 overflow-hidden shrink-0"
                   >
                     <img
                       src={item.productImage || '/placeholder.svg'}
@@ -207,46 +188,40 @@ export function MobileWishlistPage() {
                   </Link>
 
                   {/* Product Info */}
-                  <div className="flex-1 min-w-0">
-                    <Link 
-                      to={`/product/${item.product?.slug}`}
-                      className="font-medium text-sm line-clamp-2 hover:text-primary"
-                    >
-                      {item.product?.name}
-                    </Link>
+                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div>
+                      <Link
+                        to={`/product/${item.product?.slug}`}
+                        className="font-bold text-xs line-clamp-2 hover:text-primary transition-colors leading-tight"
+                      >
+                        {item.product?.name}
+                      </Link>
 
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <span className="font-bold text-primary">
-                        {formatPrice(item.product?.price || 0)}
-                      </span>
-                      {item.product?.original_price && (
-                        <span className="text-xs text-muted-foreground line-through">
-                          {formatPrice(item.product.original_price)}
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="font-black text-sm text-primary">
+                          {formatPrice(item.product?.price || 0)}
                         </span>
-                      )}
+                        {item.product?.original_price && (
+                          <span className="text-[10px] text-muted-foreground line-through decoration-muted-foreground/30">
+                            {formatPrice(item.product.original_price)}
+                          </span>
+                        )}
+                      </div>
                     </div>
-
-                    <p className="text-xs mt-1">
-                      {(item.product?.stock ?? 0) > 0 ? (
-                        <span className="text-emerald-600">In Stock</span>
-                      ) : (
-                        <span className="text-destructive">Out of Stock</span>
-                      )}
-                    </p>
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() => handleAddToCart(item)}
                         disabled={(item.product?.stock ?? 0) === 0}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-primary text-white rounded-full text-xs font-medium disabled:opacity-50"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-primary text-white rounded-full text-[11px] font-black uppercase tracking-tight shadow-lg shadow-primary/20 disabled:grayscale transition-all active:scale-95"
                       >
-                        <ShoppingCart className="h-3.5 w-3.5" />
+                        <ShoppingCart className="h-3 w-3" />
                         Add to Cart
                       </button>
                       <button
                         onClick={() => removeFromWishlist.mutate(item.id)}
-                        className="p-2 rounded-full bg-secondary text-destructive"
+                        className="p-2 rounded-full bg-secondary/50 text-destructive/70 hover:text-destructive hover:bg-destructive/5 transition-colors"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

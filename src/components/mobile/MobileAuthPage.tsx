@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
+import { MobileHeader } from './MobileHeader';
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -103,31 +104,22 @@ export function MobileAuthPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-card border-b border-border/50 safe-area-top">
-        <div className="flex items-center h-14 px-4">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2">
-            <ArrowLeft className="h-5 w-5 text-foreground" />
-          </button>
-          <h1 className="text-base font-semibold text-foreground ml-2">
-            {isLogin ? 'Sign In' : 'Create Account'}
-          </h1>
-        </div>
-      </header>
+      <MobileHeader title={isLogin ? 'Sign In' : 'Create Account'} showBack showSearch={false} />
 
       <div className="px-6 py-8">
-        {/* Logo */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 mb-8"
+        {/* Logo - Govaly Style */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center justify-center mb-10"
         >
-          <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-2xl">J</span>
+          <div className="h-20 w-20 rounded-3xl bg-primary flex items-center justify-center shadow-xl shadow-primary/20 mb-4 ring-8 ring-primary/5">
+            <span className="text-white font-black text-4xl">G</span>
           </div>
-          <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            <span className="text-primary">Jhu</span>ri
-          </span>
+          <h2 className="text-3xl font-black tracking-tighter uppercase italic">
+            <span className="text-primary">GOV</span>ALY
+          </h2>
+          <div className="h-1 w-12 bg-primary rounded-full mt-1" />
         </motion.div>
 
         {/* Title */}
@@ -135,12 +127,13 @@ export function MobileAuthPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
+          className="text-center"
         >
-          <h2 className="text-2xl font-bold mb-2">
+          <h2 className="text-2xl font-black mb-2 tracking-tight">
             {isLogin ? 'Welcome back!' : 'Create account'}
           </h2>
-          <p className="text-muted-foreground mb-8">
-            {isLogin ? 'Enter your phone number and password' : 'Join Jhuri to start shopping'}
+          <p className="text-muted-foreground text-sm font-semibold max-w-[240px] mx-auto">
+            {isLogin ? 'Enter your phone number and password' : 'Join Govaly to start shopping'}
           </p>
         </motion.div>
 
@@ -231,12 +224,12 @@ export function MobileAuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-full bg-primary text-white font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-4 rounded-2xl bg-primary text-white font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
           >
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              isLogin ? 'Sign In' : 'Create Account'
+              isLogin ? 'Sign In Now' : 'Join Now'
             )}
           </button>
         </form>

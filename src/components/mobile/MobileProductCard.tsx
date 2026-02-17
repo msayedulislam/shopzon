@@ -49,23 +49,24 @@ export function MobileProductCard({ product, index = 0, variant = 'default' }: M
           )}
         </div>
 
-        <div className="p-1.5 space-y-0.5">
-          <h3 className="text-[11px] font-semibold text-foreground line-clamp-1 leading-tight h-[14px]">
+        <div className="p-1.5 space-y-0.5 bg-white">
+          <h3 className="text-[10px] font-black text-foreground line-clamp-1 leading-tight uppercase tracking-tighter">
             {product.name}
           </h3>
-          <div className="flex flex-wrap items-baseline gap-1">
-            <p className="text-[13px] font-black text-primary">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <p className="text-[12px] font-black text-primary tracking-tighter">
               {formatPrice(product.price)}
             </p>
             {product.originalPrice && product.originalPrice > product.price && (
-              <p className="text-[9px] text-muted-foreground line-through decoration-muted-foreground/50">
+              <p className="text-[9px] text-muted-foreground line-through decoration-muted-foreground/30 font-bold">
                 {formatPrice(product.originalPrice)}
               </p>
             )}
           </div>
-          {/* Tagline/Brand or Location can go here if available */}
           <div className="flex items-center justify-between pt-0.5">
-            <span className="text-[9px] font-medium text-muted-foreground">Free Delivery</span>
+            <div className="bg-emerald-50 px-1 py-0.5 rounded">
+              <span className="text-[8px] font-black text-emerald-600 uppercase tracking-tighter">Free Delivery</span>
+            </div>
           </div>
         </div>
       </Link>

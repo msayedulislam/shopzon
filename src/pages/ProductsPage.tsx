@@ -23,7 +23,7 @@ import {
 import { products as mockProducts, categories as mockCategories, formatPrice } from '@/data/mockData';
 import { useProducts, useCategories, toDisplayProduct } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { MobileSearchPage } from '@/components/mobile/MobileSearchPage';
+import { MobileProductsPage } from '@/components/mobile/MobileProductsPage';
 
 const brands = [
   { id: 'samsung', name: 'Samsung', count: 45 },
@@ -190,7 +190,7 @@ export default function ProductsPage() {
   );
 
   if (isMobile) {
-    return <MobileSearchPage />;
+    return <MobileProductsPage title={category ? category.name : 'All Products'} />;
   }
 
   return (
