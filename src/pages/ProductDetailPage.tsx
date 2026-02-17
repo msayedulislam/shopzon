@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Minus, Plus, Check, Share2, ChevronRight, Award, Package, Scale, Bell } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { products, formatPrice } from '@/data/mockData';
 import { useCart } from '@/hooks/useCart';
-import { ProductCard } from '@/components/product/ProductCard';
+import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +29,7 @@ export default function ProductDetailPage() {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const product = products.find((p) => p.slug === slug) || products[0];
-  
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(
@@ -139,7 +139,7 @@ export default function ProductDetailPage() {
 
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
               {/* Product Images */}
-              <motion.div 
+              <motion.div
                 className="space-y-4"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -155,7 +155,7 @@ export default function ProductDetailPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3 }}
                   />
-                  
+
                   {/* Badges */}
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
                     {product.discount && (
@@ -169,7 +169,7 @@ export default function ProductDetailPage() {
                       </span>
                     )}
                   </div>
-                  
+
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -180,7 +180,7 @@ export default function ProductDetailPage() {
                     <Heart className={`h-5 w-5 transition-all ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600 dark:text-gray-300'}`} />
                   </motion.button>
                 </div>
-                
+
                 {/* Thumbnails */}
                 <div className="flex gap-3 overflow-x-auto pb-2 px-1">
                   {product.images.slice(0, 4).map((img, index) => (
@@ -189,11 +189,10 @@ export default function ProductDetailPage() {
                       onClick={() => setSelectedImage(index)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shadow-md ${
-                        selectedImage === index 
-                          ? 'border-primary ring-2 ring-primary/20' 
-                          : 'border-transparent hover:border-primary/50'
-                      }`}
+                      className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shadow-md ${selectedImage === index
+                        ? 'border-primary ring-2 ring-primary/20'
+                        : 'border-transparent hover:border-primary/50'
+                        }`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" />
                     </motion.button>
@@ -205,11 +204,10 @@ export default function ProductDetailPage() {
                       onClick={() => setSelectedImage(0)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shadow-md ${
-                        selectedImage === product.images.length + i 
-                          ? 'border-primary ring-2 ring-primary/20' 
-                          : 'border-transparent hover:border-primary/50'
-                      }`}
+                      className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shadow-md ${selectedImage === product.images.length + i
+                        ? 'border-primary ring-2 ring-primary/20'
+                        : 'border-transparent hover:border-primary/50'
+                        }`}
                     >
                       <img src={product.images[0]} alt="" className="w-full h-full object-cover opacity-50" />
                     </motion.button>
@@ -218,7 +216,7 @@ export default function ProductDetailPage() {
               </motion.div>
 
               {/* Product Info */}
-              <motion.div 
+              <motion.div
                 className="space-y-6"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -226,8 +224,8 @@ export default function ProductDetailPage() {
               >
                 {/* Brand */}
                 {product.brand && (
-                  <Link 
-                    to={`/brand/${product.brand.slug}`} 
+                  <Link
+                    to={`/brand/${product.brand.slug}`}
                     className="inline-flex items-center gap-2 text-xs text-primary/80 font-semibold uppercase tracking-widest hover:text-primary transition-colors"
                   >
                     <span className="w-8 h-[2px] bg-primary/50"></span>
@@ -287,11 +285,10 @@ export default function ProductDetailPage() {
                           onClick={() => setSelectedColor(variation.value)}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`px-5 py-2.5 rounded-xl border-2 transition-all font-medium ${
-                            selectedColor === variation.value
-                              ? 'border-primary bg-primary/10 text-primary shadow-md'
-                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                          }`}
+                          className={`px-5 py-2.5 rounded-xl border-2 transition-all font-medium ${selectedColor === variation.value
+                            ? 'border-primary bg-primary/10 text-primary shadow-md'
+                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            }`}
                         >
                           {variation.value}
                         </motion.button>
@@ -310,11 +307,10 @@ export default function ProductDetailPage() {
                           onClick={() => setSelectedSize(variation.value)}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className={`w-14 h-14 rounded-xl border-2 transition-all font-semibold ${
-                            selectedSize === variation.value
-                              ? 'border-primary bg-primary text-primary-foreground shadow-lg'
-                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                          }`}
+                          className={`w-14 h-14 rounded-xl border-2 transition-all font-semibold ${selectedSize === variation.value
+                            ? 'border-primary bg-primary text-primary-foreground shadow-lg'
+                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            }`}
                         >
                           {variation.value}
                         </motion.button>
@@ -373,9 +369,9 @@ export default function ProductDetailPage() {
                     </Button>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                    <Button 
-                      variant={isInComparison(product.id) ? "default" : "outline"} 
-                      size="lg" 
+                    <Button
+                      variant={isInComparison(product.id) ? "default" : "outline"}
+                      size="lg"
                       className="h-14 w-14 p-0 border-2"
                       onClick={() => {
                         const success = addToCompare({
@@ -421,7 +417,7 @@ export default function ProductDetailPage() {
                     { icon: Shield, title: "Warranty", subtitle: "1 Year", color: "text-emerald-500 bg-emerald-500/10" },
                     { icon: RotateCcw, title: "Easy Return", subtitle: "7 Days", color: "text-amber-500 bg-amber-500/10" }
                   ].map((feature, i) => (
-                    <motion.div 
+                    <motion.div
                       key={i}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -498,7 +494,7 @@ export default function ProductDetailPage() {
               ))}
             </TabsList>
             <TabsContent value="description" className="mt-0">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-card rounded-b-2xl rounded-tr-2xl p-8 border border-border/50 shadow-sm"
@@ -523,7 +519,7 @@ export default function ProductDetailPage() {
               </motion.div>
             </TabsContent>
             <TabsContent value="specifications" className="mt-0">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-card rounded-b-2xl rounded-tr-2xl p-8 border border-border/50 shadow-sm"
@@ -546,10 +542,10 @@ export default function ProductDetailPage() {
               </motion.div>
             </TabsContent>
             <TabsContent value="reviews" className="mt-0">
-              <ProductReviews 
-                productId={product.id} 
-                productRating={product.rating} 
-                reviewCount={product.reviewCount} 
+              <ProductReviews
+                productId={product.id}
+                productRating={product.rating}
+                reviewCount={product.reviewCount}
               />
             </TabsContent>
             <TabsContent value="qa" className="mt-0">
@@ -582,7 +578,7 @@ export default function ProductDetailPage() {
       </main>
 
       {/* Sticky Mobile Add to Cart Bar */}
-      <motion.div 
+      <motion.div
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-xl border-t border-border shadow-2xl shadow-black/20"
@@ -597,7 +593,7 @@ export default function ProductDetailPage() {
               </span>
             )}
           </div>
-          
+
           {/* Wishlist */}
           <Button
             variant="outline"
@@ -608,7 +604,7 @@ export default function ProductDetailPage() {
           >
             <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
           </Button>
-          
+
           {/* Add to Cart */}
           <Button
             size="lg"
@@ -622,10 +618,10 @@ export default function ProductDetailPage() {
       </motion.div>
 
       <Footer />
-      
+
       {/* Product Comparison Bar */}
       <ProductComparisonBar />
-      
+
       {/* Live Chat */}
       <LiveChatWidget />
     </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { ProductCard } from '@/components/product/ProductCard';
+import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,9 +39,9 @@ export default function SellerStorePage() {
   useEffect(() => {
     const fetchSellerData = async () => {
       if (!slug) return;
-      
+
       setLoading(true);
-      
+
       // Fetch seller info
       const { data: sellerData, error: sellerError } = await supabase
         .from('sellers')
@@ -49,14 +49,14 @@ export default function SellerStorePage() {
         .eq('slug', slug)
         .eq('status', 'active')
         .single();
-      
+
       if (sellerError || !sellerData) {
         setLoading(false);
         return;
       }
-      
+
       setSeller(sellerData);
-      
+
       // Fetch seller's products with images
       const { data: productsData } = await supabase
         .from('products')
@@ -69,7 +69,7 @@ export default function SellerStorePage() {
         .eq('seller_id', sellerData.id)
         .eq('status', 'approved')
         .order('created_at', { ascending: false });
-      
+
       if (productsData) {
         const displayProducts = productsData.map(p => toDisplayProduct({
           ...p,
@@ -77,10 +77,10 @@ export default function SellerStorePage() {
         }));
         setProducts(displayProducts);
       }
-      
+
       setLoading(false);
     };
-    
+
     fetchSellerData();
   }, [slug]);
 
@@ -136,7 +136,7 @@ export default function SellerStorePage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-6">
         {/* Store Header */}
         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 md:p-8 mb-8">
@@ -151,7 +151,7 @@ export default function SellerStorePage() {
                 </div>
               )}
             </div>
-            
+
             {/* Store Info */}
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
@@ -166,11 +166,11 @@ export default function SellerStorePage() {
                   Verified
                 </Badge>
               </div>
-              
+
               {seller.description && (
                 <p className="text-muted-foreground mb-4 max-w-2xl">{seller.description}</p>
               )}
-              
+
               <div className="flex flex-wrap gap-4 text-sm">
                 {seller.rating !== null && seller.rating > 0 && (
                   <div className="flex items-center gap-1">
@@ -197,7 +197,7 @@ export default function SellerStorePage() {
             </div>
           </div>
         </div>
-        
+
         {/* Tabs for Products and Reviews */}
         <Tabs defaultValue="products" className="space-y-6">
           <TabsList>
@@ -224,7 +224,7 @@ export default function SellerStorePage() {
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
               </select>
-              
+
               <div className="flex rounded-lg border border-border overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
@@ -240,16 +240,16 @@ export default function SellerStorePage() {
                 </button>
               </div>
             </div>
-            
+
             {sortedProducts.length > 0 ? (
-              <div className={viewMode === 'grid' 
+              <div className={viewMode === 'grid'
                 ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
                 : "flex flex-col gap-4"
               }>
                 {sortedProducts.map((product, index) => (
-                  <ProductCard 
-                    key={`seller-product-${product.id}-${index}`} 
-                    product={product} 
+                  <ProductCard
+                    key={`seller-product-${product.id}-${index}`}
+                    product={product}
                     variant={viewMode === 'list' ? 'horizontal' : 'default'}
                     compact={viewMode === 'grid'}
                   />
@@ -269,7 +269,7 @@ export default function SellerStorePage() {
           </TabsContent>
         </Tabs>
       </main>
-      
+
       <Footer />
     </div>
   );

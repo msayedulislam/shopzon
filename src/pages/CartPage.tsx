@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, Tag, LogIn } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ export default function CartPage() {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [couponCode, setCouponCode] = useState('');
-  
+
   const subtotal = getSubtotal();
   const deliveryCharge = subtotal > 5000 ? 0 : 60;
   const total = subtotal + deliveryCharge;

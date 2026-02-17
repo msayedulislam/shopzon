@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { useCategories } from '@/hooks/useProducts';
 import { categories as mockCategories } from '@/data/mockData';
@@ -35,16 +35,16 @@ const getInitials = (name: string) => {
 export default function CategoriesPage() {
   const { data: dbCategories, isLoading } = useCategories();
   const isMobile = useIsMobile();
-  
-  const categories = dbCategories && dbCategories.length > 0 
-    ? dbCategories.map(c => ({ 
-        id: c.id, 
-        name: c.name, 
-        slug: c.slug, 
-        icon: c.icon || '📦', 
-        productCount: 0,
-        image_url: c.image_url 
-      }))
+
+  const categories = dbCategories && dbCategories.length > 0
+    ? dbCategories.map(c => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      icon: c.icon || '📦',
+      productCount: 0,
+      image_url: c.image_url
+    }))
     : mockCategories.map(c => ({ ...c, image_url: null }));
 
   // Mobile view
@@ -55,7 +55,7 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      
+
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative py-16 lg:py-24 overflow-hidden">
@@ -64,9 +64,9 @@ export default function CategoriesPage() {
             <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px]" />
             <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-accent/10 blur-[100px]" />
           </div>
-          
+
           <div className="container relative z-10">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -96,7 +96,7 @@ export default function CategoriesPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-6">
                 {categories.map((category, index) => {
                   const gradient = getGradientForIndex(index);
-                  
+
                   return (
                     <motion.div
                       key={category.id}
@@ -110,33 +110,33 @@ export default function CategoriesPage() {
                       >
                         {/* Background Gradient */}
                         <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-90 group-hover:opacity-100 transition-opacity duration-300`} />
-                        
+
                         {/* Overlay Pattern */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
-                        
+
                         {/* Shine Effect */}
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                           <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                         </div>
-                        
+
                         {/* Content */}
                         <div className="relative z-10 flex flex-col items-center p-4 text-center">
                           {/* Initials Badge */}
                           <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
                             <span className="text-2xl md:text-3xl font-bold text-white">{getInitials(category.name)}</span>
                           </div>
-                          
+
                           {/* Category Name */}
                           <h3 className="font-bold text-sm md:text-base text-white drop-shadow-lg line-clamp-2">
                             {category.name}
                           </h3>
-                          
+
                           {/* Arrow on Hover */}
                           <div className="absolute bottom-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                             <ArrowRight className="h-5 w-5 text-white" />
                           </div>
                         </div>
-                        
+
                         {/* Bottom Glow */}
                         <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
                       </Link>
@@ -148,7 +148,7 @@ export default function CategoriesPage() {
           </div>
         </section>
       </main>
-      
+
       <Footer />
     </div>
   );

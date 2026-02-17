@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Filter, SlidersHorizontal, Grid, List, ChevronDown, Loader2 } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
-import { ProductCard } from '@/components/product/ProductCard';
+import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
@@ -57,7 +57,7 @@ export default function ProductsPage() {
     return mockProducts;
   }, [dbProducts]);
 
-  const categories = dbCategories && dbCategories.length > 0 
+  const categories = dbCategories && dbCategories.length > 0
     ? dbCategories.map(c => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon || '📦', productCount: 0 }))
     : mockCategories;
 
@@ -134,9 +134,8 @@ export default function ProductsPage() {
             <button
               key={rating}
               onClick={() => setSelectedRating(selectedRating === rating ? null : rating)}
-              className={`flex items-center gap-2 w-full p-2 rounded-lg transition-colors ${
-                selectedRating === rating ? 'bg-primary/10' : 'hover:bg-secondary'
-              }`}
+              className={`flex items-center gap-2 w-full p-2 rounded-lg transition-colors ${selectedRating === rating ? 'bg-primary/10' : 'hover:bg-secondary'
+                }`}
             >
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (

@@ -1,20 +1,20 @@
 import { motion } from 'framer-motion';
 import { Percent, ArrowRight, Tag, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ProductCard } from '@/components/product/ProductCard';
+import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { products as mockProducts } from '@/data/mockData';
 import { useDiscountProducts, toDisplayProduct } from '@/hooks/useProducts';
 
 export function TrendingDealsSection() {
   const { data: dbProducts, isLoading } = useDiscountProducts(8);
-  
+
   // Get products with highest discounts
   const trendingDeals = dbProducts && dbProducts.length > 0
     ? dbProducts.map(toDisplayProduct).filter(p => p.discount && p.discount > 0)
     : [...mockProducts]
-        .filter(p => p.discount && p.discount > 0)
-        .sort((a, b) => (b.discount || 0) - (a.discount || 0))
-        .slice(0, 8);
+      .filter(p => p.discount && p.discount > 0)
+      .sort((a, b) => (b.discount || 0) - (a.discount || 0))
+      .slice(0, 8);
 
   if (trendingDeals.length === 0 && !isLoading) {
     return null;
@@ -25,10 +25,10 @@ export function TrendingDealsSection() {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-rose-500/5 via-background to-background" />
       <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-rose-500/10 blur-[120px]" />
-      
+
       <div className="container relative z-10 px-3 sm:px-4 md:px-6">
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -46,9 +46,9 @@ export function TrendingDealsSection() {
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base mt-1 sm:mt-2">Grab the best discounts before they're gone</p>
           </div>
-          
-          <Link 
-            to="/products?deals=true" 
+
+          <Link
+            to="/products?deals=true"
             className="group inline-flex items-center gap-2 text-rose-600 dark:text-rose-400 font-semibold text-sm sm:text-base hover:gap-3 transition-all duration-300"
           >
             View All Deals

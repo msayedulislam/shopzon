@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { Truck, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ProductCard } from '@/components/product/ProductCard';
+import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { useFreeDeliveryProducts, toDisplayProduct } from '@/hooks/useProducts';
 import { getFreeDeliveryProducts } from '@/data/mockData';
 
 export function FreeDeliverySection() {
   const { data: dbProducts, isLoading } = useFreeDeliveryProducts(4);
-  
+
   // Use database products if available, otherwise fall back to mock data
   const freeDeliveryProducts = dbProducts && dbProducts.length > 0
     ? dbProducts.map(toDisplayProduct)
@@ -22,10 +22,10 @@ export function FreeDeliverySection() {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-emerald-500/5 to-background" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-emerald-500/10 blur-[100px]" />
-      
+
       <div className="container relative z-10">
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -42,9 +42,9 @@ export function FreeDeliverySection() {
             </h2>
             <p className="text-muted-foreground mt-2">No extra cost - delivered straight to your door</p>
           </div>
-          
-          <Link 
-            to="/products?freeDelivery=true" 
+
+          <Link
+            to="/products?freeDelivery=true"
             className="group inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:gap-3 transition-all duration-300"
           >
             View All

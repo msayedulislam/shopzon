@@ -16,8 +16,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 8%;
 
-    /* Primary - Govaly Purple */
-    --primary: 262 52% 47%;
+    /* Primary - Premium Ruby Red */
+    --primary: 0 84% 55%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Light Gray */
@@ -27,8 +27,8 @@
     --muted: 0 0% 94%;
     --muted-foreground: 0 0% 40%;
 
-    /* Accent - Govaly Orange */
-    --accent: 14 100% 61%;
+    /* Accent - Gold/Amber */
+    --accent: 45 93% 47%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 55%;
@@ -36,12 +36,12 @@
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 262 52% 47%;
+    --ring: 0 84% 55%;
 
     --radius: 0.75rem;
 
     /* RGB values for JS shadows */
-    --primary-rgb: 107, 70, 193;
+    --primary-rgb: 217, 38, 38;
     --success: 142 76% 40%;
     --success-foreground: 0 0% 100%;
 
@@ -52,33 +52,33 @@
     --info-foreground: 0 0% 100%;
 
     /* Premium Gradients - Light Mode */
-    --gradient-primary: linear-gradient(135deg, hsl(262 52% 47%), hsl(272 52% 57%));
-    --gradient-accent: linear-gradient(135deg, hsl(14 100% 61%), hsl(24 100% 51%));
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(262 30% 97%) 50%, hsl(0 0% 98%) 100%);
-    --gradient-flash: linear-gradient(90deg, hsl(262 52% 47%), hsl(14 100% 61%));
+    --gradient-primary: linear-gradient(135deg, hsl(0 84% 55%), hsl(340 80% 50%));
+    --gradient-accent: linear-gradient(135deg, hsl(45 93% 50%), hsl(30 95% 50%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(0 50% 95%) 50%, hsl(0 0% 98%) 100%);
+    --gradient-flash: linear-gradient(90deg, hsl(0 84% 55%), hsl(45 93% 50%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(0 0% 97%) 100%);
     --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
-    --gradient-premium: linear-gradient(135deg, hsl(262 52% 47%) 0%, hsl(272 52% 57%) 50%, hsl(282 52% 67%) 100%);
+    --gradient-premium: linear-gradient(135deg, hsl(0 84% 55%) 0%, hsl(330 80% 50%) 50%, hsl(280 70% 45%) 100%);
 
     /* Premium Shadows - Light Mode */
     --shadow-sm: 0 2px 4px 0 hsl(0 0% 0% / 0.05);
     --shadow-md: 0 4px 12px -1px hsl(0 0% 0% / 0.08), 0 2px 6px -2px hsl(0 0% 0% / 0.06);
     --shadow-lg: 0 12px 24px -4px hsl(0 0% 0% / 0.1), 0 4px 10px -4px hsl(0 0% 0% / 0.06);
     --shadow-xl: 0 24px 48px -12px hsl(0 0% 0% / 0.12);
-    --shadow-glow: 0 0 30px hsl(262 52% 47% / 0.25);
-    --shadow-glow-accent: 0 0 30px hsl(14 100% 61% / 0.2);
-    --shadow-accent: 0 8px 24px hsl(262 52% 47% / 0.25);
+    --shadow-glow: 0 0 30px hsl(0 84% 55% / 0.25);
+    --shadow-glow-accent: 0 0 30px hsl(45 93% 50% / 0.2);
+    --shadow-accent: 0 8px 24px hsl(0 84% 55% / 0.25);
     --shadow-glass: 0 8px 32px hsl(0 0% 0% / 0.08);
 
     /* Sidebar - Light Mode */
     --sidebar-background: 0 0% 99%;
     --sidebar-foreground: 0 0% 8%;
-    --sidebar-primary: 262 52% 47%;
+    --sidebar-primary: 0 84% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 96%;
     --sidebar-accent-foreground: 0 0% 8%;
     --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 262 52% 47%;
+    --sidebar-ring: 0 84% 55%;
   }
 
   .dark {
@@ -92,8 +92,8 @@
     --popover: 0 0% 8%;
     --popover-foreground: 0 0% 98%;
 
-    /* Primary - Govaly Purple */
-    --primary: 262 52% 57%;
+    /* Primary - Premium Ruby Red */
+    --primary: 0 84% 60%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Charcoal */

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Trash2, ShoppingCart, Loader2, Package, ArrowRight } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -109,7 +109,7 @@ export default function WishlistPage() {
   // Add to cart
   const handleAddToCart = (item: WishlistItem) => {
     if (!item.product) return;
-    
+
     const product = {
       id: item.product.id,
       name: item.product.name,
@@ -190,7 +190,7 @@ export default function WishlistPage() {
                 </p>
               </div>
               {wishlistItems.length > 0 && (
-                <Button 
+                <Button
                   onClick={handleAddAllToCart}
                   className="gap-2 font-semibold"
                 >
@@ -208,7 +208,7 @@ export default function WishlistPage() {
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
           ) : wishlistItems.length === 0 ? (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="max-w-md mx-auto text-center py-16"
@@ -265,7 +265,7 @@ export default function WishlistPage() {
 
                     {/* Product Info */}
                     <div className="p-4 space-y-3">
-                      <Link 
+                      <Link
                         to={`/product/${item.product?.slug}`}
                         className="font-semibold line-clamp-2 hover:text-primary transition-colors"
                       >

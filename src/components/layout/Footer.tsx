@@ -168,9 +168,7 @@ export function Footer() {
           {/* Copyright */}
           <div className="mt-10 text-center text-sm text-muted-foreground">
             <p className="flex items-center justify-center gap-2">
-              © 2024 Jhuri. All rights reserved. Made with
-              <Heart className="h-4 w-4 text-primary fill-primary animate-pulse" />
-              in Bangladesh
+              © 2026 Jhuri. All rights reserved. Developed BY SA Coder
             </p>
           </div>
         </div>

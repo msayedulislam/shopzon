@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, CreditCard, Truck, ChevronRight, Check, ArrowLeft, Wallet, Info, LocateFixed, Loader2, Clock } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { DeliverySlotSelector } from '@/components/DeliverySlotSelector';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -51,7 +51,7 @@ export default function CheckoutPage() {
       }));
     }
   };
-  
+
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
     phone: '',
@@ -75,7 +75,7 @@ export default function CheckoutPage() {
         .select('balance')
         .eq('user_id', user?.id)
         .maybeSingle();
-      
+
       if (data) {
         setWalletBalance(data.balance);
       }
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
     try {
       // Create order
       const orderNumber = `BDM-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
-      
+
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -182,7 +182,7 @@ export default function CheckoutPage() {
       };
 
       const validItems = items.filter(item => isValidUUID(item.product.id));
-      
+
       if (validItems.length === 0) {
         throw new Error('No valid products in cart. Please add products from the store.');
       }
@@ -248,18 +248,16 @@ export default function CheckoutPage() {
               {steps.map((step, index) => (
                 <div key={step.id} className="flex items-center">
                   <div
-                    className={`flex items-center gap-2 ${
-                      currentStep >= step.id ? 'text-primary' : 'text-muted-foreground'
-                    }`}
+                    className={`flex items-center gap-2 ${currentStep >= step.id ? 'text-primary' : 'text-muted-foreground'
+                      }`}
                   >
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        currentStep > step.id
+                      className={`w-10 h-10 rounded-full flex items-center justify-center ${currentStep > step.id
                           ? 'bg-primary text-primary-foreground'
                           : currentStep === step.id
-                          ? 'bg-primary/20 text-primary border-2 border-primary'
-                          : 'bg-secondary text-muted-foreground'
-                      }`}
+                            ? 'bg-primary/20 text-primary border-2 border-primary'
+                            : 'bg-secondary text-muted-foreground'
+                        }`}
                     >
                       {currentStep > step.id ? (
                         <Check className="h-5 w-5" />
@@ -449,11 +447,10 @@ export default function CheckoutPage() {
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                     <div className="space-y-3">
                       <label
-                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-                          paymentMethod === 'cod'
+                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'cod'
                             ? 'border-primary bg-primary/5'
                             : 'border-border hover:border-primary/50'
-                        }`}
+                          }`}
                       >
                         <RadioGroupItem value="cod" />
                         <div className="flex-1">
@@ -466,11 +463,10 @@ export default function CheckoutPage() {
                       </label>
 
                       <label
-                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-                          paymentMethod === 'bkash'
+                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'bkash'
                             ? 'border-primary bg-primary/5'
                             : 'border-border hover:border-primary/50'
-                        }`}
+                          }`}
                       >
                         <RadioGroupItem value="bkash" />
                         <div className="flex-1">
@@ -483,11 +479,10 @@ export default function CheckoutPage() {
                       </label>
 
                       <label
-                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-                          paymentMethod === 'nagad'
+                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'nagad'
                             ? 'border-primary bg-primary/5'
                             : 'border-border hover:border-primary/50'
-                        }`}
+                          }`}
                       >
                         <RadioGroupItem value="nagad" />
                         <div className="flex-1">
@@ -500,11 +495,10 @@ export default function CheckoutPage() {
                       </label>
 
                       <label
-                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-                          paymentMethod === 'card'
+                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'card'
                             ? 'border-primary bg-primary/5'
                             : 'border-border hover:border-primary/50'
-                        }`}
+                          }`}
                       >
                         <RadioGroupItem value="card" />
                         <div className="flex-1">
@@ -536,7 +530,7 @@ export default function CheckoutPage() {
                 <div className="space-y-4 animate-fade-in">
                   <div className="bg-card rounded-2xl p-6 shadow-sm">
                     <h2 className="text-xl font-semibold mb-4">Order Review</h2>
-                    
+
                     {/* Items */}
                     <div className="divide-y">
                       {items.map((item) => (
@@ -619,7 +613,7 @@ export default function CheckoutPage() {
             <div className="lg:col-span-1">
               <div className="bg-card rounded-2xl p-6 shadow-sm sticky top-24">
                 <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
-                
+
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">

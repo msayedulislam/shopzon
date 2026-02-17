@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { Percent, ArrowRight, Flame, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ProductCard } from '@/components/product/ProductCard';
+import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { useDiscountProducts, toDisplayProduct } from '@/hooks/useProducts';
 import { getDiscountProducts } from '@/data/mockData';
 
 export function DiscountProductSection() {
   const { data: dbProducts, isLoading } = useDiscountProducts(4);
-  
+
   // Use database products if available, otherwise fall back to mock data
   const discountProducts = dbProducts && dbProducts.length > 0
     ? dbProducts.map(toDisplayProduct)
@@ -22,10 +22,10 @@ export function DiscountProductSection() {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-rose-500/5 to-background" />
       <div className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full bg-rose-500/10 blur-[120px]" />
-      
+
       <div className="container relative z-10">
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -42,9 +42,9 @@ export function DiscountProductSection() {
             </h2>
             <p className="text-muted-foreground mt-2">Amazing discounts on top products - save big today!</p>
           </div>
-          
-          <Link 
-            to="/products?discount=true" 
+
+          <Link
+            to="/products?discount=true"
             className="group inline-flex items-center gap-2 text-rose-600 dark:text-rose-400 font-semibold hover:gap-3 transition-all duration-300"
           >
             View All Deals
