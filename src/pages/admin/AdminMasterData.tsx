@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -25,13 +25,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { 
-  AlertTriangle, 
-  Trash2, 
-  Database, 
-  Package, 
-  ShoppingCart, 
-  Users, 
+import {
+  AlertTriangle,
+  Trash2,
+  Database,
+  Package,
+  ShoppingCart,
+  Users,
   Store,
   Tag,
   Layers,
@@ -114,7 +114,7 @@ const AdminMasterData = () => {
           count: ordersRes.count || 0,
           description: 'All customer orders and related items, notes, courier data',
           dangerLevel: 'critical',
-          dependencies: ['order_items', 'order_notes', 'order_courier', 'order_edit_history']
+          dependencies: ['order_items', 'order_notes', 'order_courier', 'order_edit_history', 'transactions', 'refunds', 'fraud_alerts', 'return_requests', 'seller_reviews']
         },
         {
           id: 'products',
@@ -124,7 +124,7 @@ const AdminMasterData = () => {
           count: productsRes.count || 0,
           description: 'All products, images, variations, and reviews',
           dangerLevel: 'critical',
-          dependencies: ['product_images', 'product_variations', 'reviews', 'wishlists']
+          dependencies: ['product_images', 'product_variations', 'reviews', 'wishlists', 'product_edit_history', 'price_alerts', 'inventory_alerts']
         },
         {
           id: 'profiles',
@@ -238,7 +238,7 @@ const AdminMasterData = () => {
   };
 
   const toggleSelection = (id: string) => {
-    setSelectedItems(prev => 
+    setSelectedItems(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
@@ -259,14 +259,20 @@ const AdminMasterData = () => {
     setDeleting(true);
     setProgress(0);
     setOperationLog([]);
-    
+
     try {
       // Delete dependencies first
       if (category.dependencies) {
         for (let i = 0; i < category.dependencies.length; i++) {
           const dep = category.dependencies[i];
-          setOperationLog(prev => [...prev, `Deleting ${dep}...`]);
-          await supabase.from(dep as 'order_items').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+          setOperationLog(prev => [...prev, `Deleting items from ${dep}...`]);
+          const { error: depError } = await supabase.from(dep as any).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+          if (depError) {
+            setOperationLog(prev => [...prev, `❌ Error deleting ${dep}: ${depError.message}`]);
+            throw depError;
+          }
+          setOperationLog(prev => [...prev, `✅ Finished deleting ${dep}`]);
           setProgress(((i + 1) / (category.dependencies.length + 1)) * 100);
         }
       }
@@ -274,18 +280,18 @@ const AdminMasterData = () => {
       // Delete main table
       setOperationLog(prev => [...prev, `Deleting ${category.table}...`]);
       const { error } = await supabase.from(category.table as 'orders').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-      
+
       if (error) throw error;
 
       setProgress(100);
       setOperationLog(prev => [...prev, `✓ Successfully deleted all ${category.name}`]);
-      
-      await logAudit('bulk_delete', { 
-        category: category.name, 
+
+      await logAudit('bulk_delete', {
+        category: category.name,
         table: category.table,
-        dependencies: category.dependencies 
+        dependencies: category.dependencies
       });
-      
+
       toast.success(`Deleted all ${category.name}`);
       fetchDataCounts();
     } catch (error) {
@@ -303,7 +309,7 @@ const AdminMasterData = () => {
     setDeleting(true);
     setProgress(0);
     setOperationLog([]);
-    
+
     const selectedCategories = categories.filter(c => selectedItems.includes(c.id));
     const totalSteps = selectedCategories.reduce((acc, c) => acc + (c.dependencies?.length || 0) + 1, 0);
     let currentStep = 0;
@@ -313,26 +319,38 @@ const AdminMasterData = () => {
         // Delete dependencies first
         if (category.dependencies) {
           for (const dep of category.dependencies) {
-            setOperationLog(prev => [...prev, `Deleting ${dep}...`]);
-            await supabase.from(dep as 'order_items').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+            setOperationLog(prev => [...prev, `Deleting items from ${dep}...`]);
+            const { error: depError } = await supabase.from(dep as any).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+            if (depError) {
+              setOperationLog(prev => [...prev, `❌ Error deleting ${dep}: ${depError.message}`]);
+              throw depError;
+            }
+            setOperationLog(prev => [...prev, `✅ Finished deleting ${dep}`]);
             currentStep++;
             setProgress((currentStep / totalSteps) * 100);
           }
         }
 
         // Delete main table
-        setOperationLog(prev => [...prev, `Deleting ${category.table}...`]);
-        await supabase.from(category.table as 'orders').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        setOperationLog(prev => [...prev, `Deleting main table ${category.table}...`]);
+        const { error: mainError } = await supabase.from(category.table as any).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+        if (mainError) {
+          setOperationLog(prev => [...prev, `❌ Error deleting ${category.table}: ${mainError.message}`]);
+          throw mainError;
+        }
+        setOperationLog(prev => [...prev, `✅ Finished deleting ${category.table}`]);
         currentStep++;
         setProgress((currentStep / totalSteps) * 100);
       }
 
       setOperationLog(prev => [...prev, '✓ Bulk delete completed successfully']);
-      
-      await logAudit('bulk_delete_multiple', { 
+
+      await logAudit('bulk_delete_multiple', {
         categories: selectedCategories.map(c => c.name)
       });
-      
+
       toast.success('Bulk delete completed');
       setSelectedItems([]);
       fetchDataCounts();
@@ -367,16 +385,22 @@ const AdminMasterData = () => {
       for (let i = 0; i < tablesToReset.length; i++) {
         const table = tablesToReset[i];
         setOperationLog(prev => [...prev, `Resetting ${table}...`]);
-        await supabase.from(table as 'orders').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        const { error } = await supabase.from(table as any).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+        if (error) {
+          setOperationLog(prev => [...prev, `❌ Error resetting ${table}: ${error.message}`]);
+          throw error;
+        }
+        setOperationLog(prev => [...prev, `✅ Finished resetting ${table}`]);
         setProgress(((i + 1) / tablesToReset.length) * 100);
       }
 
       setOperationLog(prev => [...prev, '✓ Full data reset completed']);
-      
-      await logAudit('full_data_reset', { 
-        tables: tablesToReset 
+
+      await logAudit('full_data_reset', {
+        tables: tablesToReset
       });
-      
+
       toast.success('Full data reset completed');
       fetchDataCounts();
     } catch (error) {
@@ -415,8 +439,8 @@ const AdminMasterData = () => {
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             onClick={() => setResetDialog(true)}
             className="gap-2"
           >
@@ -434,7 +458,7 @@ const AdminMasterData = () => {
             <div>
               <h3 className="font-semibold text-destructive">⚠️ Danger Zone</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Operations in this panel are <strong>irreversible</strong>. All deleted data cannot be recovered. 
+                Operations in this panel are <strong>irreversible</strong>. All deleted data cannot be recovered.
                 Make sure to create a backup before performing any delete operations.
               </p>
             </div>
@@ -475,8 +499,8 @@ const AdminMasterData = () => {
                         Also deletes: {category.dependencies.join(', ')}
                       </p>
                     )}
-                    <Button 
-                      variant="destructive" 
+                    <Button
+                      variant="destructive"
                       size="sm"
                       className="w-full gap-2"
                       disabled={category.count === 0}
@@ -503,16 +527,15 @@ const AdminMasterData = () => {
                 {categories.map((category) => {
                   const Icon = category.icon;
                   return (
-                    <div 
+                    <div
                       key={category.id}
-                      className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                        selectedItems.includes(category.id) 
-                          ? 'border-destructive bg-destructive/5' 
-                          : 'border-border hover:bg-muted/50'
-                      }`}
+                      className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${selectedItems.includes(category.id)
+                        ? 'border-destructive bg-destructive/5'
+                        : 'border-border hover:bg-muted/50'
+                        }`}
                       onClick={() => toggleSelection(category.id)}
                     >
-                      <Checkbox 
+                      <Checkbox
                         checked={selectedItems.includes(category.id)}
                         onCheckedChange={() => toggleSelection(category.id)}
                       />
@@ -536,7 +559,7 @@ const AdminMasterData = () => {
                     Total: {categories.filter(c => selectedItems.includes(c.id)).reduce((acc, c) => acc + c.count, 0).toLocaleString()} records
                   </p>
                 </div>
-                <Button 
+                <Button
                   variant="destructive"
                   disabled={selectedItems.length === 0}
                   onClick={() => setBulkDeleteDialog(true)}
@@ -565,7 +588,7 @@ const AdminMasterData = () => {
               This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          
+
           {deleting ? (
             <div className="space-y-4">
               <Progress value={progress} />
@@ -579,7 +602,7 @@ const AdminMasterData = () => {
             <div className="space-y-4">
               <div>
                 <Label>Type "DELETE {confirmDialog.category?.name.toUpperCase()}" to confirm</Label>
-                <Input 
+                <Input
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value)}
                   placeholder={`DELETE ${confirmDialog.category?.name.toUpperCase()}`}
@@ -588,12 +611,12 @@ const AdminMasterData = () => {
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDialog({ open: false })} disabled={deleting}>
               Cancel
             </Button>
-            <Button 
+            <Button
               variant="destructive"
               disabled={deleting || confirmText !== `DELETE ${confirmDialog.category?.name.toUpperCase()}`}
               onClick={() => confirmDialog.category && deleteCategory(confirmDialog.category)}
@@ -617,7 +640,7 @@ const AdminMasterData = () => {
               {categories.filter(c => selectedItems.includes(c.id)).reduce((acc, c) => acc + c.count, 0).toLocaleString()} records.
             </DialogDescription>
           </DialogHeader>
-          
+
           {deleting ? (
             <div className="space-y-4">
               <Progress value={progress} />
@@ -639,7 +662,7 @@ const AdminMasterData = () => {
               </div>
               <div>
                 <Label>Type "BULK DELETE" to confirm</Label>
-                <Input 
+                <Input
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value)}
                   placeholder="BULK DELETE"
@@ -648,12 +671,12 @@ const AdminMasterData = () => {
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setBulkDeleteDialog(false)} disabled={deleting}>
               Cancel
             </Button>
-            <Button 
+            <Button
               variant="destructive"
               disabled={deleting || confirmText !== 'BULK DELETE'}
               onClick={bulkDelete}
@@ -689,7 +712,7 @@ const AdminMasterData = () => {
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          
+
           {deleting ? (
             <div className="space-y-4 py-4">
               <Progress value={progress} />
@@ -702,7 +725,7 @@ const AdminMasterData = () => {
           ) : (
             <div className="py-4">
               <Label>Type "RESET ALL DATA" to confirm</Label>
-              <Input 
+              <Input
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="RESET ALL DATA"
@@ -710,7 +733,7 @@ const AdminMasterData = () => {
               />
             </div>
           )}
-          
+
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
