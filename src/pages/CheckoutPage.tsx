@@ -230,7 +230,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <GovalyHeader />
       <main className="flex-1 bg-secondary/30">
         <div className="container py-8">
           {/* Breadcrumb */}
@@ -253,10 +253,10 @@ export default function CheckoutPage() {
                   >
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center ${currentStep > step.id
-                          ? 'bg-primary text-primary-foreground'
-                          : currentStep === step.id
-                            ? 'bg-primary/20 text-primary border-2 border-primary'
-                            : 'bg-secondary text-muted-foreground'
+                        ? 'bg-primary text-primary-foreground'
+                        : currentStep === step.id
+                          ? 'bg-primary/20 text-primary border-2 border-primary'
+                          : 'bg-secondary text-muted-foreground'
                         }`}
                     >
                       {currentStep > step.id ? (
@@ -448,8 +448,8 @@ export default function CheckoutPage() {
                     <div className="space-y-3">
                       <label
                         className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'cod'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-primary/50'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
                           }`}
                       >
                         <RadioGroupItem value="cod" />
@@ -464,8 +464,8 @@ export default function CheckoutPage() {
 
                       <label
                         className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'bkash'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-primary/50'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
                           }`}
                       >
                         <RadioGroupItem value="bkash" />
@@ -480,8 +480,8 @@ export default function CheckoutPage() {
 
                       <label
                         className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'nagad'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-primary/50'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
                           }`}
                       >
                         <RadioGroupItem value="nagad" />
@@ -496,8 +496,8 @@ export default function CheckoutPage() {
 
                       <label
                         className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'card'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-primary/50'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
                           }`}
                       >
                         <RadioGroupItem value="card" />

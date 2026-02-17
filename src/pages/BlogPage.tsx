@@ -2,17 +2,17 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  BookOpen, 
-  Calendar, 
-  Clock, 
-  Eye, 
-  Search, 
+import {
+  BookOpen,
+  Calendar,
+  Clock,
+  Eye,
+  Search,
   ArrowRight,
   Home,
   ChevronRight
@@ -77,14 +77,14 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <GovalyHeader />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden min-h-[280px] md:min-h-[350px] flex items-center">
         <div className="absolute inset-0 bg-gradient-to-br from-orange-600 to-amber-700" />
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,white)]" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-        
+
         <div className="container relative z-10 py-12 md:py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -99,7 +99,7 @@ export default function BlogPage() {
               <ChevronRight className="h-4 w-4" />
               <span className="text-white">Blog</span>
             </nav>
-            
+
             <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white glass-card">
                 <BookOpen className="h-8 w-8" />
@@ -177,7 +177,7 @@ export default function BlogPage() {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Content */}
                       <div className="p-6">
                         {/* Tags */}
@@ -190,17 +190,17 @@ export default function BlogPage() {
                             ))}
                           </div>
                         )}
-                        
+
                         <h2 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
                           {post.title}
                         </h2>
-                        
+
                         {post.excerpt && (
                           <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
                             {post.excerpt}
                           </p>
                         )}
-                        
+
                         {/* Meta */}
                         <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <div className="flex items-center gap-4">
@@ -218,9 +218,9 @@ export default function BlogPage() {
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="mt-4 flex items-center text-primary font-medium group-hover:gap-2 transition-all">
-                          Read More 
+                          Read More
                           <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>

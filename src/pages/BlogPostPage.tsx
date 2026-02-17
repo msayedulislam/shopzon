@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  BookOpen, 
-  Calendar, 
-  Eye, 
+import {
+  BookOpen,
+  Calendar,
+  Eye,
   ArrowLeft,
   Home,
   ChevronRight,
@@ -137,7 +137,7 @@ export default function BlogPostPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <GovalyHeader />
         <div className="container py-20">
           <Skeleton className="h-80 w-full rounded-2xl mb-8" />
           <Skeleton className="h-12 w-2/3 mb-4" />
@@ -156,7 +156,7 @@ export default function BlogPostPage() {
   if (!post) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <GovalyHeader />
         <div className="container py-20 text-center">
           <div className="max-w-md mx-auto">
             <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
@@ -179,7 +179,7 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <GovalyHeader />
 
       {/* Hero */}
       <section className="relative overflow-hidden">

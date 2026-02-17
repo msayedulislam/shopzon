@@ -195,7 +195,7 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <GovalyHeader />
       <main className="flex-1 bg-secondary/30">
         <div className="container py-8">
           {/* Breadcrumb */}
@@ -310,10 +310,10 @@ export default function ProductsPage() {
                   }
                 >
                   {filteredProducts.map((product, index) => (
-                    <ProductCard
+                    <GovalyProductCard
                       key={`prod-${product.id}-${index}`}
                       product={product}
-                      variant={viewMode === 'list' ? 'horizontal' : 'default'}
+                      index={index}
                     />
                   ))}
                 </div>

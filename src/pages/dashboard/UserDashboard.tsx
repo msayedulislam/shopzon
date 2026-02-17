@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  User, 
-  Package, 
-  Heart, 
-  MapPin, 
-  LogOut, 
+import {
+  User,
+  Package,
+  Heart,
+  MapPin,
+  LogOut,
   Menu,
   LayoutDashboard,
   ChevronRight,
   Settings,
   Wallet
 } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -188,7 +188,7 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <GovalyHeader />
       <main className="flex-1">
         <div className="container py-6 lg:py-8">
           {/* Mobile Header */}

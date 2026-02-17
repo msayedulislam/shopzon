@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -94,7 +94,7 @@ export default function StaticPage() {
   const [loading, setLoading] = useState(true);
   const [orderNumber, setOrderNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  
+
   // Contact form state
   const [contactForm, setContactForm] = useState({
     name: '',
@@ -110,7 +110,7 @@ export default function StaticPage() {
   useEffect(() => {
     async function fetchPage() {
       if (!slug) return;
-      
+
       setLoading(true);
       const { data, error } = await supabase
         .from('static_pages')
@@ -154,7 +154,7 @@ export default function StaticPage() {
     }
 
     setSubmitting(true);
-    
+
     const { error } = await supabase
       .from('contact_inquiries')
       .insert({
@@ -314,7 +314,7 @@ export default function StaticPage() {
 
   const formatText = (text: string) => {
     // Handle bold text
-    return text.split(/\*\*(.*?)\*\*/).map((part, i) => 
+    return text.split(/\*\*(.*?)\*\*/).map((part, i) =>
       i % 2 === 1 ? <strong key={i} className="text-foreground font-semibold">{part}</strong> : part
     );
   };
@@ -330,7 +330,7 @@ export default function StaticPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <GovalyHeader />
         <div className="container py-20">
           <Skeleton className="h-12 w-2/3 mb-4" />
           <Skeleton className="h-6 w-1/2 mb-8" />
@@ -348,7 +348,7 @@ export default function StaticPage() {
   if (!page) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <GovalyHeader />
         <div className="container py-20 text-center">
           <div className="max-w-md mx-auto">
             <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
@@ -373,14 +373,14 @@ export default function StaticPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
+      <GovalyHeader />
+
       {/* Hero Section with Image */}
       <section className="relative overflow-hidden min-h-[280px] md:min-h-[350px] flex items-center">
         {/* Background Image */}
         {heroImage ? (
           <>
-            <div 
+            <div
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
               style={{ backgroundImage: `url(${heroImage})` }}
             />
@@ -389,12 +389,12 @@ export default function StaticPage() {
         ) : (
           <div className={`absolute inset-0 bg-gradient-to-br ${gradientColor.replace('/90', '')} ${gradientColor.replace('/90', '/80')}`} />
         )}
-        
+
         {/* Decorative Elements */}
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,white)]" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-black/10 rounded-full blur-3xl" />
-        
+
         <div className="container relative z-10 py-12 md:py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -410,7 +410,7 @@ export default function StaticPage() {
               <ChevronRight className="h-4 w-4" />
               <span className="text-white">{page.title}</span>
             </nav>
-            
+
             <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white glass-card">
                 {icon}

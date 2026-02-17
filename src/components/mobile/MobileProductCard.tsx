@@ -80,7 +80,7 @@ export function MobileProductCard({ product, index = 0, variant = 'default' }: M
             {/* Product Info - Compact */}
             <div className="p-2">
               <h3 className="text-[11px] font-medium text-foreground line-clamp-2 min-h-[28px] leading-tight">
-                {shortName}
+                {product.name}
               </h3>
 
               {/* Price Row */}
@@ -101,7 +101,7 @@ export function MobileProductCard({ product, index = 0, variant = 'default' }: M
     );
   }
 
-  // Default variant - Standard card
+  // Default variant - Modern compact card
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -110,66 +110,44 @@ export function MobileProductCard({ product, index = 0, variant = 'default' }: M
     >
       <Link
         to={`/product/${product.slug}`}
-        className="block"
+        className="block bg-white dark:bg-card border border-border/50 rounded-lg overflow-hidden group"
       >
-        <motion.div
-          whileTap={{ scale: 0.98 }}
-          className="bg-white dark:bg-card rounded-lg overflow-hidden border border-border/30"
-        >
-          {/* Image Container */}
-          <div className="aspect-square relative bg-secondary/20">
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
+        <div className="aspect-square relative bg-secondary/10">
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+          {product.discount && product.discount > 0 && (
+            <span className="absolute top-0 left-0 px-2 py-0.5 text-[10px] font-bold bg-primary text-white rounded-br-lg">
+              -{product.discount}%
+            </span>
+          )}
+        </div>
 
-            {/* Discount Badge */}
-            {product.discount && product.discount > 0 && (
-              <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[9px] font-bold bg-primary text-white rounded">
-                -{product.discount}%
-              </span>
-            )}
+        <div className="p-2 space-y-1">
+          <h3 className="text-[12px] font-medium text-foreground line-clamp-2 min-h-[32px] leading-tight">
+            {product.name}
+          </h3>
 
-            {/* Wishlist Button */}
-            <motion.button
-              whileTap={{ scale: 0.85 }}
-              className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 dark:bg-card/90 flex items-center justify-center shadow-sm"
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-            >
-              <Heart className="h-3 w-3 text-muted-foreground" />
-            </motion.button>
+          <div className="flex items-center gap-1 mt-1">
+            <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+            <span className="text-[10px] text-muted-foreground">{product.rating || '4.5'}</span>
+            <span className="text-[10px] text-muted-foreground">• {product.sold || 0} sold</span>
           </div>
 
-          {/* Product Info */}
-          <div className="p-2">
-            <h3 className="text-[11px] font-medium text-foreground line-clamp-2 min-h-[28px] leading-tight">
-              {shortName}
-            </h3>
-
-            {/* Rating */}
-            <div className="flex items-center gap-1 mt-0.5">
-              <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
-              <span className="text-[9px] text-muted-foreground">{product.rating || '4.5'}</span>
-              <span className="text-[9px] text-muted-foreground">• {product.sold || 0} sold</span>
-            </div>
-
-            {/* Price */}
-            <div className="flex items-baseline gap-1.5 mt-1">
-              <p className="text-sm font-bold text-primary">
-                {formatPrice(product.price)}
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-bold text-primary">
+              {formatPrice(product.price)}
+            </p>
+            {product.originalPrice && product.originalPrice > product.price && (
+              <p className="text-[10px] text-muted-foreground line-through">
+                {formatPrice(product.originalPrice)}
               </p>
-              {product.originalPrice && product.originalPrice > product.price && (
-                <p className="text-[9px] text-muted-foreground line-through">
-                  {formatPrice(product.originalPrice)}
-                </p>
-              )}
-            </div>
+            )}
           </div>
-        </motion.div>
+        </div>
       </Link>
     </motion.div>
   );

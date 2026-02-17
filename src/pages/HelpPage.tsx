@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -175,7 +175,7 @@ export default function HelpPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <GovalyHeader />
       <main className="flex-1 container py-8">{content}</main>
       <Footer />
     </div>

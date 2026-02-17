@@ -54,7 +54,7 @@ export default function CategoriesPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <GovalyHeader />
 
       <main className="flex-1">
         {/* Hero Section */}

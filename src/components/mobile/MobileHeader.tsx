@@ -13,8 +13,8 @@ interface MobileHeaderProps {
   transparent?: boolean;
 }
 
-export function MobileHeader({ 
-  title = 'Jhuri', 
+export function MobileHeader({
+  title = 'Jhuri',
   showBack = false,
   backPath,
   showSearch = true,
@@ -24,7 +24,7 @@ export function MobileHeader({
   const navigate = useNavigate();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
-  
+
   const isHome = location.pathname === '/';
 
   useEffect(() => {
@@ -46,14 +46,13 @@ export function MobileHeader({
   };
 
   return (
-    <motion.header 
+    <motion.header
       initial={false}
       animate={{
         backgroundColor: scrolled || !transparent ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
       }}
-      className={`sticky top-0 z-50 safe-area-top transition-all duration-300 ${
-        scrolled ? 'glass-strong shadow-sm' : transparent ? '' : 'bg-white/85 dark:bg-card/85 backdrop-blur-xl'
-      } ${scrolled || !transparent ? 'border-b border-border/30' : ''}`}
+      className={`sticky top-0 z-50 safe-area-top transition-all duration-300 ${scrolled ? 'glass-strong shadow-sm' : transparent ? '' : 'bg-white/85 dark:bg-card/85 backdrop-blur-xl'
+        } ${scrolled || !transparent ? 'border-b border-border/30' : ''}`}
     >
       <div className="flex items-center justify-between h-14 px-4">
         {/* Left - Back Button or Brand */}
@@ -71,29 +70,22 @@ export function MobileHeader({
         </div>
 
         {/* Center - Title/Brand */}
-        <motion.div 
+        <motion.div
           className="flex-1 flex justify-center"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
           {isHome ? (
             <Link to="/" className="flex items-center gap-1.5">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center"
+              <span
+                className="text-xl font-bold tracking-tight text-primary"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
-                <span 
-                  className="text-xl font-bold"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                >
-                  <span className="bg-gradient-to-r from-primary via-primary to-rose-500 bg-clip-text text-transparent">Jhu</span>
-                  <span className="text-foreground">ri</span>
-                </span>
-              </motion.div>
+                Jhuri
+              </span>
             </Link>
           ) : (
-            <h1 
+            <h1
               className="text-base font-semibold text-foreground truncate max-w-[180px]"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
@@ -121,8 +113,8 @@ export function MobileHeader({
               className="w-9 h-9 rounded-full bg-secondary/60 dark:bg-secondary/40 flex items-center justify-center hover:bg-secondary transition-colors relative"
               aria-label="Notifications"
             >
-              <Bell className="h-4.5 w-4.5 text-muted-foreground" />
-              <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-white dark:ring-card" />
+              <Bell className="h-5 w-5 text-foreground" />
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary ring-2 ring-white" />
             </motion.button>
           )}
         </div>

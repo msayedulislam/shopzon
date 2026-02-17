@@ -31,7 +31,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <GovalyHeader />
         <main className="flex-1 flex items-center justify-center bg-secondary/30">
           <div className="text-center py-16">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
@@ -56,7 +56,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <GovalyHeader />
       <main className="flex-1 bg-secondary/30">
         <div className="container py-8">
           {/* Breadcrumb */}

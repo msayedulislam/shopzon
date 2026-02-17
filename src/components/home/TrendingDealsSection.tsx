@@ -72,7 +72,7 @@ export function TrendingDealsSection() {
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 className="aspect-square"
               >
-                <ProductCard product={product} compact />
+                <GovalyProductCard product={product} index={index} />
               </motion.div>
             ))}
           </div>

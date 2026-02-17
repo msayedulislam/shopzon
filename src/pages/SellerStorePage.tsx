@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Header } from '@/components/layout/Header';
+import { GovalyHeader } from '@/components/layout/GovalyHeader';
 import { Footer } from '@/components/layout/Footer';
 import { GovalyProductCard } from '@/components/product/GovalyProductCard';
 import { Button } from '@/components/ui/button';
@@ -100,7 +100,7 @@ export default function SellerStorePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <GovalyHeader />
         <main className="container mx-auto px-4 py-8">
           <div className="space-y-8">
             <Skeleton className="h-48 w-full rounded-2xl" />
@@ -119,7 +119,7 @@ export default function SellerStorePage() {
   if (!seller) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <GovalyHeader />
         <main className="container mx-auto px-4 py-20 text-center">
           <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h1 className="text-2xl font-bold mb-2">Store Not Found</h1>
@@ -135,7 +135,7 @@ export default function SellerStorePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <GovalyHeader />
 
       <main className="container mx-auto px-4 py-6">
         {/* Store Header */}
@@ -247,11 +247,11 @@ export default function SellerStorePage() {
                 : "flex flex-col gap-4"
               }>
                 {sortedProducts.map((product, index) => (
-                  <ProductCard
+                  <GovalyProductCard
                     key={`seller-product-${product.id}-${index}`}
                     product={product}
                     variant={viewMode === 'list' ? 'horizontal' : 'default'}
-                    compact={viewMode === 'grid'}
+                    index={index}
                   />
                 ))}
               </div>

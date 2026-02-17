@@ -119,7 +119,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <GovalyHeader />
       <main className="flex-1">
         {/* Hero Section with Gradient */}
         <div className="bg-gradient-to-br from-primary/5 via-background to-secondary/30">
@@ -567,7 +567,7 @@ export default function ProductDetailPage() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {relatedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <GovalyProductCard key={p.id} product={p} />
               ))}
             </div>
           </section>

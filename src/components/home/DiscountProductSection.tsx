@@ -67,7 +67,7 @@ export function DiscountProductSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <ProductCard product={product} />
+                <GovalyProductCard product={product} index={index} />
               </motion.div>
             ))}
           </div>

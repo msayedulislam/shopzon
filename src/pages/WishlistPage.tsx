@@ -156,7 +156,7 @@ export default function WishlistPage() {
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
+        <GovalyHeader />
         <main className="flex-1 container py-12">
           <div className="max-w-md mx-auto text-center py-16">
             <Heart className="h-20 w-20 mx-auto text-muted-foreground mb-6" />
@@ -178,7 +178,7 @@ export default function WishlistPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <GovalyHeader />
       <main className="flex-1">
         <div className="bg-gradient-to-br from-primary/5 via-background to-secondary/30 py-8">
           <div className="container">

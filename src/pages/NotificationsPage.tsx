@@ -1,4 +1,4 @@
-import { Header } from "@/components/layout/Header";
+import { GovalyHeader } from "@/components/layout/GovalyHeader";
 import { Footer } from "@/components/layout/Footer";
 import { MobileNotificationsPage } from "@/components/mobile/MobileNotificationsPage";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,7 +12,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <GovalyHeader />
       <main className="flex-1 bg-secondary/30">
         <div className="container py-10">
           <h1 className="text-2xl font-display font-bold text-foreground">Notifications</h1>
