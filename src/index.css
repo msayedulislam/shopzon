@@ -58,7 +58,7 @@
     --gradient-flash: linear-gradient(90deg, hsl(0 84% 55%), hsl(45 93% 50%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(0 0% 97%) 100%);
     --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
-    --gradient-premium: linear-gradient(135deg, hsl(0 84% 55%) 0%, hsl(330 80% 50%) 50%, hsl(280 70% 45%) 100%);
+    --gradient-premium: linear-gradient(135deg, hsl(0 84% 50%) 0%, hsl(340 80% 45%) 50%, hsl(280 70% 40%) 100%);
 
     /* Premium Shadows - Light Mode */
     --shadow-sm: 0 2px 4px 0 hsl(0 0% 0% / 0.05);
@@ -256,9 +256,9 @@
   }
 
   .btn-hero:hover {
-    background: hsl(0 72% 40%);
+    background: hsl(0 84% 45%);
     transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 40px hsl(0 72% 45% / 0.5), 0 0 60px hsl(0 72% 45% / 0.3);
+    box-shadow: 0 12px 40px hsl(0 84% 50% / 0.5), 0 0 60px hsl(0 84% 50% / 0.3);
   }
 
   .btn-hero-outline {
@@ -356,6 +356,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    @apply uppercase font-black tracking-tighter;
   }
 
   .text-gradient-accent {

@@ -44,14 +44,14 @@ export function Footer() {
             <div>
               <Link to="/" className="flex items-center gap-3 mb-6 group">
                 <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow group-hover:shadow-accent transition-shadow duration-500">
-                  <span className="text-primary-foreground font-bold text-2xl">J</span>
+                  <span className="text-primary-foreground font-black text-2xl tracking-tighter italic">G</span>
                 </div>
-                <span className="font-bold text-2xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  <span className="text-gradient">Jhu</span>ri
+                <span className="font-bold text-2xl uppercase italic tracking-tighter">
+                  <span className="text-primary">GOV</span>ALY
                 </span>
               </Link>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                Bangladesh's premium online marketplace for quality products at unbeatable prices.
+              <p className="text-sm font-semibold text-muted-foreground mb-6 leading-relaxed">
+                Govaly: Bangladesh's premium online marketplace for high-density quality products at unbeatable prices.
               </p>
               <div className="space-y-3">
                 <a href="tel:+8801234567890" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors duration-300">
@@ -60,11 +60,11 @@ export function Footer() {
                   </div>
                   +880 1234-567890
                 </a>
-                <a href="mailto:support@jhuri.com" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors duration-300">
+                <a href="mailto:support@govaly.com.bd" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors duration-300">
                   <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
                     <Mail className="h-4 w-4" />
                   </div>
-                  support@jhuri.com
+                  support@govaly.com.bd
                 </a>
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
@@ -166,9 +166,9 @@ export function Footer() {
           </div>
 
           {/* Copyright */}
-          <div className="mt-10 text-center text-sm text-muted-foreground">
+          <div className="mt-10 text-center text-xs font-bold text-muted-foreground uppercase tracking-widest">
             <p className="flex items-center justify-center gap-2">
-              © 2026 Jhuri. All rights reserved. Developed BY SA Coder
+              © 2026 GOVALY. All rights reserved. Developed BY GOVALY TECH
             </p>
           </div>
         </div>

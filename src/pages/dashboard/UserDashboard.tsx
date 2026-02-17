@@ -116,31 +116,34 @@ export default function UserDashboard() {
   };
 
   const Sidebar = ({ onNavigate }: { onNavigate?: () => void }) => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white dark:bg-card">
       {/* User Info */}
-      <div className="p-4">
-        <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-transparent rounded-xl">
-          <Avatar className="h-12 w-12 border-2 border-primary/20">
+      <div className="p-6">
+        <div className="flex flex-col items-center gap-4 p-6 bg-primary/5 rounded-[2.5rem] border border-primary/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-700" />
+          <Avatar className="h-20 w-20 border-4 border-white shadow-xl">
             <AvatarImage src={profile?.avatar_url} />
-            <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+            <AvatarFallback className="bg-primary text-primary-foreground font-black text-2xl">
               {getInitials(profile?.full_name || user?.email || 'User')}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">
-              {profile?.full_name || 'Welcome'}
+          <div className="text-center">
+            <p className="font-black text-lg uppercase tracking-tight italic">
+              {profile?.full_name || 'Govaly User'}
             </p>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
               {user?.email}
             </p>
           </div>
         </div>
       </div>
 
-      <Separator className="my-2" />
+      <div className="px-6">
+        <Separator className="bg-border/50" />
+      </div>
 
       {/* Menu Items */}
-      <nav className="flex-1 p-2 space-y-1">
+      <nav className="flex-1 p-4 space-y-2">
         {menuItems.map((item) => {
           const active = isActive(item);
           return (
@@ -152,35 +155,38 @@ export default function UserDashboard() {
                 navigate(item.path);
               }}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
+                'flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group relative overflow-hidden',
                 active
-                  ? 'bg-primary text-primary-foreground shadow-md'
-                  : 'hover:bg-secondary text-foreground'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                  : 'hover:bg-primary/5 text-foreground'
               ) + ' w-full text-left'}
             >
               <item.icon className={cn(
-                'h-5 w-5 transition-transform',
-                !active && 'group-hover:scale-110'
+                'h-5 w-5 transition-all duration-300',
+                active ? 'stroke-[3px]' : 'group-hover:text-primary group-hover:scale-110'
               )} />
-              <span className="flex-1 font-medium">{item.label}</span>
-              {!active && (
-                <ChevronRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-              )}
+              <span className="flex-1 text-[11px] font-black uppercase tracking-widest">{item.label}</span>
+              <ChevronRight className={cn(
+                'h-4 w-4 transition-all duration-300',
+                active ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0'
+              )} strokeWidth={3} />
             </button>
           );
         })}
       </nav>
 
-      <Separator className="my-2" />
+      <div className="px-6">
+        <Separator className="bg-border/50" />
+      </div>
 
       {/* Sign Out */}
-      <div className="p-2">
+      <div className="p-4">
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-destructive hover:bg-destructive/10 transition-all duration-200 group"
+          className="flex items-center gap-4 px-6 py-4 rounded-2xl w-full text-primary font-black uppercase tracking-widest hover:bg-primary/5 transition-all duration-300"
         >
-          <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform" />
-          <span className="font-medium">Sign Out</span>
+          <LogOut className="h-5 w-5" strokeWidth={3} />
+          <span>Sign Out</span>
         </button>
       </div>
     </div>
@@ -191,28 +197,28 @@ export default function UserDashboard() {
       <GovalyHeader />
       <main className="flex-1">
         <div className="container py-6 lg:py-8">
-          {/* Mobile Header */}
-          <div className="lg:hidden mb-6">
-            <div className="flex items-center justify-between bg-card rounded-xl p-4 border border-border">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
+          <div className="lg:hidden mb-10">
+            <div className="flex items-center justify-between bg-white dark:bg-card rounded-[2.5rem] p-6 border border-border/5 shadow-xl shadow-primary/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110" />
+              <div className="flex items-center gap-5 relative z-10">
+                <Avatar className="h-14 w-14 border-4 border-white dark:border-card shadow-lg">
                   <AvatarImage src={profile?.avatar_url} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                  <AvatarFallback className="bg-primary text-primary-foreground font-black text-xs uppercase">
                     {getInitials(profile?.full_name || user?.email || 'User')}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-semibold text-sm">{profile?.full_name || 'Welcome'}</p>
-                  <p className="text-xs text-muted-foreground">My Account</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1 italic">Authorized</p>
+                  <p className="font-black text-sm uppercase tracking-tighter italic">{profile?.full_name || 'Govaly Member'}</p>
                 </div>
               </div>
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <Menu className="h-5 w-5" />
+                  <Button variant="outline" size="icon" className="h-12 w-12 rounded-2xl border-border/10 bg-secondary/30 relative z-10">
+                    <Menu className="h-6 w-6 text-primary" strokeWidth={3} />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] p-0">
+                <SheetContent side="left" className="w-[300px] p-0 border-r-border/5">
                   <Sidebar onNavigate={() => setMobileMenuOpen(false)} />
                 </SheetContent>
               </Sheet>

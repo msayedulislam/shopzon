@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
-import { 
-  Package, 
-  Heart, 
-  MapPin, 
-  ShoppingBag, 
-  Truck, 
-  CheckCircle2, 
-  Clock, 
+import {
+  Package,
+  Heart,
+  MapPin,
+  ShoppingBag,
+  Truck,
+  CheckCircle2,
+  Clock,
   ArrowRight,
   Star,
   Gift
@@ -89,7 +89,7 @@ export default function DashboardOverview() {
 
       const orders = ordersResult.data || [];
       const activeStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'out_for_delivery'];
-      
+
       setStats({
         totalOrders: orders.length,
         activeOrders: orders.filter(o => activeStatuses.includes(o.status)).length,
@@ -145,205 +145,192 @@ export default function DashboardOverview() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border border-primary/10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-8">
+      {/* Welcome Section - Premium Govaly Design */}
+      <div className="relative overflow-hidden bg-white dark:bg-card p-8 rounded-[2.5rem] border border-border/5 shadow-xl shadow-primary/5 group">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-24 -mt-24 transition-transform group-hover:scale-110 duration-700" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
-            <p className="text-muted-foreground mb-1">{getGreeting()},</p>
-            <h1 className="text-2xl md:text-3xl font-bold">
-              {profile?.full_name || 'Welcome back!'}
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2 italic">Dashboard Overview</p>
+            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic">
+              {getGreeting()}, {profile?.full_name?.split(' ')[0] || 'Govaly User'}
             </h1>
-            <p className="text-muted-foreground mt-2">
-              Here's what's happening with your orders today.
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-3 opacity-70">
+              Your premium shopping experience at a glance
             </p>
           </div>
           <Link to="/products">
-            <Button className="gap-2 shadow-lg">
-              <ShoppingBag className="h-4 w-4" />
+            <Button className="h-14 rounded-2xl px-8 bg-primary text-white font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+              <ShoppingBag className="h-5 w-5 mr-3" strokeWidth={3} />
               Continue Shopping
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - High Density Uppercase */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat, index) => (
           <Link
             key={index}
             to={stat.link}
-            className="group bg-card rounded-xl p-4 border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+            className="group bg-white dark:bg-card rounded-3xl p-6 border border-border/5 shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 relative overflow-hidden"
           >
-            <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center mb-3`}>
-              <stat.icon className="h-6 w-6" />
+            <div className={`w-12 h-12 rounded-2xl ${stat.color} flex items-center justify-center mb-4 border border-current/10 shadow-inner`}>
+              <stat.icon className="h-6 w-6" strokeWidth={2.5} />
             </div>
-            <p className="text-2xl font-bold">{stat.value}</p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <p className="text-3xl font-black uppercase tracking-tighter italic">{stat.value}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-1 group-hover:text-primary transition-colors">{stat.label}</p>
+            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <ArrowRight className="h-4 w-4 text-primary" strokeWidth={3} />
+            </div>
           </Link>
         ))}
       </div>
 
-      {/* Recent Orders */}
-      <div className="bg-card rounded-2xl border border-border overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <h2 className="text-lg font-semibold">Recent Orders</h2>
-          <Link to="/dashboard/orders">
-            <Button variant="ghost" size="sm" className="gap-1 text-primary">
-              View All
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Recent Orders - Left Column */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="bg-white dark:bg-card rounded-[2.5rem] border border-border/5 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-8 py-6 border-b border-border/10">
+              <h2 className="text-sm font-black uppercase tracking-widest italic">Recent Orders</h2>
+              <Link to="/dashboard/orders">
+                <Button variant="ghost" size="sm" className="text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5">
+                  View All
+                  <ArrowRight className="h-3 w-3 ml-2" strokeWidth={3} />
+                </Button>
+              </Link>
+            </div>
+
+            {recentOrders.length === 0 ? (
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 rounded-3xl bg-secondary/50 flex items-center justify-center mx-auto mb-4 border border-border/10">
+                  <Package className="h-8 w-8 text-muted-foreground/30" strokeWidth={1.5} />
+                </div>
+                <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">No orders found yet</p>
+                <Link to="/products">
+                  <Button variant="outline" className="mt-6 rounded-2xl h-11 px-6 text-[10px] font-black uppercase tracking-widest">
+                    Start Your Search
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="divide-y divide-border/5">
+                {recentOrders.map((order) => {
+                  const StatusIcon = statusIcons[order.status] || Package;
+                  return (
+                    <div
+                      key={order.id}
+                      className="px-8 py-5 hover:bg-secondary/20 transition-all group"
+                    >
+                      <div className="flex items-center gap-6">
+                        {/* Order Images - Stacked */}
+                        <div className="flex -space-x-3">
+                          {order.order_items?.slice(0, 3).map((item: any, idx: number) => (
+                            <div
+                              key={idx}
+                              className="w-12 h-12 rounded-xl bg-white shadow-md border-2 border-white overflow-hidden shrink-0 group-hover:scale-105 transition-transform"
+                            >
+                              {item.product_image ? (
+                                <img
+                                  src={item.product_image}
+                                  alt={item.product_name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-secondary">
+                                  <Package className="h-5 w-5 text-muted-foreground/50" />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Order Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-black uppercase tracking-tighter truncate group-hover:text-primary transition-colors">
+                            {order.order_number}
+                          </p>
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
+                            {new Date(order.created_at).toLocaleDateString('en-BD', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </p>
+                        </div>
+
+                        {/* Status & Price */}
+                        <div className="text-right shrink-0">
+                          <Badge
+                            variant="outline"
+                            className={`${statusColors[order.status]} mb-1.5 rounded-full border-0 px-3 py-0.5 text-[9px] font-black uppercase tracking-widest`}
+                          >
+                            <StatusIcon className="h-2.5 w-2.5 mr-1.5" strokeWidth={3} />
+                            {order.status.replace('_', ' ')}
+                          </Badge>
+                          <p className="text-sm font-black uppercase tracking-tighter text-black dark:text-white">
+                            {formatPrice(order.total)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Widgets Row */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-white dark:bg-card p-6 rounded-[2rem] border border-border/5 shadow-sm">
+              <LoyaltyPointsWidget />
+            </div>
+            <div className="bg-white dark:bg-card p-6 rounded-[2rem] border border-border/5 shadow-sm">
+              <OrderTrackingWidget />
+            </div>
+          </div>
         </div>
 
-        {recentOrders.length === 0 ? (
-          <div className="p-8 text-center">
-            <Package className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-            <p className="text-muted-foreground">No orders yet</p>
-            <Link to="/products">
-              <Button variant="outline" className="mt-4">
-                Start Shopping
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="divide-y divide-border">
-            {recentOrders.map((order) => {
-              const StatusIcon = statusIcons[order.status] || Package;
-              return (
-                <div
-                  key={order.id}
-                  className="p-4 hover:bg-secondary/50 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Order Images */}
-                    <div className="flex -space-x-2">
-                      {order.order_items?.slice(0, 3).map((item: any, idx: number) => (
-                        <div
-                          key={idx}
-                          className="w-12 h-12 rounded-lg bg-secondary border-2 border-card overflow-hidden"
-                        >
-                          {item.product_image ? (
-                            <img
-                              src={item.product_image}
-                              alt={item.product_name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Package className="h-5 w-5 text-muted-foreground" />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                      {(order.order_items?.length || 0) > 3 && (
-                        <div className="w-12 h-12 rounded-lg bg-secondary border-2 border-card flex items-center justify-center text-xs font-medium">
-                          +{order.order_items.length - 3}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Order Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium">{order.order_number}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(order.created_at).toLocaleDateString('en-BD', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-
-                    {/* Status & Price */}
-                    <div className="text-right">
-                      <Badge 
-                        variant="outline" 
-                        className={`${statusColors[order.status]} mb-1`}
-                      >
-                        <StatusIcon className="h-3 w-3 mr-1" />
-                        {order.status.replace('_', ' ')}
-                      </Badge>
-                      <p className="font-semibold text-primary">
-                        {formatPrice(order.total)}
-                      </p>
-                    </div>
-                  </div>
+        {/* Quick Links - Sidebar Column */}
+        <div className="space-y-4">
+          {[
+            { title: 'Addresses', count: stats.addressCount, icon: MapPin, color: 'text-orange-500', bg: 'bg-orange-500/10', link: '/dashboard/addresses' },
+            { title: 'Wishlist', count: stats.wishlistCount, icon: Heart, color: 'text-pink-500', bg: 'bg-pink-500/10', link: '/dashboard/wishlist' },
+            { title: 'Wallet', subtitle: 'View Balance', icon: Gift, color: 'text-emerald-500', bg: 'bg-emerald-500/10', link: '/dashboard/wallet' }
+          ].map((item, i) => (
+            <Link
+              key={i}
+              to={item.link}
+              className="block p-2 bg-white dark:bg-card rounded-[2rem] border border-border/5 shadow-sm hover:shadow-lg transition-all active:scale-95 group"
+            >
+              <div className="flex items-center gap-4 p-4">
+                <div className={`w-14 h-14 rounded-2xl ${item.bg} ${item.color} flex items-center justify-center shrink-0 shadow-inner`}>
+                  <item.icon className="h-7 w-7" strokeWidth={2.5} />
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                <div className="flex-1">
+                  <h4 className="text-[11px] font-black uppercase tracking-widest">{item.title}</h4>
+                  <p className="text-[10px] font-bold text-muted-foreground mt-1 uppercase">
+                    {item.subtitle || `${item.count} saved`}
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" strokeWidth={3} />
+              </div>
+            </Link>
+          ))}
 
-      {/* Loyalty & Tracking Row */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <LoyaltyPointsWidget />
-        <OrderTrackingWidget />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <Link
-          to="/dashboard/addresses"
-          className="group bg-card rounded-xl p-5 border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-600 flex items-center justify-center">
-              <MapPin className="h-6 w-6" />
+          {/* Ad Banner Widget */}
+          <div className="relative rounded-[2.5rem] overflow-hidden h-40 shadow-xl shadow-primary/5">
+            <img
+              src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80"
+              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+              alt="Ad"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent p-6 flex flex-col justify-end">
+              <p className="text-[8px] font-black uppercase tracking-[0.4em] text-primary">Limited Offer</p>
+              <h3 className="text-white text-lg font-black uppercase tracking-tighter italic">Summer Sale</h3>
             </div>
-            <div className="flex-1">
-              <p className="font-semibold group-hover:text-primary transition-colors">
-                Manage Addresses
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {stats.addressCount} saved address{stats.addressCount !== 1 ? 'es' : ''}
-              </p>
-            </div>
-            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
           </div>
-        </Link>
-
-        <Link
-          to="/dashboard/wishlist"
-          className="group bg-card rounded-xl p-5 border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-pink-500/10 text-pink-600 flex items-center justify-center">
-              <Heart className="h-6 w-6" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold group-hover:text-primary transition-colors">
-                My Wishlist
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {stats.wishlistCount} item{stats.wishlistCount !== 1 ? 's' : ''} saved
-              </p>
-            </div>
-            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-          </div>
-        </Link>
-
-        <Link
-          to="/dashboard/wallet"
-          className="group bg-card rounded-xl p-5 border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-              <Gift className="h-6 w-6" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold group-hover:text-primary transition-colors">
-                Wallet & Rewards
-              </p>
-              <p className="text-sm text-muted-foreground">
-                View your credits
-              </p>
-            </div>
-            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-          </div>
-        </Link>
-      </div>
-    </div>
-  );
+        </div>
+        );
 }

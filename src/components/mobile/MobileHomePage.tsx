@@ -16,28 +16,34 @@ export function MobileHomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f7f7] pb-24">
-      <MobileHeader transparent />
+    <div className="flex flex-col min-h-screen bg-[#f7f7f7] dark:bg-background pb-24">
+      <MobileHeader />
 
       <main className="flex-1">
-        {/* Main Banner / Story Row could go here */}
-        <section className="bg-white px-3 py-2">
-          <div className="w-full h-40 rounded-xl overflow-hidden bg-secondary/20">
-            <img
-              src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80"
-              className="w-full h-full object-cover"
-              alt="Main Banner"
-            />
-          </div>
-        </section>
+        <MobileBanner />
 
-        <MobileCategories />
+        <div className="mt-4">
+          <MobileCategories />
+        </div>
 
-        <div className="space-y-3 mt-3">
+        <div className="space-y-4 mt-4">
           <MobileFlashSale />
-          <MobileNewProducts />
+
+          {/* Promo Section */}
+          <div className="px-3">
+            <div className="w-full h-32 rounded-3xl overflow-hidden shadow-lg shadow-primary/10">
+              <img
+                src="https://images.unsplash.com/photo-1549439602-43ebca2327af?w=800&q=80"
+                className="w-full h-full object-cover"
+                alt="Ad Banner"
+              />
+            </div>
+          </div>
+
           <MobileBestSellers />
-          <div className="px-3 pb-6">
+          <MobileNewProducts />
+
+          <div className="px-3 pb-8">
             <MobileAllProducts />
           </div>
         </div>

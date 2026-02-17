@@ -228,149 +228,146 @@ export default function AddressesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-card rounded-2xl border border-border p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8">
+      {/* Header - Premium Govaly Design */}
+      <div className="bg-white dark:bg-card rounded-[2.5rem] border border-border/5 p-8 shadow-xl shadow-primary/5 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
-            <h1 className="text-2xl font-bold">My Addresses</h1>
-            <p className="text-muted-foreground">
-              Manage your delivery addresses
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2 italic">Dashboard</p>
+            <h1 className="text-3xl font-black uppercase tracking-tighter italic">My Delivery Hub</h1>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-2 opacity-70">
+              Manage your premium shipping destinations
             </p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2" onClick={() => openDialog()}>
-                <Plus className="h-4 w-4" />
-                Add Address
+              <Button
+                className="h-14 px-8 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                onClick={() => openDialog()}
+              >
+                <Plus className="h-5 w-5 mr-3" strokeWidth={3} />
+                Add New Heritage
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[550px] rounded-[2.5rem] border-border/5 p-10">
               <DialogHeader>
-                <DialogTitle>
-                  {editingAddress ? 'Edit Address' : 'Add New Address'}
+                <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">
+                  {editingAddress ? 'Modify Heritage' : 'Register New Heritage'}
                 </DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+                <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name" className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Guardian Name</Label>
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="John Doe"
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="ENTER FULL NAME"
+                      className="h-12 bg-secondary/30 border-none rounded-2xl focus-visible:ring-primary shadow-inner font-bold uppercase tracking-widest text-[10px]"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
+                    <Label htmlFor="phone" className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Contact Protocol</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      placeholder="01XXXXXXXXX"
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="+880 XXXXXX"
+                      className="h-12 bg-secondary/30 border-none rounded-2xl focus-visible:ring-primary shadow-inner font-bold uppercase tracking-widest text-[10px]"
                       required
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="address">Street Address</Label>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between ml-1">
+                    <Label htmlFor="address" className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Detailed Coordinates</Label>
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={handleDetectLocation}
                       disabled={detecting}
-                      className="gap-1.5 h-7 text-xs"
+                      className="gap-2 h-6 text-primary hover:bg-primary/5 text-[8px] font-black uppercase tracking-[0.2em]"
                     >
-                      {detecting ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Navigation className="h-3 w-3" />
-                      )}
-                      {detecting ? 'Detecting...' : 'Detect Location'}
+                      {detecting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Navigation className="h-3 w-3" />}
+                      Sync Real-time
                     </Button>
                   </div>
                   <Input
                     id="address"
                     value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
-                    placeholder="House/Building, Road, Block"
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="HOUSE, ROAD, BLOCK, LANDMARK..."
+                    className="h-12 bg-secondary/30 border-none rounded-2xl focus-visible:ring-primary shadow-inner font-bold uppercase tracking-widest text-[10px]"
                     required
                   />
                 </div>
+
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
+                    <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Estate</Label>
                     <Input
                       id="city"
                       value={formData.city}
-                      onChange={(e) =>
-                        setFormData({ ...formData, city: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      className="h-12 bg-secondary/30 border-none rounded-2xl focus-visible:ring-primary shadow-inner font-bold uppercase tracking-widest text-[10px]"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="area">Area</Label>
+                    <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Sector</Label>
                     <Input
                       id="area"
                       value={formData.area}
-                      onChange={(e) =>
-                        setFormData({ ...formData, area: e.target.value })
-                      }
-                      placeholder="e.g., Dhanmondi"
+                      onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                      placeholder="AREA"
+                      className="h-12 bg-secondary/30 border-none rounded-2xl focus-visible:ring-primary shadow-inner font-bold uppercase tracking-widest text-[10px]"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="postal_code">Postal Code</Label>
+                    <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Code</Label>
                     <Input
                       id="postal_code"
                       value={formData.postal_code}
-                      onChange={(e) =>
-                        setFormData({ ...formData, postal_code: e.target.value })
-                      }
-                      placeholder="1205"
+                      onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+                      placeholder="POSTAL"
+                      className="h-12 bg-secondary/30 border-none rounded-2xl focus-visible:ring-primary shadow-inner font-bold uppercase tracking-widest text-[10px]"
                     />
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+
+                <div className="flex items-center space-x-3 bg-secondary/10 p-4 rounded-3xl border border-border/5">
                   <Checkbox
                     id="is_default"
                     checked={formData.is_default}
-                    onCheckedChange={(checked) =>
-                      setFormData({ ...formData, is_default: checked as boolean })
-                    }
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_default: checked as boolean })}
+                    className="border-primary data-[state=checked]:bg-primary rounded-lg h-5 w-5"
                   />
-                  <Label htmlFor="is_default" className="text-sm cursor-pointer">
-                    Set as default delivery address
+                  <Label htmlFor="is_default" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground cursor-pointer">
+                    Establish as Primary Delivery Site
                   </Label>
                 </div>
-                <div className="flex justify-end gap-3 pt-4">
+
+                <div className="flex justify-end gap-4 pt-4">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setDialogOpen(false)}
+                    className="h-12 px-8 rounded-2xl border-border/5 font-black uppercase tracking-widest text-[9px]"
                   >
-                    Cancel
+                    Abort
                   </Button>
-                  <Button type="submit" disabled={formLoading}>
-                    {formLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : editingAddress ? (
-                      'Update Address'
-                    ) : (
-                      'Add Address'
-                    )}
+                  <Button
+                    type="submit"
+                    disabled={formLoading}
+                    className="h-12 px-10 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-xl shadow-primary/20 text-[9px]"
+                  >
+                    {formLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : editingAddress ? 'Confirm Protocol' : 'Deploy Heritage'}
                   </Button>
                 </div>
               </form>
@@ -379,77 +376,80 @@ export default function AddressesPage() {
         </div>
       </div>
 
-      {/* Addresses */}
+      {/* Addresses Grid - High Density Layout */}
       {addresses.length === 0 ? (
-        <div className="bg-card rounded-2xl border border-border p-12 text-center">
-          <div className="w-20 h-20 rounded-full bg-orange-500/10 flex items-center justify-center mx-auto mb-4">
-            <MapPin className="h-10 w-10 text-orange-500" />
+        <div className="bg-white dark:bg-card rounded-[2.5rem] border border-border/5 p-20 text-center shadow-sm">
+          <div className="w-24 h-24 rounded-[2.5rem] bg-secondary/50 flex items-center justify-center mx-auto mb-8 border border-border/10">
+            <MapPin className="h-12 w-12 text-muted-foreground/30" strokeWidth={1} />
           </div>
-          <h2 className="text-xl font-semibold mb-2">No addresses saved</h2>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Add a delivery address to make checkout faster and easier.
+          <h2 className="text-2xl font-black uppercase tracking-tighter italic mb-4">No Registered Sites</h2>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-10 max-w-sm mx-auto leading-relaxed">
+            Register your delivery coordinates to enable rapid heritage deployment and priority logistics.
           </p>
-          <Button onClick={() => openDialog()} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Your First Address
+          <Button onClick={() => openDialog()} className="h-14 px-12 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+            Begin Site Integration
           </Button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-8">
           {addresses.map((address) => (
             <div
               key={address.id}
-              className={`bg-card rounded-2xl border-2 p-6 transition-all ${
-                address.is_default 
-                  ? 'border-primary shadow-lg shadow-primary/10' 
-                  : 'border-border hover:border-primary/30'
-              }`}
+              className={`bg-white dark:bg-card rounded-[2.5rem] border-2 p-8 transition-all group relative overflow-hidden ${address.is_default
+                ? 'border-primary shadow-2xl shadow-primary/10'
+                : 'border-border/5 shadow-sm hover:border-primary/20'
+                }`}
             >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                    address.is_default 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-secondary text-muted-foreground'
-                  }`}>
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
+
+              {/* Header Info */}
+              <div className="flex items-start justify-between relative z-10 mb-8">
+                <div className="flex items-center gap-5">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner border border-current/10 ${address.is_default
+                    ? 'bg-primary text-white'
+                    : 'bg-secondary text-muted-foreground'
+                    }`}>
                     {address.city === 'Dhaka' ? (
-                      <Building className="h-5 w-5" />
+                      <Building className="h-7 w-7" strokeWidth={2.5} />
                     ) : (
-                      <Home className="h-5 w-5" />
+                      <Home className="h-7 w-7" strokeWidth={2.5} />
                     )}
                   </div>
                   <div>
-                    <p className="font-semibold">{address.name}</p>
-                    <p className="text-sm text-muted-foreground">{address.phone}</p>
+                    <h3 className="text-base font-black uppercase tracking-tighter italic group-hover:text-primary transition-colors">{address.name}</h3>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-1 flex items-center gap-2">
+                      Protocol: <span className="text-black dark:text-white">{address.phone}</span>
+                    </p>
                   </div>
                 </div>
                 {address.is_default && (
-                  <Badge className="bg-primary/10 text-primary border-0">
-                    Default
+                  <Badge variant="outline" className="bg-primary hover:bg-primary rounded-full border-0 px-4 py-1.5 text-[8px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20">
+                    Primary
                   </Badge>
                 )}
               </div>
 
-              {/* Address Details */}
-              <div className="text-sm space-y-1 mb-6">
-                <p>{address.address}</p>
-                <p className="text-muted-foreground">
-                  {address.area}, {address.city}
-                  {address.postal_code && ` - ${address.postal_code}`}
+              {/* Coordinates */}
+              <div className="bg-secondary/10 p-6 rounded-[2rem] border border-border/5 relative z-10 mb-8">
+                <p className="text-[10px] font-bold text-muted-foreground leading-relaxed uppercase tracking-tight">
+                  {address.address}
                 </p>
+                <div className="flex items-center gap-3 mt-3 text-[10px] font-black uppercase tracking-widest text-primary">
+                  <Navigation className="h-3.5 w-3.5" />
+                  {address.area}, {address.city} {address.postal_code ? `• ${address.postal_code}` : ''}
+                </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex items-center gap-2 pt-4 border-t border-border">
+              {/* Actions Protocol */}
+              <div className="flex items-center gap-4 relative z-10 pt-6 border-t border-border/5">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => openDialog(address)}
-                  className="gap-1"
+                  className="h-10 px-5 rounded-xl border-border/5 text-[9px] font-black uppercase tracking-widest flex-1 sm:flex-none hover:bg-secondary"
                 >
-                  <Edit2 className="h-4 w-4" />
-                  Edit
+                  <Edit2 className="h-3.5 w-3.5 mr-2" strokeWidth={3} />
+                  Reconfigure
                 </Button>
                 {!address.is_default && (
                   <>
@@ -457,19 +457,17 @@ export default function AddressesPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => setAsDefault(address.id)}
-                      className="gap-1"
+                      className="h-10 px-5 rounded-xl border-primary/20 text-primary text-[9px] font-black uppercase tracking-widest flex-1 sm:flex-none hover:bg-primary hover:text-white"
                     >
-                      <Check className="h-4 w-4" />
-                      Set Default
+                      <Check className="h-3.5 w-3.5 mr-2" strokeWidth={3} />
+                      Set Primary
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:bg-destructive/10 ml-auto"
+                    <button
                       onClick={() => deleteAddress(address.id)}
+                      className="w-10 h-10 rounded-xl bg-secondary hover:bg-primary/10 text-muted-foreground hover:text-primary flex items-center justify-center transition-all ml-auto hover:rotate-12"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      <Trash2 className="h-5 w-5" strokeWidth={2.5} />
+                    </button>
                   </>
                 )}
               </div>

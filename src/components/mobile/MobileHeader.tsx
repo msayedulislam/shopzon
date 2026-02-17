@@ -65,7 +65,7 @@ export function MobileHeader({
               </button>
             )}
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-black text-primary tracking-tighter">
+              <span className="text-2xl font-black text-primary tracking-tighter uppercase italic">
                 GOVALY
               </span>
             </Link>
@@ -104,10 +104,10 @@ export function MobileHeader({
           <div className="px-3 pb-3">
             <div
               onClick={() => navigate('/search')}
-              className="flex items-center gap-2 h-10 px-3 bg-secondary/50 rounded-lg border border-border/30 text-muted-foreground transition-colors active:bg-secondary"
+              className="flex items-center gap-2 h-11 px-4 bg-secondary/30 rounded-2xl border border-border/10 text-muted-foreground transition-all active:scale-[0.98] shadow-sm"
             >
-              <Search className="h-4.5 w-4.5" />
-              <span className="text-sm">Search for products, brands...</span>
+              <Search className="h-4.5 w-4.5 text-primary" strokeWidth={3} />
+              <span className="text-xs font-bold uppercase tracking-tight">Search for products, brands...</span>
             </div>
           </div>
         )}
